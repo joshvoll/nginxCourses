@@ -1406,7 +1406,7 @@ If a user makes a request over HTTP, we can redirect to HTTPS using a 301 return
 		  <ol>
 		    <li>Use openssl to generate a cert and key in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx:</pre>
 <pre><code class="linux" data-trim contenteditable>
-	sudo openssl req -x509 -nodes –days 365 -newkey rsa:2048 -keyout nginx.key –out nginx.crt</code></pre></li>
+	sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx.key -out nginx.crt </code></pre></li>
 		    <li>In <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</pre> open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">example_ssl.conf</span></pre></li>
 		    <li>Uncomment the example HTTPS server block</li>
 		   	<li>Replace your cert and key with the one you generated</li>
