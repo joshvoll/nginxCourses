@@ -1,8 +1,5 @@
 # NGINX Core Course Materials
-This repository contains all of the training materials from today's session. To view the presentation you can either:
-
-1. Open the **nginxCore.html** file in your favorite browser
-2. View the **NGINX - CORE.pdf** file
+This repository contains all of the training materials from today's session. To view the presentation you can open the **nginxCore.html** file in your favorite browser
 
 The lab solutions cover the material for all of the configurations for part 1 (day 1) and part 2 (day 2).
 
