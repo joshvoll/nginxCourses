@@ -173,7 +173,7 @@ For those of you using Windows, you’ll want to a Linux OS on a virtual machine
 	      </section>
 	      
               <section>
-                <h3>Agenda: Day One</h3>
+                <h3>Agenda: Part One</h3>
 
                 <div style="text-align:left;">
                     <img src="assets/images/NGINXCoreAgenda1.png" style="border:0;background:none; left:0; top:0;">
@@ -1898,12 +1898,21 @@ map $uri $path {
 			<li>Set variable relationships as follows:
 				<ul>
 					<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">default  0;</span></pre></li>
-					<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">test1    1;</span></pre></li>
-					<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">test2    2;</span></pre></li>
-					<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">test3    3;</span></pre></li>
+					<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/test1    1;</span></pre></li>
+					<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/test2    2;</span></pre></li>
+					<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/test3    3;</span></pre></li>
 				</ul>
 			</li>
-		    <li>Save the file and reload Nginx. Run a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl</span></pre> command against http://server/test1. What do you observe? Try the other URIs</li>
+			<li>Create a regex for /test:
+				<pre><code class="linux" data-trim contenteditable>
+					server {
+	....
+	location ~* /test(\d+)$ {
+        return 200 "variable = $is_redirect \n";
+    }
+}
+				</code></pre></li>
+		    
 		  </ol>
 		  <aside class ="notes">
 		  	<p>Solution</p>
@@ -2093,11 +2102,11 @@ If the URI matches the pattern, it is then changed according to the specified re
 <section data-state="lab">
 		  <h3>Lab 8.1: Setting Up Rewrite Data</h3>
 		  <ol>
-		    <li>Inside your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public.html</span></pre> folder, ensure that there are the following directories and files: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/shop/products/product1.html product2.html product3.html</span></pre></li> 
+		    <li>Inside your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html</span></pre> folder, ensure that there are the following directories and files: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/shop/products/product1.html product2.html product3.html</span></pre></li> 
 			<li>Inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">product1.html</span></pre> edit the paragraph tag by removing <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">8080</span></pre> and replacing <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">&#60;server&#62;</span></pre> with your ec2 url</li> 
 			<pre><code class="html" data-trim contenteditable>
 				&#60;p&#62;
-&#60;img src="&#60;server&#62;:8080/media/pics/logo.png"/&#62;
+&#60;img src="&#60;server&#62;/media/pics/logo.png"/&#62;
 &#60;/p&#62;
 
 			</pre></code>
@@ -2112,7 +2121,7 @@ If the URI matches the pattern, it is then changed according to the specified re
 <section data-state="lab">
 		  <h3>Lab 8.2: Rewrite URLs</h3>
 		  <ol>
-		    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server2.conf</span></pre> in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</span></pre></li> 
+		    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre> in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</span></pre></li> 
 			<li>Inside the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context, define a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">rewrite</span></pre> regex:
 <pre><code class="html" data-trim contenteditable>
 	^/shop/greatproducts/(\d+)$ 
@@ -2259,13 +2268,13 @@ The redirected URL is formed based on the server name and port number of the req
 
  <!--Next Section-->
 		<section data-background="rgb(20, 149, 62)">
-                  <h2>End of Day One: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">Thank You!</span></pre></h2>
+                  <h2>End of Part One: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">Thank You!</span></pre></h2>
                  </section>
 
  <!--END OF DAY ONE!!!!!!!!!!!-->
 
 <section>
-                <h3>Agenda: Day Two</h3>
+                <h3>Agenda: Part Two</h3>
 
                 <div style="text-align:left;">
                     <img src="assets/images/NGINXCoreAgenda2.png" style="border:0;background:none; left:0; top:0;">
@@ -2599,15 +2608,15 @@ upstream myServers {
 	<p></p>
 <pre><code class="linux" data-trim contenteditable>
 	upstream myServers{
-    server localhost:8080 max_fails=3 fail_timeout=30s;
+    server backend1.example.com:8080 max_fails=3 fail_timeout=30s;
 	…
 }
 </code></pre>
 	<aside class="notes">
 <p>If NGINX fails to connect to or receive a response from a server, the server can be marked as unavailable for a period of time</p>
 <p>Subsequent requests will not be routed to that server until it is no longer unavailable</p>
-<p>max_fails parameter on the server directive specifies how many failures before a server is marked as unavailable</p>
-<p>fail_timeout parameter on the server directive specifies how long a server is unavailable for</p>
+<p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">max_fails</span></pre> parameter on the server directive specifies how many failures before a server is marked as unavailable</p>
+<p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">fail_timeout</span></pre> parameter on the server directive specifies how long a server is unavailable for</p>
 
 	</aside>
 </section>
@@ -2792,13 +2801,14 @@ $cookie_JESSIONID looks at the value of the cookie called JESSIONID, which is pr
 		    <li>In the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http</span></pre> context, create a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;"> log_format</span></pre> called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;"> sticky</span></pre></li>
 		    <li>Set the new log to:<pre><code class="linux" data-trim contenteditable>"$request\tUpstream: $upstream_addr \t URL token: $arg_serverid\t Cookie: $cookie_serverid"
 </code></pre> </li> 
-<li> Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">sticky route</span></pre> directive in your upstream group with the two variables: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$arg_serverid $cookie_serverid;</span></pre></li><li>Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">route</span></pre> parameter to each upstream like so: <pre><code class="linux" data-trim contenteditable>upstream myServers {
+<li> Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">sticky route</span></pre> directive with two variables: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$arg_serverid $cookie_serverid;</span></pre></li>
+<li>Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">route</span></pre> parameter to each upstream like so: <pre><code class="linux" data-trim contenteditable>upstream myServers {
 	zone backend 64k;
 	server &#60;backend_url&#62;:8081 route=backend1;
 	server &#60;backend_url&#62;:8082 route=backend2;
 	server &#60;backend_url&#62;:8083 route=backend3;
 }
-</code></pre> <span style="color:rgb(240,168,40);"><small>ask your instructor about the backend urls!!!</small></span></li>
+</code></pre> <span style="color:rgb(240,168,40);"><small>ask your instructor about changing the upstream backend urls!!!</small></span></li>
 		</ol>
 		  <aside class ="notes">
 		  	<p>Solution</p>
@@ -3170,6 +3180,7 @@ Uses the zone directive and health_check directive
 		  <h3>Lab 13.1: Server Maintenance</h3>
 		  <ol>
 		    <li>Open the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">myServers.conf</span></pre>, file</li>
+		    <li>Change your upstream <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> entries back to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">localhost:8081, localhost:8082, localhost:8083</span></pre></li>
 		    <li>Define a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">match</span></pre> block called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">health_conditions</span></pre> with the following directives:
 		    	<pre><code class="linux" data-trim contenteditable>
 		    		match health_conditions {
@@ -3571,8 +3582,8 @@ server {
 <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">myServers.conf</span></pre> and use a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">map</span></pre> to create a custom variable called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">purge_method</span></pre> that depends on the predefined <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">request_method</span></pre></li>
 <li>In the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">location</span></pre> where caching occurs, specify a condition for the cache purge request.</li>
 <li>Save and reload NGINX</li>
-<li>Send the purge command using the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl</span></pre> command, your machine url, and necessary port (http://&#60;server&#62;:8081).</li>
-<li>A successful purge should return an HTTP 204 code (no content).</li>
+<li>Send the purge command using the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl</span></pre> command, your machine url, and port. E.g. <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;server&#62;:8080</span></pre>.</li>
+<li>A successful purge should return an <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">HTTP 204</span></pre> code (no content).</li>
 		</ol>
 		    <aside class="notes">
 		    	<p>Solution:</p>
@@ -3591,10 +3602,6 @@ location / {
 		    </aside>
 		</section>
 
-<section>
-	<h3></h3>
-	<aside class="notes"> </aside>
-</section>
 
 <!--Next Section-->
 <section data-background="rgb(20, 149, 62)">
@@ -3764,16 +3771,19 @@ gunzip_buffers 32 4k;
 
 	</ul>
 	<p>Disadvantages</p>
+	<ul>
 	<li>Runtime config is not saved to conf file</li>
 	<li>Changes revert back to conf settings after reload (unless using <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">state</span></pre> directive)</li>
+</ul>
 	<aside class="notes"></aside>
 </section>
 
 <section>
 	<h3>Shared Memory Zone</h3>
-	<p>Required to make server dynamically configurable</p>
-	<p>Distributes traffic more evenly</p>
-	<p>Necessary for <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">state</span></pre> changes (covered later)</p>
+	<ul>
+	<li>Required to make server dynamically configurable</li>
+	<li>Distributes traffic more evenly</li>
+	<li>Necessary for <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">state</span></pre> changes (covered later)</li>
 	<aside class="notes">
 <p>Requires shared memory zone defined in the upstream group (i.e. zone directive) </p>
 <p>In NGINX, weights are managed independently per-worker process.  NGINX Plus uses a shared memory segment (the ‘zone’) for upstream data, so weights are shared between workers and traffic is distributed more accurately.
@@ -3909,10 +3919,10 @@ http://&#60;server&#62;:8080/upstream_conf?upstream=myServers&#38;id=0&#38;serve
 			<h3>Lab 17: Dynamic Config</h3>
 			<ol>
 <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">myServers.conf</span></pre> and add an <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">upstream_conf</span></pre> location prefix in the same server block where the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">status</span></pre> prefix is located.</li>
-<li>Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">upstream_conf</span></pre>directive inside the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">upstream_conf prefix</span></pre></li>
+<li>Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">upstream_conf</span></pre> directive inside the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">upstream_conf prefix</span></pre></li>
 <li>Open your browser and hit <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://server:9090/upstream_conf?upstream=myServers</span></pre>, note the id number of the first server</li>
 <li>Use the API commands to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">remove</span></pre> the server, then <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">add</span></pre> it back with a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">weight</span></pre> of 5</li>
-<li>Try using the status.html page to change the server details</li>
+<li>Try using the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">status.html</span></pre> page to change server details</li>
 		</ol>
 		    <aside class="notes">
 		    	<p>Solution:</p>
@@ -3928,8 +3938,8 @@ http://&#60;server&#62;:8080/upstream_conf?upstream=myServers&#38;id=0&#38;serve
 	<h3>Persistent Changes</h3>
 	<p>For SDP protocols that allow automatic detection of devices and/or services, changes must persist across reloads</p>
 	<ul>
-		<li>Documentation:<a href="https://www.nginx.com/blog/service-discovery-in-a-microservices-architecture/" target="_blank">Microservices architecture</a></li>
-		<li>Demo:<a href="https://www.nginx.com/blog/service-discovery-with-nginx-plus-and-consul/" target="_blank">Service Descovery with Consul</a></li>
+		<div><small>Documentation:<a href="https://www.nginx.com/blog/service-discovery-in-a-microservices-architecture/" target="_blank"> Microservices architecture</a></small></div>
+		<div><small>Demo:<a href="https://www.nginx.com/blog/service-discovery-with-nginx-plus-and-consul/" target="_blank"> Service Descovery with Consul</a></small></div>
 	</ul>
 	<aside class="notes">
 <p>Service instances sometimes have dynamically assigned network locations and use SDPs (service discovery protocols) that allow automatic detection of devices/services.</p>
@@ -3941,7 +3951,7 @@ http://&#60;server&#62;:8080/upstream_conf?upstream=myServers&#38;id=0&#38;serve
 
 <section>
 	<h3>state Directive</h3>
-	<p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">state</span></pre> name must match <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">zone</span></pre> name</p>
+	<p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">state</span></pre> name MUST match <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">zone</span></pre> name</p>
 	<p>Syntax: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">state <i>file/path.state</i></span></pre></p>
 	<pre><code class="linux" data-trim contenteditable>
     upstream myServers {
@@ -3996,6 +4006,27 @@ $ sudo chown nginx:nginx /var/lib/nginx/state
 		<li>Install NGINX from a binary distribution</li>
 		<li>Compile binary from source code</li>
 	<aside class="notes"></aside>
+</section>
+<section>
+	<h3>CentOS, RHEL</h3>
+	<ul>
+		<li>Setup <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">yum</span></pre> repository</li>
+		<li>Edit repo file to pull latest packages</li>
+		<li>Update repo</li>
+		<li>Install NGINX</li>
+	</ul>
+	<div style="text-align:center;"><small>Documentation: <a href="https://www.nginx.com/resources/admin-guide/installing-nginx-open-source/#prebuilt_redhat" target="_blank">CentOS/RHEL Install Guide</a></small></div>
+	<aside class="notes">The big thing to remember when installing open source with CentOS or RHEL, besides using yum, is to choose between using a RHEL/CentOS default repo, or setting up your own EPEL repo, and adding the necessary baseURL in your repo file.</aside>
+</section>
+
+<section>
+	<h3>Debian, Ubuntu</h3>
+	<ul>
+		<li>Authenticate repo signature</li>
+		<li>Retrieve distribution components </li>
+		<li>Resolve dependencies</li>
+		<li>Install NGINX</li>
+	</ul>
 </section>
 
 <section>
