@@ -336,7 +336,7 @@ The command you we will frequently use is the reload command because changes mad
                   <div style="float:right;width:45%;padding-right:0px;">
                   	<img src="assets/images/reloadConfig.png" width="45%" style="border:none; background:none; width:100%">
 		  </div>
-		  <div style="text-align:center;"><small>Documentation: <a href="http://nginx.org/en/docs/beginners_guide.html#control" target="_blank">Controlling the Configuration</a></small></div>
+		  
 		  <aside class="notes">
 		    <p>nginx –s reload command sends the master process a SIGHUP signal.</p>
 		    <p>The reload command is safe. Worker update is contingent upon lack of syntax errors
@@ -735,14 +735,16 @@ server {
 		  <ol>
 		    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</pre> and backup <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">default.conf</span></pre>.</li>
 		    <li>Create a new configuration called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre>.</li>
-		    <li>Create one <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context with a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">listen</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directive pointing to "/home/student1/public_html."</li>
-		   	<li>Add two <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">location</span></pre> prefixes for:
+		    <li>Create a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> listening on port <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">80</span></pre> and a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directive of <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/home/student1/public_html</span></pre></li>
+		   	<li>Add three <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">location</span></pre> prefixes for:
 		   		<ul>
 		   			<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application1</span></pre></li><li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application2</span></pre></li>
+		   			<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/images</span></pre></li>
 		   		</ul>
 		   	</li>
+		   	<li>In <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/images</span></pre> prefix, add <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root /data;</span></pre></li>
 		   	<li>Close and save the configuration. Then reload NGINX.</li>
-		    <li>Open your browser and test your server URL. Then test the "/application1" and "/application2" URI. What do you observe?</li>
+		    <li>Test your EC2 url with the following URIs <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application1</span></pre>, <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application2</span></pre>, and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/images/logo.png</span></pre> What do you observe?</li>
 		  </ol>
 		  <aside class ="notes">
 		  	<ol>
@@ -812,7 +814,7 @@ On the server which acts as a proxy, use the proxy_pass directive to pass reques
 		<p>Example:
 		<pre><code class="linux" data-trim contenteditable>
     location / {
-    	proxy_pass http://backend:8080/application
+    	proxy_pass http://backend:8080/application/;
 }
                     </code></pre></p>
 		<aside class="notes">
@@ -831,7 +833,7 @@ The URL can be a domain name or an IP address or a server group. Can also contai
 	<h4>With a Path</h4>
 	<pre><code class="linux" data-trim contenteditable>
 location /application1 {
-    proxy_pass http://localhost:8080/otherapp;
+    proxy_pass http://localhost:8080/otherapp/;
 }
 	</code></pre>
 	<h4>Without a Path</h4>
@@ -868,7 +870,7 @@ server {
 	}
 
 	location /application1 {
-	    proxy_pass http://localhost:8080/sampleApp;
+	    proxy_pass http://localhost:8080/sampleApp/;
 	}
 
 	location /images {
@@ -899,8 +901,8 @@ Will load the index.html page in /data/proxy/sampleapp</li>
 		  <h3>Lab 2: Setup a Reverse Proxy</h3>
 		  <ol>
 		    <li>Create a new configuration file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server2.conf</span></pre> inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</span></pre></li>
-		    <li>Define a server context that listens on port <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">8080</span></pre> and has a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directive pointing to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/server2</span></pre></li>
-		    <li>Open <strong>server1.conf</strong> from the previous exercise and modify the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application1</span></pre> context by adding a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_pass</span></pre> with the URI: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://localhost:8080/sampleApp/</span></pre></li>
+		    <li>Define a server context that listens on port <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">90</span></pre> and has a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directive pointing to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/server2</span></pre></li>
+		    <li>Open <strong>server1.conf</strong> from the previous exercise and modify the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application1</span></pre> context by adding a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_pass</span></pre> with the URI: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://localhost:90/sampleApp/</span></pre></li>
 		   	<li>Save and Reload NGINX</li>
 		    <li>Open your browser and test your server url/application1. What do you see?</li>
 		  </ol>
@@ -917,7 +919,7 @@ Will load the index.html page in /data/proxy/sampleapp</li>
 <li><pre><code class="linux" data-trim contenteditable>server {
  root /home/student1/public_html;
  location /application1 {
-   proxy_pass http://localhost:8080/sampleApp;
+   proxy_pass http://localhost:8080/sampleApp/;
   }
  location /images {
  root /data;
@@ -1157,7 +1159,7 @@ access_log syslog:server=[2001:db8::1]:12345,facility=local7,tag=nginx,severity=
 		    <li>Set the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">error_log</span></pre> to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">info</span></pre>, and the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">access_log</span></pre> to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">combined</span></pre></li>
 		    <li>Repeat the same steps for server2.conf</li>
 		   	<li>Save and Reload NGINX</li>
-		    <li>Open your browser and test your http://server:8080/</li>
+		    <li>Open your browser and test your http://server:90/</li>
 		    <li>Back in your terminal, run a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">tail -f</span></pre> command. What do you see?</li>
 		  </ol>
 		  <aside class ="notes">
@@ -1170,7 +1172,7 @@ access_log syslog:server=[2001:db8::1]:12345,facility=local7,tag=nginx,severity=
     access_log /var/log/nginx/server1.access.log combined;
 		
     location /application1 {
-	    proxy_pass http://localhost:8080/sampleApp;
+	    proxy_pass http://localhost:90/sampleApp/;
 	}
   		
     location /application2 {
@@ -2139,9 +2141,11 @@ If the URI matches the pattern, it is then changed according to the specified re
 		  </ol>
 		  <aside class ="notes">
 		  	<p>Solution</p>
-		  	<pre><code class="linux" data-trim contenteditable>
-        
-		  	</pre></code>
+		  	<pre><code class="html" data-trim contenteditable>
+rewrite ^/shop/greatproducts/(\d+)$ /shop/products/product1.html;
+       
+}
+</pre></code>
 </aside>
 		</section>
 
@@ -2165,7 +2169,9 @@ If the URI matches the pattern, it is then changed according to the specified re
 		  <aside class ="notes">
 		  	<p>Solution</p>
 		  	<pre><code class="linux" data-trim contenteditable>
-        
+        rewrite ^/media/pics/(.+\.(gif|jpe?g|png))$ /images/$1;
+
+   
 		  	</pre></code>
 </aside>
 		</section>
@@ -2364,7 +2370,6 @@ The redirected URL is formed based on the server name and port number of the req
 <section data-state="lab">
 		  <h3>Lab 10.1: Setup "Backends"</h3>
 		  <ol>
-		    <li>In <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/conf.d/</span></pre> backup <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server2.conf</span></pre> to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server2.conf.bak</span></pre></li>
 		    <li>In the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">conf.d</span></pre> directory, create a new .conf called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">backends.conf</span></pre> and define a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context with the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directive pointing to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/backend1</span></pre>. The server should listen on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">8081</span></pre></li>
 			<li>Repeat steps 1 and 2 for the remaning servers. Servers should listen on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">8082</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">8083</span></pre> respectively, and the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directories are <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/backend2</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/backend3</span></pre></li>
 		</ol>
@@ -2804,31 +2809,49 @@ $cookie_JESSIONID looks at the value of the cookie called JESSIONID, which is pr
 <li> Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">sticky route</span></pre> directive with two variables: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$arg_serverid $cookie_serverid;</span></pre></li>
 <li>Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">route</span></pre> parameter to each upstream like so: <pre><code class="linux" data-trim contenteditable>upstream myServers {
 	zone backend 64k;
-	server &#60;backend_url&#62;:8081 route=backend1;
-	server &#60;backend_url&#62;:8082 route=backend2;
-	server &#60;backend_url&#62;:8083 route=backend3;
+	server &#60;backend_url&#62;:8080 route=backend1;
+	server &#60;backend_url&#62;:8080 route=backend2;
+	server &#60;backend_url&#62;:8080 route=backend3;
 }
 </code></pre> <span style="color:rgb(240,168,40);"><small>ask your instructor about changing the upstream backend urls!!!</small></span></li>
 		</ol>
 		  <aside class ="notes">
-		  	<p>Solution</p>
+		  	<p>Note to instructor, if you haven't already please spinup the following Tomcat instances that are already pre-configured with the jvmRoute parameter</p>
+		  	<p>Command to access AMI (assuming you have the public key)</p>:
 		  	<pre><code class="linux" data-trim contenteditable>
-        log_format sticky  "$request \t Upstream: $upstream_addr \t Route URI: $route_uri \t Routing Cookie: $route_cookie \t All Cookies: $http_cookie \t Custom_cookie: '$upstream_cookie_<example>'";
+		  		ssh -i AWS_service_rocket_key.pub ec2-user@ec2-54-196-159-75.compute-1.amazonaws.com
+		  	</pre></code>
+		  	<p>Spinup the following machines:</p>
+		  	<pre><code class="linux" data-trim contenteditable>
+		  		ngx-launch-class ubuntu-backend1
+ngx-launch-class ubuntu-backend2
+ngx-launch-class ubuntu-backend3
+		  	</code></pre>
+		  	<p>Copy the URL for each machine and give it to the students. You won't have to log into any of these machines so don't worry about the student numbers and passwords</p>
+		  	<p>Lab Solution</p>
+		  	<pre><code class="linux" data-trim contenteditable>
+        log_format sticky  "$request \t Upstream: $upstream_addr \t Route URI: $route_uri \t Routing Cookie: $route_cookie \t All Cookies: $http_cookie \t ";
 
 upstream myServers {
-	server backend1 route=jvmRoute1;
-	server backend2 route=jvmRoute2;
-	server backend3 route=jvmRoute3;
+	server &#60;backend1&#62; route=jvmRoute1;
+	server &#60;backend2&#62; route=jvmRoute2;
+	server &#60;backend3&#62; route=jvmRoute3;
 
 	sticky $route_cookie $route_uri;
 }
 
 map $cookie_jsessionid $route_cookie { 	
-	~.+\.(?P<route>\w+)$ $route; 
+	~.+\.(?P&#60;route&#62;\w+)$ $route; 
 }
 
 map $request_uri $route_uri { 	
-	~jsessionid=.+\.(?P<route>\w+)$ $route; 
+	~jsessionid=.+\.(?P&#60;route&#62;\w+)$ $route; 
+}
+
+server {
+	listen 8080;
+	...
+	access_log /var/log/nginx/upstream.access.log sticky;
 }
 
 
@@ -2847,8 +2870,17 @@ map $request_uri $route_uri {
 		</ol>
 		  <aside class ="notes">
 		  	<p>Solution</p>
+		  	<p>You can test the below URIs in a browser (recommended so you can show students the source code once you hit the SessionExample), or you can use the curl requests below.</p>
+		  	<p>Make sure you run a tail command to show the new log_format in a separate or tabbed shell</p>
 		  	<pre><code class="linux" data-trim contenteditable>
-      
+		  		sudo tail -f /var/log/nginx/upstream.access.log
+
+
+      curl http://localhost:8080/
+      curl http://localhost:8080/examples/
+      curl http://localhost:8080/examples/servlets/
+      curl http://localhost:8080/examples/servlets/servlet/
+      curl http://localhost:8080/examples/servlets/servlet/SessionExample/
 		  	</pre></code>
 </aside>
 		</section>
@@ -3194,7 +3226,11 @@ Uses the zone directive and health_check directive
 		  <aside class ="notes">
 		  	<p>Solution</p>
 		  	<pre><code class="linux" data-trim contenteditable>
-      
+      match health_conditions {
+    status 200-399;
+    header Content-Type = text/html;
+    body !~ maintenance;
+}
 		  	</pre></code>
 </aside>
 		</section>
@@ -3214,6 +3250,26 @@ Uses the zone directive and health_check directive
 		    <li>Save and reload NGINX</li>
 		    <li> Refresh your browser listening on <pre><code class="linux" data-trim contenteditable>http://&#60;server&#62;:9090/status.html</code></pre></li>
 		</ol>
+		<aside class="notes">
+<pre><code class="linux" data-trim contenteditable>
+      match health_conditions {
+    status 200-399;
+    header Content-Type = text/html;
+    body !~ maintenance;
+}
+...
+
+server {
+	listen 8080;
+	...
+
+	location / {
+        proxy_pass http://myServers;
+        health_check match=health_conditions fails=2uri=/health/test.html;
+    }
+}
+		  	</pre></code>
+		</aside>
 	</section>
 </section>
 
@@ -3241,8 +3297,16 @@ Uses the zone directive and health_check directive
 			<li>Define a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">cache_path</span></pre></li>
 			<li>Configure the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_pass</span></pre></li>
 			<li>Reference the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">cache_key</span></pre></li>
+			<li>Validate the cacheability of content using <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_valid</span></pre>/li>
 		</ul>
-	<aside class="notes"></aside>
+	<aside class="notes">
+<p>NGINX uses a hybrid persistent cache that stores the content on disc, and the metadata about the cache in the shared memory zone. In order to instrument a cache, we must:</p>
+<ul>
+	<li>Define a cache using the proxy_cache_path directive</li>
+	<li>Define a proxy_pass in order to set the proxy_cache conditions for backend responses</li>
+	<li>Reference a cache_key which is used to create the md5 hash (metadata), in order to store this information in the shared memory zone</li>
+	<li>Validate the cacheability (usually dicated by the Cache-Control headers of the origin server) by specificy which responses are cached via proxy_cache_valid</li>
+	</aside>
 </section>
 
 <section>
@@ -3267,7 +3331,7 @@ Uses the zone directive and health_check directive
 
 <p>So for example if we make a request to http://www.example.com/images/logo.png, the first time we make that request NGINX will cache it. The second time we make the same request, nginx will check for a match against the cache_key, if there’s a match nginx will serve the request from the cache rather than proxy to the backend.</p>
 
-<p>The proxy_cache directive represents the shared memory zone used for caching. The name specified must match the name we specified in the proxy_cache_path directive</p>
+<p>The proxy_cache directive represents the shared memory zone used for caching the md5 hash. The name specified must match the name we specified in the proxy_cache_path directive</p>
 	</aside>
 </section>
 
