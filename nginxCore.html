@@ -2370,7 +2370,7 @@ The redirected URL is formed based on the server name and port number of the req
 <section data-state="lab">
 		  <h3>Lab 10.1: Setup "Backends"</h3>
 		  <ol>
-		    <li>In the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">conf.d</span></pre> directory, create a new .conf called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">backends.conf</span></pre> and define a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context with the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directive pointing to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/backend1</span></pre>. The server should listen on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">8081</span></pre></li>
+		    <li>In the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</span></pre> , create a new .conf called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">backends.conf</span></pre> and define a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context with the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directive pointing to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/backend1</span></pre>. The server should listen on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">8081</span></pre></li>
 			<li>Repeat steps 1 and 2 for the remaning servers. Servers should listen on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">8082</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">8083</span></pre> respectively, and the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directories are <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/backend2</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/backend3</span></pre></li>
 		</ol>
 		  <aside class ="notes">
@@ -2804,9 +2804,10 @@ $cookie_JESSIONID looks at the value of the cookie called JESSIONID, which is pr
 		  <ol>
 		    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">myServers.conf</span></pre> in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</span></pre></li>
 		    <li>In the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http</span></pre> context, create a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;"> log_format</span></pre> called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;"> sticky</span></pre></li>
-		    <li>Set the new log to:<pre><code class="linux" data-trim contenteditable>"$request\tUpstream: $upstream_addr \t URL token: $arg_serverid\t Cookie: $cookie_serverid"
+		    <li>Set the new log to:<pre><code class="linux" data-trim contenteditable>"\t Route URI: $route_uri \t Routing Cookie: $route_cookie \t All Cookies: $http_cookie \t ";
 </code></pre> </li> 
-<li> Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">sticky route</span></pre> directive with two variables: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$arg_serverid $cookie_serverid;</span></pre></li>
+<li> Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">sticky route</span></pre> directive with two variables: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$route_cookie $route_uri;</span></pre></li>
+<li>Change the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">access_log</span</pre> format to the new "sticky" <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">log_level</span></pre></li>
 <li>Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">route</span></pre> parameter to each upstream like so: <pre><code class="linux" data-trim contenteditable>upstream myServers {
 	zone backend 64k;
 	server &#60;backend_url&#62;:8080 route=backend1;
@@ -3249,6 +3250,11 @@ Uses the zone directive and health_check directive
 		    </li>
 		    <li>Save and reload NGINX</li>
 		    <li> Refresh your browser listening on <pre><code class="linux" data-trim contenteditable>http://&#60;server&#62;:9090/status.html</code></pre></li>
+		    <li>A server is down. To fix it, change the text "maintenance" in the test.html for backend3</li>
+		    <pre><code class="linux" data-trim contenteditable>
+		    	$ cd /data/server2/backend3/health/
+		    	$ sudo vim test.html
+		    		</code></pre>
 		</ol>
 		<aside class="notes">
 <pre><code class="linux" data-trim contenteditable>
@@ -3297,7 +3303,7 @@ server {
 			<li>Define a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">cache_path</span></pre></li>
 			<li>Configure the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_pass</span></pre></li>
 			<li>Reference the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">cache_key</span></pre></li>
-			<li>Validate the cacheability of content using <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_valid</span></pre>/li>
+			<li>Validate the cacheability of content using <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_valid</span></pre></li>
 		</ul>
 	<aside class="notes">
 <p>NGINX uses a hybrid persistent cache that stores the content on disc, and the metadata about the cache in the shared memory zone. In order to instrument a cache, we must:</p>
@@ -3404,16 +3410,24 @@ keys_zone=img_cache:20m inactive=5m;
 		    		</code></pre>
 		    </li>
 		    <li>In the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context, set the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_key</span></pre> to the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$scheme</span></pre>, <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$host</span></pre>, and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$request_uri</span></pre></li>
-		    <li>Set the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_set_header</span></pre> to forward the client IP address</li>
+		    <li>Add the following in your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre>context</li>
+		    <pre><code class="linux" data-trim contenteditable>
+		    proxy_cache_key $scheme$host$request_uri;
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</code></pre>
 		</ol>
 	</section>
 <section data-state="lab">
 			<h3>Lab 14.2: Proxy Cache Continued</h3>
 			<ol>
 			<li>Set the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache</span></pre> in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">application1</span></pre> prefix, and set the validation of the cache for 10 minutes.</li>
-			<li>Change the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_pass</span></pre> port from <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">8080</span></pre> to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">90</span></pre></li>
-			<li>Change <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server2.conf.bak</span></pre> back</span></pre> to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server2.conf</span></pre></li>
-			<li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server2.conf</span></pre> and change the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">listen</span></pre> port to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">90</span></pre></li>
+			<pre><code class="linux" data-trim contenteditable>
+				location /application1 {
+	proxy_cache img_cache;
+	proxy_cache_valid 10m;
+	proxy_pass http://localhost:90/sampleApp			</code></pre>
 		    <li>Save and reload NGINX</li>
 		    <li>Reload NGINX and make a request to <pre><code class="linux" data-trim contenteditable>http://&#60;server&#62;/application1</code></pre></li>
 		    <li>Hit refresh multiple times and then check your status.html in a separate tab. Notice the cache icon is now “warm” and the hit ratio is increasing</li>
@@ -3527,7 +3541,7 @@ This directive is useful if you have a lot of concurrent requests and you don’
 <section>
 	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">cache_methods</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">no_cache</span></pre></h3>
 	<p>Syntax: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_methods &#60;REQUEST METHOD&#62;</span></pre></p>
-	<p>Syntax: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_no_cache $arg$arg_comment</span></pre></p>
+	<p>Syntax: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_no_cache $arg</span></pre></p>
 <pre><code class="linux" data-trim contenteditable>
 	map $request_uri $no_cache;
     /default	0;
@@ -3557,7 +3571,15 @@ Proxy_no_cache is recommended if there’s a request URI that you don’t want t
 	<pre><code class="linux" data-trim contenteditable>
 		proxy_cache_path /data/nginx/cache keys_zone=one:10m loader_threshold=300 loader_files=200;
 	</code></pre>
-	<aside class="notes"></aside>
+	<aside class="notes">
+		<p>Cache Manager is a background process NGINX uses to prune the cache (evict old data based on max-age) that's dictated by your max_size, and timeout parameters in proxy_cache_path</p>
+		
+<p>A cache loader spins up at startup and runs once, loading metadata onto disk in small chunks: 100 files at a time, sandboxed to 200 ms, and then pausing for 50 ms in between, and then repeating until it’s worked its way through the entire cache and populated the shared memory segment.</p>
+
+<p>The cache loader then exits and doesn’t need to run again unless NGINX is restarted or reconfigured and the shared memory segment needs to be reinitialized.</p>
+
+<p>You can tune the operation of the cache loader, which may be appropriate if you have very fast disks and a light load. You can make it run faster or perhaps you might want to wind it back a little bit if you’re storing a cache with a huge number of files and slow disks and you don’t want the cache loader to use excessive amounts of CPU when NGINX starts up.</p>
+	</aside>
 </section>
 
 <section>
@@ -3583,7 +3605,7 @@ Syntax: proxy_cache_purge "string"</p>
 	<h3>Purge Methods</h3>
 	<p>Partial Purge</p>
 	<ul>
-		<li>use <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl</span></pre> command to send <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">PURGE HTTP</span></pre> request, <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">map</span></pre> evualtes request and enables the directive</li>
+		<li>use <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl</span></pre> command to send <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">PURGE HTTP</span></pre> request, <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">map</span></pre> evaluates request and enables the directive</li>
 	</ul>
 	<p>Full Purge</p>
 	<ul>
