@@ -1157,10 +1157,10 @@ access_log syslog:server=[2001:db8::1]:12345,facility=local7,tag=nginx,severity=
 		  <ol>
 		    <li>Open server1.conf at <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</span></pre> and add an <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">error_log</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">access_log</span></pre> directive</li>
 		    <li>Set the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">error_log</span></pre> to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">info</span></pre>, and the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">access_log</span></pre> to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">combined</span></pre></li>
-		    <li>Repeat the same steps for server2.conf</li>
+		    <li>Repeat the same steps for <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server2.conf</span></pre></li>
 		   	<li>Save and Reload NGINX</li>
-		    <li>Open your browser and test your http://server:90/</li>
-		    <li>Back in your terminal, run a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">tail -f</span></pre> command. What do you see?</li>
+		    <li>Open a browser, test <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://server/</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://server:90/</span></pre></li>
+		    <li>Back in your terminal, run a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">tail -f</span></pre> command for each <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">access_log</span></pre>. What do you see?</li>
 		  </ol>
 		  <aside class ="notes">
 		  	<p>Solution</p>
