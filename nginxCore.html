@@ -1185,7 +1185,7 @@ access_log syslog:server=[2001:db8::1]:12345,facility=local7,tag=nginx,severity=
 }
 
 server {
-    listen 8080;
+    listen 90;
     root /data/server2;
     error_log /var/log/nginx/server2.error.log info;
     access_log /var/log/nginx/server2.access.log combined;
