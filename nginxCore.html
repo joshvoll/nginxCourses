@@ -1538,24 +1538,17 @@ add_header X-Frame-Options DENY;
 </section>
 		
 		<section data-state="lab">
-		  <h3>Lab 4: Let's Encrypt</h3>
+		  <h3>Lab 4: SSL Certs</h3>
 		  <ol>
-		    <li>Add the certbot repositories to your apt utility, and update dependencies</li>
+		    <li>Create a directory for your certificates and key signatures</li>
 		    <pre><code class="linux" data-trim contenteditable>
-		    	$ sudo apt-get install software-properties-common
-$ sudo add-apt-repository ppa:certbot/certbot
-$ sudo apt-get update
-$ sudo apt-get install certbot  
+		    	  $ sudo mkdir /etc/nginx/ssl -p
 		    </code></pre>
-		    <li>Obtain a standalone certificate</li>
+		    <li>Run the following openssl command to generate a self-signed cert and key</li>
 		    <pre><code class="linux" data-trim contenteditable>
-		    	$ certbot certonly --standalone -d ec2-url.com -d www.ec2-url.com
+		    	$ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx.key -out nginx.crt
 		    </code></pre>
 		  </ol>
-		  <p></p>
-		  <div style="text-align:center;"><small>Documentation: <a href="https://certbot.eff.org/#ubuntuxenial-nginx" target="_blank">Certbot Installation</a></small></div>
-		  <aside class ="notes">
-		  	<p>Instructions: <a href "https://certbot.eff.org/#ubuntuxenial-nginx" target="_blank"> Link</a></p>
 
 </aside>
 
@@ -1564,12 +1557,12 @@ $ sudo apt-get install certbot
 		<section data-state="lab">
 		  <h3>Lab 4.2: Configure SSL Parameters</h3>
 		  <ol>
-		    <li>Add the following to a new file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl.params.conf</span></pre></li>
+		    <li>In conf.d, create and add the following to a new file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl.params.conf</span></pre></li>
 		    <pre><code class="linux" data-trim contenteditable>
-		    	ssl_certificate /etc/letsencrypt/live/&#60;ec2-url&#62;/fullchain.pem; 
-ssl_certificate_key /etc/letsencrypt/live/&#60;ec2-url&#62;/privkey.pem;
+		    	ssl_certificate /etc/nginx/ssl/nginx.crt; 
+ssl_certificate_key /etc/nginx/ssl/nginx.key;
 ssl_dhparam /etc/nginx/ssl/dhparam.pem;
-ssl_trusted_certificate /etc/letsencrypt/live/&#60;ec2-url&#62;/cert.pem;
+
 ssl_protocols TLSv1.2;
 ssl_ciphers "AES256+EECDH:AES256+EDH:!aNULL";
 ssl_prefer_server_ciphers on;
@@ -1584,7 +1577,7 @@ add_header X-Frame-Options DENY;
 add_header X-Content-Type-Options nosniff;
 
 		    </code></pre>
-		    <li>Change the certificate/key details to your certbot values.</li>
+		    <li>Save and Close the file</li>
 		  </ol>
 		  <aside class ="notes">
 		  	<ol>
