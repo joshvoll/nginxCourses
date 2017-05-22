@@ -1542,9 +1542,10 @@ add_header X-Frame-Options DENY;
 		  <ol>
 		    <li>Add the certbot repositories to your apt utility, and update dependencies</li>
 		    <pre><code class="linux" data-trim contenteditable>
-		    	sudo add-apt-repository ppa:certbot/certbot
+		    	$ sudo apt-get install software-properties-common
+$ sudo add-apt-repository ppa:certbot/certbot
 $ sudo apt-get update
-$ sudo apt-get install certbot 
+$ sudo apt-get install certbot  
 		    </code></pre>
 		    <li>Obtain a standalone certificate</li>
 		    <pre><code class="linux" data-trim contenteditable>
