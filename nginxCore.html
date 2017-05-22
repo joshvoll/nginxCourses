@@ -1538,7 +1538,7 @@ add_header X-Frame-Options DENY;
 </section>
 		
 		<section data-state="lab">
-		  <h3>Lab: Let's Encrypt</h3>
+		  <h3>Lab 4: Let's Encrypt</h3>
 		  <ol>
 		    <li>Add the certbot repositories to your apt utility, and update dependencies</li>
 		    <pre><code class="linux" data-trim contenteditable>
@@ -1562,7 +1562,7 @@ $ sudo apt-get install certbot
 		</section>
 
 		<section data-state="lab">
-		  <h3>Lab: Configure SSL Parameters</h3>
+		  <h3>Lab 4.2: Configure SSL Parameters</h3>
 		  <ol>
 		    <li>Add the following to a new file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl.params.conf</span></pre></li>
 		    <pre><code class="linux" data-trim contenteditable>
@@ -1593,7 +1593,7 @@ add_header X-Content-Type-Options nosniff;
 		</section>
 
 		<section data-state="lab">
-		  <h3>Lab: Configure HTTPS</h3>
+		  <h3>Lab 4.5: Configure HTTPS</h3>
 		  <ol>
 		  	<li>Save and open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">main.conf</span></pre></li>
 		    <li>Add a new <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">return</span></pre> directive in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context that redirects all traffic to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">https</span></pre></li>
@@ -1639,7 +1639,7 @@ server {
 		</section>
 
 		<section data-state="lab">
-		  <h3>Lab: Test on SSL Labs.com</h3>
+		  <h3>Lab 4.8: Test on SSL Labs.com</h3>
 		  <div style="float:left;width:50%;padding-right:0px;">
 		  <ol>
 		  	<li>Save and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">reload</span></pre> NGINX</li>
