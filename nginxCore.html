@@ -1195,22 +1195,23 @@ server {
 
 		</section>
 
-<!--Next Section-->
-		<section data-background="rgb(20, 149, 62)">
-                  <h2>Security</h2>
-                 </section>
+		<!--Adv. Security Module-->
+              <section data-background="rgb(20, 149, 62)">
+                <h2>Security</h2>
+              </section>
 
-                 <section>
+                <section>
                   <h3>Module Objectives</h3>
                   <p>This module enables you to:</p>
                   <ul>
-                    <li>Configure a HTTPS server</li>
-                    <li>Understand how NGINX handles SSL</li>
-                    <li>Set limit rates</li>
+                    <li>Signature Strength</li>
+                    <li>Cipher Strength</li>
+                    <li>A+ Score on SSL Labs.com</li>
 		  </ul>
                   <aside class="notes"></aside>
                 </section>
-		<section>
+
+                <section>
                 	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">http_ssl_module</pre></h3>
                 	<ul>
                 		<li>Provides directives for configuring and managing HTTPS servers</li>
@@ -1222,7 +1223,9 @@ server {
                 		<p>The only caveat here is that you must have openssl installed and configured on your machine</p>
                 	</aside>
                 </section>
-        <section>
+
+ 
+        	<section>
         	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">ssl</pre> vs. <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_ssl</pre></h3>
         	<img src="assets/images/sslvsproxyssl.png" style="border:0; background:none; width:100%">
         	<aside class="notes">
@@ -1268,96 +1271,6 @@ server {
         </section>
 
         <section>
-        	<h3>Configuring an HTTPS Server</h3>
-        	<ul>
-        		<li>Define <i>ssl</i> on listen port</li>
-        		<li>Generate trusted certificate and private key</li>
-        		<li>Configure protocols and ciphers</li>
-        	</ul>
-        	<aside class="notes">
-        		<p>So diving a little bit deeper, let's explore how to setup HTTPS based on each directive</p>
-        		<p>The first thing you may have noticed in the previous slide was that we were listening on the standard SSL port 443, and also we appeneded the ssl parameter on the listen port</p>
-        		<p>Next thing we need to do is define a certificate and private key. As a quick reminder the certs are sent to the clients, whereas the private key is used in the trust store to make sure the server is the legititmate destination</p>
-        		<p>Finally we can specifidy the ssl protocols and ciphers, which will indicate which device and browser combo are accpeted by the nginx configurations</p>
-        		<p>For example: older browsers, OS's, and platforms are vulnerable to various kinds of attacks, so limiting access to these will imporve website security, however there will be a trade off with alienating a portion of your user base.</p>
-        	</aside>
-        </section>
-
-        <section>
-        	<h3>Certs and Keys</h3>
-        	<p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_certificate</pre> = the public certificate</p>
-        	<p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_certificate_key</pre> = the private key</p>
-        	<pre><code class="linux" data-trim contenteditable>
-        		server  {
-    listen  443 ssl;
-    root /data;
-
-    error_log /var/log/nginx/secure_server.error.log
-
-    ssl_certificate /etc/nginx/nginx.crt:
-    ssl_certificate_key /etc/nginx/nginx.key;
-}
-
-        	</code></pre>
-        	<aside class="notes">
-        		<p>The server certificate is a public entity. It is sent to every client that connects to the server.</p> 
-
-<p>The private key is a secure entity and should be stored in a file with restricted access, however, it must be readable by nginx’s master process.</p> <p>The private key may alternately be stored in the same file as the certificate:</p>
-</aside>
-        </section>
-
-        <section>
-        	<h3>Protocols and Ciphers</h3>
-        	<p>ssl_protocols</p>
-        	<pre><code class="linux" data-trim contenteditable>
-        		ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
-        	</code></pre>
-        	<p>ssl_ciphers</p>
-        	<pre><code class="linux" data-trim contenteditable>
-ssl_ciphers ECDH+AESGCM:ECDH+AES256:ECDH+AES128:DH+3DES:!ADH:!AECDH:!MD5
-        	</code></pre>
-        	<div style="text-align:center;"><small>Documentation: <a href="http://nginx.org/en/docs/http/ngx_http_ssl_module.html#ssl_ciphers" target="_blank">SSL Ciphers</a></small></div>
-        	<aside class="notes">
-<p>Use the ssl_protocols directive to specify which protocols are enabled
-ssl_ciphers configures which ciphers to use</p>
-<p>Follows the OpenSSL format, and dependingin on which protocols you disable or enable it will provide more or less security. We have detailed explanations on how to get an A+ rating on SSLLabs.com in other courses, but these examples provide a general idea</p>
-        	</aside>
-        </section>
-
-        <section>
-        	<h3>Perferred Ciphers</h3>
-        	<p>Configure NGINX to tell client there is a preferred order of available cipher suites
-</p>
-<p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_prefer_server_ciphers on;</span></pre></p>
-        	<aside class="notes"></aside>
-        </section>
-
-        <section>
-        	<h3>Dual Stack "RSA" and "ECC"</h3>
-       <pre><code class="linux" data-trim contenteditable>
-       			server { 
-    listen 443 ssl; 
-    server_name example.com;
-
-    #RSA cert
-    ssl_certificate example.com.rsa.crt;
-    ssl_certificate_key example.com.rsa.key;
-
-    #ECC cert
-    ssl_certificate example.com.ecdsa.crt;
-    ssl_certificate_key example.com.ecdsa.key; 
-}
-       </code></pre>
-        	<aside class="notes">
-
-        		<p>ECC is 3x quicker than equivalent‑strength RSA certificates</p>
-<p>To support both RSA and ECC certificates, in the configuration include pair of ssl_certificate and ssl_certificate_key directives for each certificate type.</p>
-<p>With NGINX Plus R10, you can publish SSL/TLS services using both RSA and ECC certificates. In our testing, ECC certificates were up to 3x quicker than equivalent‑strength RSA certificates; this translates to more SSL/TLS connections per server and faster SSL/TLS handshakes.</p>
-<p>NGINX Plus selects the optimal certificate based on each client’s capabilities, allowing modern clients to use higher‑speed ECC certificates while still supporting legacy RSA‑only clients.
-</p>
-        	</aside>
-        </section>
-<section>
         <section>
         	<h3>Popular Use Cases</h3>
         	<p>Combine HTTP & HTTPS</p>
@@ -1403,36 +1316,348 @@ If a user makes a request over HTTP, we can redirect to HTTPS using a 301 return
         </section>
     </section>
 
-         <section data-state="lab">
-		  <h3>Lab 4: Configure HTTPS</h3>
-		  <ol>
-		    <li>Use openssl to generate a cert and key in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx:</pre>
+<section>
+	<h3>General Infrastructure Security</h3>
+	<ul>
+		<li>Turn off server_tokens</li>
+		<li>Turn off corresponding backend engine headers
+			<ul>
+				<li>X-Powered-By</li>
+			</ul>
+		</li>
+		<li>Change client side error pages</li>
+		<li>Encrypt ALL THE THINGS!!!</li>
+		<li>Test on <a href="https://www.ssllabs.com/ssltest/" target="_blank">SSL Labs.com</a></li>
+	</ul>
+	<aside class="notes"></aside>
+</section>
+
+<section>
+	<h3>Getting a Perfect SSL Score</h3>
+	<ul>
+		<li>Verify cert/chain in order and from trusted authority</li>
+		<li>Use strong signature algorithm</li>
+		<li>Use the latest protocol support</li>
+		<li>Generate strong key signature</li>
+		<li>Use preferred ciphers</li>
+	</ul>
+	<aside class="notes"></aside>
+</section>
+
+<section>
+	<h3>Configure HTTPS</h3>
+	<ul>
+		<li>Enable <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl</span></pre> on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">listen</span></pre> directive</li>
+		<li>Specify <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_certifcate</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_certificate_key</span></pre></li>
+	</ul>
+	<pre><code class="linux" data-trim contenteditable>
+		server  {
+    listen  443 ssl;
+    root /data;
+
+    ssl_certificate /etc/nginx/ssl/nginx.crt;
+    ssl_certificate_key /etc/nginx/ssl/nginx.key;
+
+}
+
+	</code></pre>
+	<aside class="notes"></aside>
+</section>
+
+<section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">ssl_dhparam</span></pre></h3>
+	<ul>
+		<li>Specifies a file with DH parameters for <a href="https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange" target="_blank">DHE</a> ciphers</li>
+		<li>Aids in Forward Secrecy</li>
+		<li>Make them strong, 4096 rather than 2048</li>
+	</ul>
 <pre><code class="linux" data-trim contenteditable>
-	sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx.key -out nginx.crt </code></pre></li>
-		    <li>In <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</pre> open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">example_ssl.conf</span></pre></li>
-		    <li>Uncomment the example HTTPS server block</li>
-		   	<li>Replace your cert and key with the one you generated</li>
-		    <li>Save and reload NGINX</li>
-		    <li>Test http://server/ index page using https</li>
-		    <li>Click-through the warning message, what do you see?</li>
+server  {
+    listen  443 ssl;
+    root /data;
+
+    ssl_certificate /etc/nginx/ssl/nginx.crt;
+    ssl_certificate_key /etc/nginx/ssl/nginx.key;
+    ssl_dhparam ssl/dhparam.pem; 
+}
+
+</code></pre>
+
+	<aside class="notes">
+<p>By default, Nginx will use the default DHE (Ephemeral Diffie-Hellman) paramaters provided by openssl. This uses a weak key that gets lower scores. The best thing to do is build your own. You can create a 2048 bit key, but it's better to toss a 4096 at NGINX. It will take a very long time to create, so there should be an existing one in your ssl directory.</p>
+
+<p>After you've build the key, go ahead and reference it using the ssl_dhparam directive</p>
+	</aside>
+</section>
+
+<section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">ssl_protocols</span></pre></h3>
+	<ul>
+		<li>Specifies which protocols are enabled</li>
+		<li>Best Practice: Only support TLS</li>
+		<li>Best Practice: Only support latest for higher rating</li>
+	</ul>
+	<pre><code class="linux" data-trim contenteditable>
+server  {
+    listen  443 ssl;
+    root /data;
+
+    ssl_certificate /etc/nginx/ssl/nginx.crt;
+    ssl_certificate_key /etc/nginx/ssl/nginx.key;
+    ssl_dhparam ssl/dhparam.pem; 
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+}
+
+</code></pre>
+	<aside class="notes">
+<p>The best place to start with securing your website is protocol support. It's a given that you shouldn't be using SSLv2. It should also be a given that you should no longer be using SSLv3. The recent POODLE vulnerability pretty much put the final knife in it.</p>
+<p>This means you should only support the TLS protocols.</p>
+<p>If you want a "perfect" score however, you should only use TLSv1.2</p>
+
+	</aside>
+</section>
+
+<section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">ssl_ciphers</span></pre></h3>
+	<ul>
+		<li>Specifies a list based on business needs</li>
+		<li>Moving target; ciphers constantly change, new security threats arise daily</li>
+		<li>Configure NGINX to force client to accept preferred order of ciphers</li>
+	</ul>
+	<pre><code class="linux" data-trim contenteditable>
+		server  {
+    listen  443 ssl;
+    root /data;
+
+    ssl_certificate /etc/nginx/ssl/nginx.crt;
+    ssl_certificate_key /etc/nginx/ssl/nginx.key;
+    ssl_dhparam ssl/dhparam.pem; 
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers AES256+EECDH:AES256+EDH:!aNULL;
+    ssl_prefer_server_ciphers on;
+}
+	</code></pre>
+	<aside class="notes">
+<p>This one especially is ever changing. What's best today, may not be so hot tomorrow. Here, you'll have a battle between high security and compatibility. Keeping with the topic of this module, we should care about security only.</p>
+	</aside>
+</section>
+
+<section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">ssl_stapling</span></pre></h3>
+	<ul>
+		<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_stapling</span></pre> ”staples” an OCSP response</li>
+<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_stapling_verify</span></pre>	verifies OCSP responses</li>
+<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_trusted_certificate</span></pre> required</li>
+</ul>
+<pre><code class="linux" data-trim contenteditable>
+	server  {
+    listen  443 ssl;
+    root /data;
+
+    ssl_certificate /etc/nginx/ssl/nginx.crt;
+    ssl_certificate_key /etc/nginx/ssl/nginx.key;
+    ssl_dhparam ssl/dhparam.pem; 
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers AES256+EECDH:AES256+EDH:!aNULL;
+    ssl_prefer_server_ciphers on;
+    ssl_stapling on;
+    ssl_stapling verify on;
+}
+</code></pre>
+	<aside class="notes">
+		<p>SSL Stapling doesn't exactly make you any more secure, but it does help the client significantly. In short, you help the client by telling them they can use your server for OCSP information for your domain instead of letting the browser make the request to an often unreliable outside resource.</p> <p>In more technical terms what's happening here is:</p>
+<ul>
+		<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_stapling</span></pre>  directive will ”staples” an OCSP response to the initial TLS handshake, thus relieving the client from having to contact the CA</li>
+<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_stapling_verify</span></pre>	Enables verification of OCSP responses by the server rather than the client</li>
+<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_trusted_certificate</span></pre> must be used in order for stapling to work. This ticket must contain the intermediate & root certificates (in that order from top to bottom). This ticket is usually indicated by the .pem extension</li>
+</ul>
+	</aside>
+</section>
+
+
+<section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">ssl_session</span></pre></h3>
+	<ul>
+		<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_session_cache</span></pre></li>
+		<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_session_timeout</span></pre></li>
+		<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_handshake_timeout</span></pre></li>
+	</ul>
+	<aside class="notes">
+<ul>
+	<li>ssl_session_cache shared:name:size; Size is specified in bytes or megabytes. Can be specified in the http or server context</li>
+<li>ssl_session_timeout. The session cache can be shared between workers and will timeout after 5 minutes by default</li>
+<li>ssl_handshake_timeout. Speeds up handshake operation, not recommend setting this value too low or too high.</li>
+</ul>
+
+	</aside>
+</section>
+
+<section>
+	<h3>HSTS</h3>
+	<ul>
+		<li>Forces browsers to communicate over <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">https</span></pre></li>
+		<li>Other Security Precautions:</li>
+		<ul>
+		<li>No-Content-Sniffing</li>
+		<li>No content displaying in iFrames</li>
+	</ul></li>
+	</ul>
+	<pre><code class="linux" data-trim contenteditable>
+		add_header Strict-Transport-Security max-age=63072000; 
+add_header X-Content-Type-Options nosniff;
+add_header X-Frame-Options DENY; 
+	</code></pre>
+	<aside class="notes"></aside>
+</section>
+
+<section>
+	<h3>"Dual Stack" RSA and ECC</h3>
+	<ul>
+		<li>ECC is 3x faster than RSA</li>
+		<li>Include both pairs to support both</li>
+	</ul>
+	<pre><code class="linux" data-trim contenteditable>
+		server { 
+    listen 443 ssl; 
+    server_name example.com;
+
+    ssl_certificate example.com.rsa.crt;    ssl_certificate_key example.com.rsa.key;
+    ssl_certificate example.com.ecdsa.crt;  ssl_certificate_key example.com.ecdsa.key; 
+}
+
+	</code></pre>	
+	<aside class="notes"></aside>
+</section>
+
+<section>
+	<h3>Elliptic Curves</h3>
+	<p>NGINX doesn’t have a good default for elliptic curves, so specify manually e.g.</p>
+	<p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl_ecdh_curve secp384r1;</span></pre></p>
+
+	<aside class="notes"></aside>
+</section>
+		
+		<section data-state="lab">
+		  <h3>Lab: Let's Encrypt</h3>
+		  <ol>
+		    <li>Add the certbot repositories to your apt utility, and update dependencies</li>
+		    <pre><code class="linux" data-trim contenteditable>
+		    	sudo add-apt-repository ppa:certbot/certbot
+$ sudo apt-get update
+$ sudo apt-get install certbot 
+		    </code></pre>
+		    <li>Obtain a standalone certificate</li>
+		    <pre><code class="linux" data-trim contenteditable>
+		    	$ certbot certonly --standalone -d ec2-url.com -d www.ec2-url.com
+		    </code></pre>
+		  </ol>
+		  <p></p>
+		  <div style="text-align:center;"><small>Documentation: <a href="https://certbot.eff.org/#ubuntuxenial-nginx" target="_blank">Certbot Installation</a></small></div>
+		  <aside class ="notes">
+		  	<p>Instructions: <a href "https://certbot.eff.org/#ubuntuxenial-nginx" target="_blank"> Link</a></p>
+
+</aside>
+
+		</section>
+
+		<section data-state="lab">
+		  <h3>Lab: Configure SSL Parameters</h3>
+		  <ol>
+		    <li>Add the following to a new file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl.params.conf</span></pre></li>
+		    <pre><code class="linux" data-trim contenteditable>
+		    	ssl_certificate /etc/letsencrypt/live/&#60;ec2-url&#62;/fullchain.pem; 
+ssl_certificate_key /etc/letsencrypt/live/&#60;ec2-url&#62;/privkey.pem;
+ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+ssl_trusted_certificate /etc/letsencrypt/live/&#60;ec2-url&#62;/cert.pem;
+ssl_protocols TLSv1.2;
+ssl_ciphers "AES256+EECDH:AES256+EDH:!aNULL";
+ssl_prefer_server_ciphers on;
+ssl_ecdh_curve secp384r1;
+ssl_session_cache shared:SSL:10m;
+ssl_session_timeout 10m;
+ssl_session_tickets off;
+ssl_stapling on;
+ssl_stapling_verify on;
+add_header Strict-Transport-Security "max-age=63072000; includeSubdomains";
+add_header X-Frame-Options DENY;
+add_header X-Content-Type-Options nosniff;
+
+		    </code></pre>
+		    <li>Change the certificate/key details to your certbot values.</li>
 		  </ol>
 		  <aside class ="notes">
-		  	<p>Solution</p>
-		  	<pre><code class="linux" data-trim contenteditable>
-		  		server {
-    listen 443 ssl;
-    root /usr/share/nginx/html;
-
-    ssl_certificate /etc/nginx/nginx.crt;
-    ssl_certificate_key /etc/nginx/nginx.key;
-...
-		  	</pre></code>
-
-
+		  	<ol>
+		  	</ol>
 </aside>
 		</section>
 
-<section>
+		<section data-state="lab">
+		  <h3>Lab: Configure HTTPS</h3>
+		  <ol>
+		  	<li>Save and open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">main.conf</span></pre></li>
+		    <li>Add a new <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">return</span></pre> directive in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context that redirects all traffic to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">https</span></pre></li>
+		    <pre><code class="linux" data-trim contenteditable>
+		    	server {
+    listen 80
+    listen [::]:80 default_server ipv6only=on;
+    return 301 https://$host$request_uri;
+}
+
+		    </code></pre>
+		    <li>Add another <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> listening on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">433</span></pre>, using <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl</span></pre> and includes <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl.params.conf</span></pre></li>
+		     <pre><code class="linux" data-trim contenteditable>
+		    	server { 
+    listen 443 ssl; 
+    include /etc/nginx/conf.d/ssl.params.conf;
+    }
+}
+</code></pre>
+		  </ol>
+		  <aside class ="notes">
+		  	<pre><code class="linux" data-trim contenteditable>
+		  	server {
+    listen 80;
+    listen [::]:80 default_server ipv6only=on;
+    error_log /var/log/nginx/main.error.log info;
+    access_log /var/log/nginx/main.access.log combined;
+    return 301 https://$host$request_uri;
+    status_zone redirect;
+}
+
+server {
+    listen 443 ssl;
+    root /usr/share/nginx/html;
+    error_log /var/log/nginx/upstream.error.log info;
+    access_log /var/log/nginx/upstream.access.log combined;
+
+    include /etc/nginx/conf.d/ssl.params.conf;
+    ...
+}
+</code></pre>
+</aside>
+		</section>
+
+		<section data-state="lab">
+		  <h3>Lab: Test on SSL Labs.com</h3>
+		  <div style="float:left;width:50%;padding-right:0px;">
+		  <ol>
+		  	<li>Save and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">reload</span></pre> NGINX</li>
+		  	<li>Test your site on <a href="https://www.ssllabs.com/ssltest/" target="_blank">SSL Labs.com</a></li>
+		    <li>Share your results with the class</li>
+		  </ol>
+		</div>
+
+		  <div style="float:right;width:40%;padding-right:0px;">
+		  	<img src="assets/images/aPlus.png" style="border:0; background:none; width:80%">
+		  </div>
+
+		  <aside class ="notes">
+		  	<ol>
+		  	</ol>
+</aside>
+		</section>
+
+		<section>
         <h3>Restricting Access</h3>
         <ul>
         	<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">allow</pre> specifies access to a server or location block</li>
@@ -1695,6 +1920,7 @@ limit_rate speed</p>
     </section>
 
 </section>
+
 
 <!--Next Section-->
 		<section data-background="rgb(20, 149, 62)">
