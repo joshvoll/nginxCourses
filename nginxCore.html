@@ -1538,7 +1538,7 @@ add_header X-Frame-Options DENY;
 </section>
 		
 		<section data-state="lab">
-		  <h3>Lab 4: SSL Certs</h3>
+		  <h3>Lab 4.1: SSL Certs</h3>
 		  <ol>
 		    <li>Create a directory for your certificates and key signatures</li>
 		    <pre><code class="linux" data-trim contenteditable>
@@ -1557,11 +1557,10 @@ add_header X-Frame-Options DENY;
 		<section data-state="lab">
 		  <h3>Lab 4.2: Configure SSL Parameters</h3>
 		  <ol>
-		    <li>In conf.d, create and add the following to a new file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl.params.conf</span></pre></li>
+		    <li>In the new  <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl</span></pre> directory, create and add the following to a new file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl.params.conf</span></pre></li>
 		    <pre><code class="linux" data-trim contenteditable>
 		    	ssl_certificate /etc/nginx/ssl/nginx.crt; 
 ssl_certificate_key /etc/nginx/ssl/nginx.key;
-ssl_dhparam /etc/nginx/ssl/dhparam.pem;
 
 ssl_protocols TLSv1.2;
 ssl_ciphers "AES256+EECDH:AES256+EDH:!aNULL";
@@ -1570,8 +1569,7 @@ ssl_ecdh_curve secp384r1;
 ssl_session_cache shared:SSL:10m;
 ssl_session_timeout 10m;
 ssl_session_tickets off;
-ssl_stapling on;
-ssl_stapling_verify on;
+
 add_header Strict-Transport-Security "max-age=63072000; includeSubdomains";
 add_header X-Frame-Options DENY;
 add_header X-Content-Type-Options nosniff;
@@ -1586,9 +1584,9 @@ add_header X-Content-Type-Options nosniff;
 		</section>
 
 		<section data-state="lab">
-		  <h3>Lab 4.5: Configure HTTPS</h3>
+		  <h3>Lab 4.3: Configure HTTPS</h3>
 		  <ol>
-		  	<li>Save and open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">main.conf</span></pre></li>
+		  	<li>Save and open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre></li>
 		    <li>Add a new <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">return</span></pre> directive in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context that redirects all traffic to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">https</span></pre></li>
 		    <pre><code class="linux" data-trim contenteditable>
 		    	server {
@@ -1598,11 +1596,11 @@ add_header X-Content-Type-Options nosniff;
 }
 
 		    </code></pre>
-		    <li>Add another <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> listening on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">433</span></pre>, using <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl</span></pre> and includes <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl.params.conf</span></pre></li>
+		    <li>Add another <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context that listens on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">433</span></pre>, enables <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl</span></pre>, and includes <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl.params.conf</span></pre></li>
 		     <pre><code class="linux" data-trim contenteditable>
 		    	server { 
     listen 443 ssl; 
-    include /etc/nginx/conf.d/ssl.params.conf;
+    include /etc/nginx/ssl/ssl.params.conf;
     }
 }
 </code></pre>
@@ -1632,12 +1630,13 @@ server {
 		</section>
 
 		<section data-state="lab">
-		  <h3>Lab 4.8: Test on SSL Labs.com</h3>
+		  <h3>Lab 4.4: Test on SSL Labs.com</h3>
 		  <div style="float:left;width:50%;padding-right:0px;">
 		  <ol>
 		  	<li>Save and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">reload</span></pre> NGINX</li>
 		  	<li>Test your site on <a href="https://www.ssllabs.com/ssltest/" target="_blank">SSL Labs.com</a></li>
 		    <li>Share your results with the class</li>
+		   <li>You should receive a "T" rating</li>
 		  </ol>
 		</div>
 
@@ -1647,6 +1646,7 @@ server {
 
 		  <aside class ="notes">
 		  	<ol>
+		  		 <li>You should recieve a rating of "T," because we're using self-signed certificates (below the T rating in small print should tell you your score if all trust issues are resolved)</li>
 		  	</ol>
 </aside>
 		</section>
