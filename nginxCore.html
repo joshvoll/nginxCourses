@@ -1086,6 +1086,68 @@ FOr the example: this is the output and what gets written to the access.log usin
                 </section>
 
                 <section>
+                	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">access_log</span></pre> Rules</h3>
+                	
+                		<ul>
+                			<li>Default locations
+                				<ul>
+                					<li>From source: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">logs/access.log</span></pre></li>
+                					<li>Binary dist: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/var/log/nginx/access.log</span></pre></li>
+                				</ul></li>
+                			<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">log_format</span></pre> overrides default setting</li>
+                			<li>Defined using variables</li>
+                		</ul>
+                	
+                	<aside class="notes">
+<p>Here are the following log file locations whether you're using a built-from-source NGINX binary, or you downloaded a binary distribution</p>
+<p>The log format allows you to create custom log files and override the what's set at the global level i.e. nginx.conf.</p>
+<p>Each log format is defined using the values stored in variables. Most of the examples you see if you look in nginx.conf are module variables, but we cover variables a little bit later in the course</p>
+                	</aside>
+                </section>
+
+                <section>
+                	<h3>Useful Troubleshooting Variables</h3>
+                	
+                		<ul>
+                			<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$upstream_connect_time</span></pre></li>
+                			<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$upstream_header_time</span></pre></li>
+                			<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$upstream_response_time</span></pre></li>
+                			<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$request_time</span></pre></li>
+                		</ul>
+                	
+                	<aside class="notes">
+<ul>
+	<li>The time spent on establishing a connection with an upstream server</li>
+	<li>The time between establishing a connection and receiving the first byte of the response header from the upstream server</li>
+	<li>The time between establishing a connection and receiving the last byte of the response body from the upstream server</li>
+	<li>The total time spent processing a request</li>
+
+</ul>
+                	</aside>
+                </section>
+
+                <section>
+                	<h3>Reading the Logs</h3>
+                	<p>Various time result values:</p>
+                	<ul>
+                		<li>Separated by <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">,</span></pre></li>
+                		<li>Separated by <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">;</span></pre></li>
+                		<li>Separated by <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">0</span></pre></li>
+                		<li>Contains <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">-</span></pre></li>
+                	</ul>
+                	
+                	<aside class="notes">
+<p>Here are some rules how to read the resulting time values:</p>
+<ul>
+<li>When a request is processed through several servers, the variable contains several values separated by commas</li>
+<li>When there is an internal redirect from one upstream group to another, the values are separated by semicolons</li>
+<li>When a request is unable to reach an upstream server or a full header cannot be received, the variable contains “0” (zero)</li>
+<li>In case of internal error while connecting to an upstream or when a reply is taken from the cache, the variable contains “-” (hyphen)</li>
+</ul>
+                	</aside>
+                </section>
+
+                <section>
                 	<h3>Logging Best Practices</h3>
                 	<p>Keep a separate log files for each server</p>
                 	<pre><code class="linux" data-trim contenteditable>
@@ -1194,8 +1256,23 @@ server {
 </aside>
 
 		</section>
+		<section>
+			<h3>Conditional Logging</h3>
+			<p>Use variables to determine "logability"</p>
+			<pre><code class="linux" data-trim contenteditable>
+				map $status $loggable {
+    ~^[23]  0;
+    default 1;
+}
 
-		<!--Adv. Security Module-->
+access_log /path/to/access.log combined if=$loggable;
+			</code></pre>
+			<aside class="notes">
+<p>We cover more on the map directive, and variables later in the course, but this example is to show how we can leverage the if parameter of the access_log in order to determine conditions for NGINX to write to the log file. The advantage with this technique is you can exclude specific status codes (in this case successful and redirects) so that your logfile only consists of failed attempts.</p>
+			</aside>
+		</section>
+
+		<!--Security Module-->
               <section data-background="rgb(20, 149, 62)">
                 <h2>Security</h2>
               </section>
@@ -2134,7 +2211,10 @@ map $uri $path {
     }
 }
 				</code></pre></li>
-		    
+				<li>Test the map using curl. For example:
+		    <pre><code class="linux" data-trim contenteditable>
+curl http://localhost/test1
+		    </code></pre></li>
 		  </ol>
 		  <aside class ="notes">
 		  	<p>Solution</p>
@@ -2159,7 +2239,29 @@ curl http://localhost/test1, /test2, /test3, /test4, /test4241234
 </aside>
 		</section>
 
-		<!--Next Section-->
+		
+
+ <!--Next Section-->
+		<section data-background="rgb(20, 149, 62)">
+                  <h2>End of Part One: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">Thank You!</span></pre></h2>
+                 </section>
+
+ <!--END OF DAY ONE!!!!!!!!!!!-->
+
+<section>
+                <h3>Agenda: Part Two</h3>
+
+                <div style="text-align:left;">
+                    <img src="assets/images/NGINXCoreAgenda2.png" style="border:0;background:none; left:0; top:0;">
+                </div>
+		
+		<aside class="notes">
+		<p>So for this first day we're going to cover load balancing, then we will monitor our upstream using the status handler, then we will cover caching, then we will cover basic compression, and finally we will explore using the dynamic config api.</p>
+
+		</aside>
+              </section>
+
+              <!--Next Section-->
 		<section data-background="rgb(20, 149, 62)">
                   <h2>Routing Connections</h2>
         </section>
@@ -2492,26 +2594,6 @@ The redirected URL is formed based on the server name and port number of the req
 </aside>
 		</section>
 	</section>
-
- <!--Next Section-->
-		<section data-background="rgb(20, 149, 62)">
-                  <h2>End of Part One: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">Thank You!</span></pre></h2>
-                 </section>
-
- <!--END OF DAY ONE!!!!!!!!!!!-->
-
-<section>
-                <h3>Agenda: Part Two</h3>
-
-                <div style="text-align:left;">
-                    <img src="assets/images/NGINXCoreAgenda2.png" style="border:0;background:none; left:0; top:0;">
-                </div>
-		
-		<aside class="notes">
-		<p>So for this first day we're going to cover load balancing, then we will monitor our upstream using the status handler, then we will cover caching, then we will cover basic compression, and finally we will explore using the dynamic config api.</p>
-
-		</aside>
-              </section>
  <section data-background="rgb(20, 149, 62)">
                   <h2>Load Balancing</h2>
                  </section>
@@ -2891,7 +2973,7 @@ Only available on the server directive of an upstream block.</p>
 	<aside class="notes">
 <p>Certain applications need to store session and state data on the upstream server
 </p>
-<p>Requests need to be routed to the same server to maintain application functionality
+<p>Requests need to be routed to the same server to maintain application functionality</p>
 </p>
 <p>To ensure requests get routed to the same server we use the sticky directive
 Three methods</p>
@@ -2900,213 +2982,126 @@ Three methods</p>
 <li>Sticky Routes</li>
 <li>Sticky Learn</li>
 </ul>
+<p>We cover session affinity extensively in Advanced Load Balancing</p>
+	</aside>
+</section>
+
+<section>
+	<h3>HTTP using DNS</h3>
+	<p>NGINX Plus can monitor changes of IP addresses that correspond to domains and resolve them</p>
+	<pre><code class="linux" data-trim contenteditable>
+		http {
+    resolver 10.0.0.1 valid=300s ipv6=off;
+    resolver_timeout 10s;
+
+    server {
+        location / {
+            proxy_pass http://backend;
+        }
+    }
+   
+    upstream backend {
+        zone backend 32k;
+        least_conn;
+        ...
+        server backend1.example.com resolve;
+        server backend2.example.com resolve;
+    }
+}
+	
+</code></pre>
+	<aside class="notes">
+
+<p>In the example, the resolve parameter of the server directive will periodically re-resolve backend1.example.com and backend2.example.com servers into IP addresses. By default, NGINX re-resolves DNS records basing on their TTL, but the TTL value can be overridden with the valid parameter to the resolver directive, in our example it is 5 minutes.</p>
+
+<p>The optional ipv6=off parameter allows resolving only to IPv4 addresses, though both IPv4 and IPv6 resolving is supported</p>
+
+<p>If a domain name resolves to several IP addresses, the addresses will be saved to the upstream configuration and load-balanced. In our example, the servers will be load balanced according to the least_conn load balancing method. If one or more IP addresses has been changed or added/removed, then the servers will be re-balanced.
 </p>
 
+
 	</aside>
 </section>
 
 <section>
-	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">sticky cookie</span></pre></h3>
-	<p>Syntax: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">sticky cookie <i>name</i></span></pre></p>
+	<h3>Load Balancing NTLM</h3>
+	<p>Release 7+ only. Requires HTTP 1.1 connection</p>
 	<pre><code class="linux" data-trim contenteditable>
-	    upstream backendServers {
-	server my.example1.com;
-	server my.example2.com;
+		http {
+    ...
+    upstream exchange {
+        zone exchange 64k;
+        ntlm;
+        server exchange1.example.com;
+        server exchange2.example.com;
+    }
+
+    server {
+        listen              443 ssl;
+        ssl_certificate     /etc/nginx/ssl/company.com.crt;
+        ssl_certificate_key /etc/nginx/ssl/company.com.key;
+        ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+
+        location / {
+            proxy_pass         https://exchange;
+            proxy_http_version 1.1;
+            proxy_set_header   Connection "";
+        }
+    }
+}
 	
-	sticky cookie my_srv expires=1h domain=example.com path=/cart;
-}
-
 </code></pre>
 	<aside class="notes">
-<p>Uses a HTTP cookie to identify the upstream server</p>
-<p>Cookie is inserted by NGINX for the first response by the upstream server</p>
-<p>Subsequent requests from the same client will be passed to the same server</p>
-<p>If the server cannot be identified another server will be chosen based on the configured routing method</p>
+
+<p>In a location, configure proxying to Microsoft Exchange upstream server group with the proxy_pass directive:</p>
+
+<p>n order for Microsoft Exchange connections to pass to the upstream servers, in the location block set the proxy_http_version directive value to 1.1, and the proxy_set_header directive to “Connection “” ”, just like for a keepalive connection:</p>
+<p>In the http block, configure a load balancing group with Microsoft Exchange servers. Specify the upstream directive with the name of the server group previously specified in the proxy_pass directive. Then specify the ntlm directive that will allow the group to accept the requests with NTLM authentication:</p>
+<p>Add Microsoft Exchange servers to the upstream group and optionally specify a http load balancing method:</p>
+
 	</aside>
 </section>
-
-<section>
-	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">sticky learn</span></pre></h3>
-	<p>Syntax: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">sticky cookie <i>name</i></span></pre></p>
-	<pre><code class="linux" data-trim contenteditable>
-	    upstream backendServers {
-	server my.example1.com:8081;
-	server my.example2.com:8082;
-	
-	sticky learn create=$upstream_cookie_sessionid lookup=$cookie_sessionid zone=client_sessions:1m; 
-}
-
-server {
-	location / {
-		proxy_pass http://backendServers;
-}
-}
-
-</code></pre>
-	<aside class="notes">
-<p>Upstream server creates a session, usually via a HTTP cookie or a URL token, and places it in the response</p>
-<p>NGINX will learn which cookie corresponds with which upstream server</p>
-<p>When a client request contains a session cookie, NGINX will forward the request to the appropriate server</p>
-<p>Note: Session identifier does not necessarily have to be a cookie</p>
-	</aside>
-</section>
-
-<section>
-	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">sticky learn</span></pre> Part 1</h3>
-	<img src="assets/images/stickyLearn1.png" style="border:none; background:none; width:100%">
-		  <aside class="notes">
-	<aside class="notes"></aside>
-</section>
-
-<section>
-	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">sticky learn</span></pre> Part 2</h3>
-	<img src="assets/images/stickyLearn2.png" style="border:none; background:none; width:100%">
-		  <aside class="notes">
-	<aside class="notes"></aside>
-</section>
-
-<section>
-	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">sticky learn</span></pre> Part 3</h3>
-	<img src="assets/images/stickyLearn3.png" style="border:none; background:none; width:100%">
-		  <aside class="notes">
-	<aside class="notes"></aside>
-</section>
-
-<section>
-	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">sticky route</span></pre></h3>
-	<pre><code class="linux" data-trim contenteditable>	
-upstream backend {
-	zone backend 64k;
-	server backend1.com route=tomcat1;
-	server backend2.com route=tomcat2;
-	server backend3.com route=tomcat3;
-
-	sticky route $route_cookie $route_uri;
-}
-</code></pre>
-		  <aside class="notes">
-<p>Client is assigned a route from the backend proxied server, the first time it sends a request</p>
-<p>Routing information is stored in a cookie or in the URI</p>
-<p>On subsequent requests NGINX will examine the routing information to determine which server to send the request to</p>
-<p>sticky directive uses the route parameter followed by multiple variables</p>
-<p>The value of the variables will determine the route </p>
-<p>The first non empty variable will be used to find the matching server
-</p>
-	</aside>
-</section>
-
-<section>
-	<h3>Tomcat Example</h3>
-	<img src="assets/images/tomcatExample.png" style="border:none; background:none; width:100%">
-	<aside class="notes"></aside>
-</section>
-
-<section>
-	<h3>Routing Variables</h3>
-		<pre><code class="linux" data-trim contenteditable>
-			map $cookie_JSESSIONID $route_cookie {
-	~.+\.(?P&#60;route&#62;\w+)$ $route;
-}
-
-map $request_uri $route_uri {
-	~JSESSIONID=.+\.(?P&#60;route&#62;\w+)$ $route;
-}
-
-</code></pre>
-	<aside class="notes">
-The values of $route_cookie and $route_uri can be determined through the use of a map
-$cookie_JESSIONID looks at the value of the cookie called JESSIONID, which is present in the clients request
-	</aside>
-</section>
-
-<section>
-<section data-state="lab">
-		  <h3>Lab 11.1: Tomcat Route</h3>
-		  <ol>
-		    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">myServers.conf</span></pre> in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</span></pre></li>
-		    <li>In the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http</span></pre> context, create a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;"> log_format</span></pre> called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;"> sticky</span></pre></li>
-		    <li>Set the new log to:<pre><code class="linux" data-trim contenteditable>"\t Route URI: $route_uri \t Routing Cookie: $route_cookie \t All Cookies: $http_cookie \t ";
-</code></pre> </li> 
-<li> Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">sticky route</span></pre> directive with two variables: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$route_cookie $route_uri;</span></pre></li>
-<li>Change the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">access_log</span</pre> format to the new "sticky" <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">log_level</span></pre></li>
-<li>Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">route</span></pre> parameter to each upstream like so: <pre><code class="linux" data-trim contenteditable>upstream myServers {
-	zone backend 64k;
-	server &#60;backend_url&#62;:8080 route=backend1;
-	server &#60;backend_url&#62;:8080 route=backend2;
-	server &#60;backend_url&#62;:8080 route=backend3;
-}
-</code></pre> <span style="color:rgb(240,168,40);"><small>ask your instructor about changing the upstream backend urls!!!</small></span></li>
-		</ol>
-		  <aside class ="notes">
-		  	<p>Note to instructor, if you haven't already please spinup the following Tomcat instances that are already pre-configured with the jvmRoute parameter</p>
-		  	<p>Command to access AMI (assuming you have the public key)</p>:
-		  	<pre><code class="linux" data-trim contenteditable>
-		  		ssh -i AWS_service_rocket_key.pub ec2-user@ec2-54-196-159-75.compute-1.amazonaws.com
-		  	</pre></code>
-		  	<p>Spinup the following machines:</p>
-		  	<pre><code class="linux" data-trim contenteditable>
-		  		ngx-launch-class ubuntu-backend1
-ngx-launch-class ubuntu-backend2
-ngx-launch-class ubuntu-backend3
-		  	</code></pre>
-		  	<p>Copy the URL for each machine and give it to the students. You won't have to log into any of these machines so don't worry about the student numbers and passwords</p>
-		  	<p>Lab Solution</p>
-		  	<pre><code class="linux" data-trim contenteditable>
-        log_format sticky  "$request \t Upstream: $upstream_addr \t Route URI: $route_uri \t Routing Cookie: $route_cookie \t All Cookies: $http_cookie \t ";
-
-upstream myServers {
-	server &#60;backend1&#62; route=jvmRoute1;
-	server &#60;backend2&#62; route=jvmRoute2;
-	server &#60;backend3&#62; route=jvmRoute3;
-
-	sticky $route_cookie $route_uri;
-}
-
-map $cookie_jsessionid $route_cookie { 	
-	~.+\.(?P&#60;route&#62;\w+)$ $route; 
-}
-
-map $request_uri $route_uri { 	
-	~jsessionid=.+\.(?P&#60;route&#62;\w+)$ $route; 
-}
-
-server {
-	listen 8080;
-	...
-	access_log /var/log/nginx/upstream.access.log sticky;
-}
-
-
-		  	</pre></code>
-</aside>
-		</section>
 
 <section data-state="lab">
-		  <h3>Lab 11.2: Tomcat Route Test</h3>
+		  <h3>Lab 11: Configure Hash Method</h3>
 		  <ol>
-		    <li>In your shell, make the following <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl</span></pre> requests:<pre><code class="linux" data-trim contenteditable>curl http://&#60;localhost&#62;:8080</code></pre></li>
-		    <li>In a separate shell, run a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">tail -f</span></pre> command on your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">upstream_access.log</span></pre></li>
-		    <li>Do you notice the IP address changing?</li>
-		    <li>Open a browser, and step through the app via the following URI: <pre><code class="linux" data-trim contenteditable>&#60;localhost&#62;/examples/servlets/servlet/SessionExample</code></pre></li>
-		    <li>Execute the application, and refresh your browser several times. What can you observe in the log now? Which IP address is the request hitting?</li>
+		    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">myServers.conf</span></pre> and define a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hash</span></pre> selection algorithm in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">upstream myServers </span></pre></li>
+		    <li>Save and reload nginx</li>
+		    <li>Refresh your browser several times and check the log file.</li>
+		    <li>Notice how the session sticks to that particular server?</li>
+		    <li>Now run a dynamic curl request from a local terminal
+		    <pre><code class="linux" data-trim contenteditable>
+for i in `seq 1 100` ; do curl -s -o /dev/null -w "%{http_code}" \
+http://&#60;external ip&#62;/\?$i \
+; done
+\
+		    </pre></code>
+		</li>
+			<li>Check the log again, what do you notice?</li>
 		</ol>
 		  <aside class ="notes">
 		  	<p>Solution</p>
-		  	<p>You can test the below URIs in a browser (recommended so you can show students the source code once you hit the SessionExample), or you can use the curl requests below.</p>
-		  	<p>Make sure you run a tail command to show the new log_format in a separate or tabbed shell</p>
 		  	<pre><code class="linux" data-trim contenteditable>
-		  		sudo tail -f /var/log/nginx/upstream.access.log
+       upstream myServers {
+    server localhost:8081;
+    server localhost:8082;
+    server localhost:8083;
+}
+
+server {
+    listen 8080;
+    root /home/student1/public_html;
+    error_log   /var/log/nginx/upstream.error.log info;
+    access_log  /var/log/nginx/upstream.access.log combined;
 
 
-      curl http://localhost:8080/
-      curl http://localhost:8080/examples/
-      curl http://localhost:8080/examples/servlets/
-      curl http://localhost:8080/examples/servlets/servlet/
-      curl http://localhost:8080/examples/servlets/servlet/SessionExample/
+    location / {
+        proxy_pass http://myServers;
+    }
+}
 		  	</pre></code>
 </aside>
 		</section>
-	</section>
 <!--Next Section-->
 		<section data-background="rgb(20, 149, 62)">
                   <h2>Live Activity Monitoring</h2>
@@ -3533,6 +3528,23 @@ server {
 	<li>Define a proxy_pass in order to set the proxy_cache conditions for backend responses</li>
 	<li>Reference a cache_key which is used to create the md5 hash (metadata), in order to store this information in the shared memory zone</li>
 	<li>Validate the cacheability (usually dicated by the Cache-Control headers of the origin server) by specificy which responses are cached via proxy_cache_valid</li>
+	</aside>
+</section>
+
+<section>
+	<h3>Configuring the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_cache_path</span></pre></h3>
+	<ul>
+		<li>Must define path to directory or mount point/disk in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">http</span></pre> context</li>
+		<li>Uses hybrid persistent model via a two level directory system</li>
+	</ul>
+<pre><code class="linux" data-trim contenteditable>
+proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=img_cache:20m inactive=5m;
+</code></pre>	
+	<aside class="notes">
+<p>In order for the cache to work we must create a path to the directory or disk that will store the cached resource</p>
+<p>We also must add the levels parameter which sets up a two‑level directory hierarchy under our cache directory path. The reason we need this paramter is because otherwise or base path could potentially have a large number of files in a single directory, which can slow down file access. Setting it to a two‑level directory hierarchy for most deployments will tell NGINX to NOT put all files in the same directory. </p>
+<p>The keys_zone paramter sets up the shared memory zone name and size allocated for storing the metadata and cache keys (md5 hash).</p>
+<p>the inactive paramter is used for specifying the life cycle of a cached resource that's no longer accessed. Once that time limit is exceeded, the resource will be evicted from the cache.</p>
 	</aside>
 </section>
 
@@ -4286,6 +4298,11 @@ $ sudo chown nginx:nginx /var/lib/nginx/state
 </li>
 
 <li>Comment out the existing servers in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">upstream</span></pre></li>
+<li>Add the state directive in it's place
+	<pre><code class="linux" data-trim contenteditable>
+state /var/lib/nginx/state/backend.state;
+</code></pre>
+</li>
 <li> Save NGINX and reload</li>
 <li>Run in a new browser window enter the following urls:<pre><code class="linux" data-trim contenteditable>
 	&#60;server&#62;:9090/upstream_conf?add=&#38;upstream=myServers&#38;server=127.0.0.1:8081&#38;weight=5
