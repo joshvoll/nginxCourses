@@ -70,7 +70,7 @@
 
         <div class="slides">
 
-            <section data-background="rgb(20, 149, 62)">
+             <section data-background="rgb(20, 149, 62)">
                 <h1>NGINX CORE</h1>
 
                 <p style="text-align:center">
@@ -175,8 +175,9 @@
             <section>
                 <h3>Course Administration</h3>
                 <ul>
-                    <li>Course Duration: 4 hours</li>
-                    <li>Takes place over 2 days</li>
+                    <li>Course Duration: 7-8 hours</li>
+                    <li>10 minute break at the top of each hour</li>
+                    <li>30-60 min break after part 1</li>
                     <li>Ask questions at any time!</li>
                 </ul>
             </section>
@@ -194,14 +195,6 @@
                 </aside>
             </section>
 
-            <section>
-                <h3>What is NGINX?</h3>
-                <img src="assets/images/NGINX_Diagram.png" style="border:none; background:none; width:100%">
-                <aside class="notes">
-                    <p>NGINX is an open source reverse proxy server. For those who don’t know, a reverse proxy server is a proxy server, sitting behind a firewall in a private network, that directs client requests to appropriate backend servers.</p>
-                    <p>Common uses cases for a reverse proxy server are: Load Balancer, or as I like to call it a web traffic cop, that sits in front of something like apache and distributes client request across a group of servers based on the load they’re handling. HTTP Cache, reverse proxy servers can cache incoming common requests which will speed up the flow of traffic between your clients and servers by reducing the amount of redundant tasks that your backend servers need to manage. Web Server: NGINX can also take over the responsibilities of a web server and host websites that are accessible by the internet.</p>
-                </aside>
-            </section>
 
             <!--Adv. Scripts Module-->
             <section data-background="rgb(20, 149, 62)">
@@ -247,60 +240,36 @@
                     <h3>Low Memory</h3>
                     <img src="assets/images/low_memory.png" style="border:0; background:none; width:100%">
                 </section>
-                <section>
-                    <h3>NGINX Request Processing</h3>
-                    <ol>
-                        <li>Translate Request</li>
-                        <li>Evaluate Configuration</li>
-                        <li>Select Virtual Server</li>
-                        <li>Proccess Request</li>
-                        <li>Serve Response</li>
-                        <li>Log Connection</li>
-                    </ol>
-
-                    <aside class="notes">
-                        <p>NGINX processes a request in multiple phases, and each phase may contain multiple ”handlers” depending on the type of request. For example: there are a three separate phases for URI rewrite translation that aren’t mentioned here, and they occur at different times during the lifecycle. Each rewrite phase can contain 3-6 handlers. If you’re interested in the specifics of the phases, as well as the event handler names, checkout NGINX’s source code documentation. So generally, these are the steps in the request processing life cylce:
-
-                            <ol>
-                                <li>Master process translates the request</li>
-                                <li>Search for a config on file system</li>
-                                <li>Evaluates configs and selects server to process the request</li>
-                                <li>server and location contexts will breakdown request into it's smallest parts i.e. the uri and its arguments</li>
-                                <li>worker will process request and serve response</li>
-                                <li>nginx lastely will log connection details</li>
-                        </p>
-                    </aside>
                 </section>
+
+                <section>
+                <h3>NGINX Use Cases</h3>
+                <img src="assets/images/NGINX_Diagram.png" style="border:none; background:none; width:100%">
+                <aside class="notes">
+                    <p>NGINX is an open source reverse proxy server. For those who don’t know, a reverse proxy server is a proxy server, sitting behind a firewall in a private network, that directs client requests to appropriate backend servers.</p>
+                    <p>Common uses cases for a reverse proxy server are: Load Balancer, or as I like to call it a web traffic cop, that sits in front of something like apache and distributes client request across a group of servers based on the load they’re handling. HTTP Cache, reverse proxy servers can cache incoming common requests which will speed up the flow of traffic between your clients and servers by reducing the amount of redundant tasks that your backend servers need to manage. Web Server: NGINX can also take over the responsibilities of a web server and host websites that are accessible by the internet.</p>
+                </aside>
+            </section>
 
                 <section>
                     <h3>NGINX Architecture</h3>
                     <!-- Left Column -->
-                    <div style="float:left;width:55%;padding-left:0px;">
-                        <img class="fragment" data-fragment-index="0" src="assets/images/EBA_master.png" width="45%" style="position:absolute;top:-100;left:0;" />
-                        <img class="fragment" data-fragment-index="1" src="assets/images/EBA_children.png" width="45%" style="position:absolute;top:-100;left:0;" />
-                        <img class="fragment" data-fragment-index="2" src="assets/images/EBA_shared.png" width="45%" style="position:absolute;top:-100;left:0;" />
-                        <img class="fragment" data-fragment-index="3" src="assets/images/EBA_Cache.png" width="45%" style="position:absolute;top:-100;left:0;" />
-                        <img class="fragment" data-fragment-index="4" src="assets/images/EBA_worker.png" width="45%" style="position:absolute;top:-100;left:0;" />
+                    <div style="float:left;width:60%;padding-left:0px;">
+                        <img src="assets/images/architecture.png" width="60%" style="border:0; background:none; width:100%">
 
                     </div>
                     <!--Right Column-->
-                    <div style="float:right;width:45%;padding-right:0px;">
+                    <div style="float:right;width:35%;padding-right:0px;">
                         <div class="fragment" data-fragment-index="0" style="vertical-align:right; margin-right: auto; margin-right: auto;">
-                            <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Master Process:</span></pre>Evaluates Config</p>
+                            <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Master:</span></pre>Evaluates config, modules, PID, logs</p>
                         </div>
 
                         <div class="fragment" data-fragment-index="1" style="vertical-align:right; margin-right: auto; margin-right: auto;">
-                            <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Child Processes:</span></pre>Adjust module behavior</p>
+                            <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Workers:</span></pre>Handles requests and responses</p>
                         </div>
 
                         <div class="fragment" data-fragment-index="2" style="vertical-align:right; margin-right: auto; margin-right: auto;">
-                            <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Shared Memory:</span></pre>Counters, rate limits, etc.</p>
-                        </div>
-                        <div class="fragment" data-fragment-index="3" style="vertical-align:right; margin-right: auto; margin-right: auto;">
-                            <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Cache Manager and Loader:</span></pre>Cache settings</p>
-                        </div>
-                        <div class="fragment" data-fragment-index="4" style="vertical-align:right; margin-right: auto; margin-right: auto;">
-                            <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Worker Processes:</span></pre>Handle requests and responses</p>
+                            <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Shared Memory:</span></pre>Counters, rate limits, status, session log etc.</p>
                         </div>
                     </div>
 
@@ -310,17 +279,27 @@
                         <p>The other nice thing about this model is because it uses an event looping mechanism, you don’t have to restart the server to apply changes made to your configuration file. You only need to reload the configuration which will wait for worker processes to finish their tasks, shutdown the worker processes, the master process evaluates the new configuration file, and relays that new information to the worker processes, and the workers begin picking up new tasks</p>
                     </aside>
                 </section>
-            </section>
 
             <section>
                 <h3>Basic NGINX Commands</h3>
-                <p style="text-align:center;">Below commands can reload, gracefully stop, terminate, or check running config</p>
-                <pre><code class="linux" data-trim contenteditable>
-  $ nginx -s reload
+                <pre><code class="apache" data-trim contenteditable>
+#reloads config
+$ nginx -s reload
+
+#graceful shutdown
 $ nginx -s quit
+
+#terminates nginx process
 $ nginx -s stop
+
+#config syntax check (pre-reload)
 $ nginx -t
+
+#displays currently running configs
 $ nginx -T
+
+#checks nginx version
+$ nginx -v
                   </code></pre>
                 <aside class="notes">
                     <p>These are the basic commands to run the executable file that loads nginx. The executable contains an “s” parameter followed by whichever command you’re trying to signal to nginx The command you we will frequently use is the reload command because changes made in the configuration file will not be applied until nginx is reloaded.</p>
@@ -334,10 +313,10 @@ $ nginx -T
                 <h3>Reloading the Configuration</h3>
                 <div style="float:left;width:50%;" class="centered">
                     <ol>
-                        <li>SIGHUP signal </li>
-                        <li>Master Process evaluates new config</li>
-                        <li>Checks for errors</li>
-                        <li>Forks new workers while old workers shut down</li>
+                        <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">nginx –s reload</span></pre> sends <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">SIGHUP</span></pre> signal to kernel </li>
+                        <li>Master evaluates new config</li>
+                        <li>Checks for <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">emerg</span></pre> level errors</li>
+                        <li>Forks new workers while old workers gracefully shut down</li>
                     </ol>
                     <p></p>
                 </div>
@@ -346,7 +325,7 @@ $ nginx -T
                 </div>
 
                 <aside class="notes">
-                    <p>nginx –s reload command sends the master process a SIGHUP signal.</p>
+                    <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">nginx –s reload</span></pre> command sends the master process a SIGHUP signal.</p>
                     <p>The reload command is safe. Worker update is contingent upon lack of syntax errors Master process then forks new set of worker processes to process connections signals old worker processes to shutdown gracefully
                     </p>
                 </aside>
@@ -368,7 +347,7 @@ $ nginx -T
             </section>
 
             <section>
-                <h3>NGINX Processes</h3>
+                <h3>Running Processes</h3>
                 <p>To check running processes, run the following command:</p>
                 <pre><code class="linux" data-trim contenteditable style="text-align:center;">
                       $ ps aux | grep nginx
@@ -378,16 +357,35 @@ $ nginx -T
                 </aside>
             </section>
             <section>
+            <section>
+                    <h3>Path to Files</h3>
+                    <ul>
+                        <p>Executable Path</p>
+                        <pre><code class="linux" data-trim contenteditable style="text-align:center;">
+                      $ /usr/sbin/nginx
+                    </code></pre>
+                        <p>Log Path</p>
+                        <pre><code class="linux" data-trim contenteditable style="text-align:center;">
+                      $ /var/log/nginx
+                    </code></pre>
+                        
+
+                    </ul>
+                    <aside class="notes">
+                        <p>The NGINX configuration file is the heart of NGINX. At its highest level, NGINX consists of many modules that are driven by specific directives that we set in the configuration file. The global configuration is called nginx.conf and lives in the file path /etc/nginx. Your particular instance of nginx can have one long global configuration file but it can also refer to other...additional configuration files in conf.d directory</p>
+                    </aside>
+                </section>
+                
                 <section>
                     <h3>Configuration File</h3>
                     <ul>
                         <p>Global Configuration Path</p>
                         <pre><code class="linux" data-trim contenteditable style="text-align:center;">
-                      $ cat /etc/nginx/nginx.conf
+                      $ /etc/nginx/nginx.conf
                     </code></pre>
                         <p>Additional Configuration(s) Path</p>
                         <pre><code class="linux" data-trim contenteditable style="text-align:center;">
-                      $ cat /etc/nginx/conf.d/*.conf
+                      $ /etc/nginx/conf.d/*.conf
                     </code></pre>
                         <div style="text-align:center;"><small>Documentation: <a href="https://www.nginx.com/resources/wiki/start/topics/examples/full/" target="_blank">nginx.conf Example</a></small></div>
 
@@ -428,6 +426,7 @@ index index.html index.htm index.php;
 
                     </code></pre>
                 </section>
+
                 <section>
                     <h3>Blocks</h3>
                     <p>Contains mixture of directives and data—begins and ends with curly brackets.</p>
@@ -463,13 +462,14 @@ index index.html index.htm index.php;
                     <div style="text-align:center;"><small>Documentation: <a href="https://www.digitalocean.com/community/tutorials/understanding-the-nginx-configuration-file-structure-and-configuration-contexts" target="_blank">Further Explanation</a></small></div>
                 </section>
             </section>
+
             <section>
                 <h3>Serving Content</h3>
                 <p>Requirements:</p>
                 <ul>
-                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">HTTP Block</span></pre>—Handles high level processing (logging, compression, caching etc.)</li>
-                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">Server Block</span></pre>—Virtual Server (Host) that handles the request</li>
-                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">Location Block</span></pre>—Further processing based on the URI of the request</li>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">http</span></pre> - high level processing (logging, compression, caching etc.)</li>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">server</span></pre> - virtual server that handles the request</li>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">location</span></pre> - processing based on request URI</li>
                 </ul>
 
                 <aside class="notes">
@@ -482,8 +482,14 @@ index index.html index.htm index.php;
                     </ul>
                 </aside>
             </section>
+           
             <section>
-                <h3>Server Block Example</h3>
+                <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">server</span></pre> Block Example</h3>
+                <ul>
+                <li>Defines virtual <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">server</span></pre> ("VirtualHost" in Apache)</li>
+                <li>Always nested inside either <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">http</span></pre> or <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">stream</span></pre> context</li>
+                <li>Binds to TCP sockets with <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">server_name</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">listen</span></pre></li>
+            </ul>
                 <pre>
                     <code class="linux" data-trim contenteditable>
                       server {
@@ -491,9 +497,9 @@ index index.html index.htm index.php;
     server_name www.example.com;
     root /etc/student1/public_html;
 }
-
                     </code>
                   </pre>
+                  <div style="text-align:center;"><small>Documentation: <a href="https://www.nginx.com/resources/wiki/start/topics/examples/server_blocks/" target="_blank">Server Block Examples</a></small></div>
                 <aside class="notes">
                     <p>We need to specify a server block to define our configurations for our virtual servers. It’s always nested inside of an http context which can contain many server blocks to handle separate subsets of incoming connections.</p>
                     <p>We can have more than server block, and you most likely will need one if you have a large company serving a lot of content. Nginx decides which server is needed based on the details of the request—which are decided by: listen port and server_name </p>
@@ -503,15 +509,268 @@ index index.html index.htm index.php;
                 </aside>
             </section>
             <section>
-                <section>
-                    <h3>Location Block Example</h3>
-                    <pre>
-                    <code class="linux" data-trim contenteditable>
-                      location /application1 {
+
+            <section>
+                <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">listen</span></pre> Directive</h3>
+                <ul>
+                    <li>Defines IP / Port that <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">server</span></pre> responds to</li>
+                    <li>Default is <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">0.0.0.0:80</span></pre> (<pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">:8080</span></pre> for non-root)</li>
+                    <li>Can be: IP, IP:Port, Port, Unix Socket</li>
+
+                <aside class="notes">
+<ul>
+    <li>First, Nginx looks at the IP address and the port of the request. It matches this against the listen directive of each server to build a list of the server blocks that can possibly resolve the request.</li>
+
+</li>The listen directive typically defines which IP address and port that the server block will respond to. By default, any server block that does not include a listen directive is given the listen parameters of 0.0.0.0:80 (or 0.0.0.0:8080 if Nginx is being run by a normal, non-root user). This allows these blocks to respond to requests on any interface on port 80, but this default value does not hold much weight within the server selection process.</li>
+<li>
+<li>The listen directive can be set to:
+    <ul>
+        <li>An IP address/port combo.</li>
+        <li>A lone IP address which will then listen on the default port 80.</li>
+        <li>A lone port which will listen to every interface on that port.</li>
+        <li>The path to a Unix socket.</li>
+    </ul>
+</li>
+<li>The last option will generally only have implications when passing requests between different servers.</li>
+</ul>
+                </aside>
+            </section>
+
+            <section>
+                <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">listen</span></pre> Rules</h3>
+                <p>NGINX will substitute values for "incomplete" directives</p>
+                <ul>
+                    <li>No <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">listen</span></pre> directive uses <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">0.0.0.0:80</span></pre></li>
+<li>IP with no port uses <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">&#60;some_ip&#62;:80</span></pre></li>
+<li>Port with no IP uses <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">0.0.0.0:&#60;some_port&#62;</span></pre></li>
+</ul>
+<p>IP takes priority over port</p>
+<p>
+                <aside class="notes">
+<p>When trying to determine which server block to send a request to, Nginx will first try to decide based on the specificity of the listen directive using the following rules:</p>
+<ul>
+    <li>Nginx translates all "incomplete" listen directives by substituting missing values with their default values so that each block can be evaluated by its IP address and port. Some examples of these translations are:
+        <ul>
+<li>A block with no listen directive uses the value 0.0.0.0:80.</li>
+<li>A block set to an IP address 111.111.111.111 with no port becomes 111.111.111.111:80</li>
+<li>A block set to port 8888 with no IP address becomes 0.0.0.0:8888</li>
+</ul>
+</li>
+<li>Nginx then attempts to collect a list of the server blocks that match the request most specifically based on the IP address and port. This means that any block that is functionally using 0.0.0.0 as its IP address (to match any interface), will not be selected if there are matching blocks that list a specific IP address. In any case, the port must be matched exactly.</li>
+</ul>
+
+                </aside>
+            </section>
+<section>
+                <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">listen</span></pre> Example</h3>
+                <p>If example.com is hosted on port 80 of 192.168.1.10, the first block serves the response</p>
+               <pre><code class="linux" data-trim contenteditable>
+                server {
+    listen 192.168.1.10;
+
+}
+
+server {
+    listen 80;
+    server_name example.com;
+
+}
+               </code></pre> 
+
+                <aside class="notes">
+<ul>
+    <li>In terms of IP and Port, if there is only one most specific match, that server block will be used to serve the request. If there are multiple server blocks with the same level of specificity matching, Nginx then begins to evaluate the server_name directive of each server block.</li>
+
+<li>It is important to understand that Nginx will only evaluate the server_name directive when it needs to distinguish between server blocks that match to the same level of specificity in the listen directive. For instance, if example.com is hosted on port 80 of 192.168.1.10, a request for example.com will always be served by the first block in this example, despite the server_name directive in the second block.</li>
+</ul>
+                </aside>
+            </section>
+
+</section>
+<section>
+        <section>
+            <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">server_name</span></pre> Directive</h3>
+            <p>Used to differentiate between matching IP:Port specificity</p>
+            <ul>
+                <li>Checks the "Host" header field</li>
+                <li>Matching Rules (in order):
+                <ul>
+                    <li>Exact Match</li>
+                    <li>Leading Wildcard</li>
+                    <li>Trailing Wildcard</li>
+                    <li>Regex</li>
+                </ul>
+            </li>
+            <aside class="notes">
+                <ul>
+<li>Next, to further evaluate requests that have equally specific listen directives, Nginx checks the request's "Host" header. This value holds the domain or IP address that the client was actually trying to reach.</li>
+
+<li>Nginx attempts to find the best match for the value it finds by looking at the server_name directive within each of the server blocks that are still selection candidates. Nginx evaluates these by using the following formula:
+    <ul>
+
+    <li>Nginx will first try to find a server block with a server_name that matches the value in the "Host" header of the request exactly. If this is found, the associated block will be used to serve the request. If multiple exact matches are found, the first one is used.</li>
+
+    <li>If no exact match is found, Nginx will then try to find a server block with a server_name that matches using a leading wildcard (indicated by a * at the beginning of the name in the config). If one is found, that block will be used to serve the request. If multiple matches are found, the longest match will be used to serve the request.</li>
+
+    <li>If no match is found using a leading wildcard, Nginx then looks for a server block with a server_name that matches using a trailing wildcard (indicated by a server name ending with a * in the config). If one is found, that block is used to serve the request. If multiple matches are found, the longest match will be used to serve the request.</li>
+
+    <li>If no match is found using a trailing wildcard, Nginx then evaluates server blocks that define the server_name using regular expressions (indicated by a ~ before the name). The first server_name with a regular expression that matches the "Host" header will be used to serve the request.</li>
+
+    <li>If no regular expression match is found, Nginx then selects the default server block for that IP address and port.</li>
+</ul></li>
+</ul>
+            </aside>
+            </section>
+            <section>
+                    <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">server_name</span></pre> Example 1</h3>
+                    <p>If "Host" value matches "host1.example.com" exactly, second block serves response</p>
+                    <pre><code class="linux" data-trim contenteditable>
+                     server {
+    listen 80;
+    server_name *.example.com;
+
+}
+
+server {
+    listen 80;
+    server_name host1.example.com;
+
 }
                     </code>
                   </pre>
-                    <p>Two most common types of locations:</p>
+                    <aside class="notes">
+                        <p>In this configuration, if there is a server_name defined that exactly matches the "Host" header value, that server block is selected to process the request. In this example, if the "Host" header of the request was set to "host1.example.com", the second server would be selected:</p>
+                        <p>If no exact match is found, Nginx then checks to see if there is a server_name with a starting wildcard that fits. The longest match beginning with a wildcard will be selected to fulfill the request</p>
+                    </aside>
+                </section>
+                <section>
+                    <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">server_name</span></pre> Example 2</h3>
+                    <p>If "Host" value is "www.example.org", second block serves response — if no match, then trailing wildcards take over</p>
+                    <pre><code class="linux" data-trim contenteditable>
+                     server {
+    listen 80;
+    server_name www.example.*;
+
+}
+
+server {
+    listen 80;
+    server_name *.example.org;
+
+}
+
+server {
+    listen 80;
+    server_name *.org;
+}
+                    </code>
+                  </pre>
+                    <aside class="notes">
+                        <p>In this example, if the request had a "Host" header of "www.example.org", the second server block would be selected:</p>
+                        <p>If no match is found with a starting wildcard, Nginx will then see if a match exists using a wildcard at the end of the expression. At this point, the longest match ending with a wildcard will be selected to serve the request.</p>
+                    </aside>
+                </section>
+                <section>
+                    <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">server_name</span></pre> Example 3</h3>
+                    <p>The FIRST matching regex has priority. If the request is "www.example.com", the first block serves the response</p>
+                    <pre><code class="linux" data-trim contenteditable>
+                   server {
+    listen 80;
+    server_name ~^(www|host1).*\.example\.com$;
+
+}
+
+server {
+    listen 80;
+    server_name ~^(subdomain|set|www|host1).*\.example\.com$;
+
+}
+                    </code>
+                  </pre>
+                    <aside class="notes">
+                        <p>If no wildcard matches can be found, Nginx will then move on to attempting to match server_name directives that use regular expressions. The first matching regular expression will be selected to respond to the request.</p>
+                        <p>For example, if the "Host" header of the request is set to "www.example.com", then the second server block will be selected to satisfy the request:</p>
+                    </aside>
+                </section>
+
+            </section>
+
+            <section>
+                    <h3>IP vs. <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">server_name</span></pre> Recap</h3>
+                    <p>If NGINX cannot determine which server to select, it will choose the first block in the configuration</p>
+                <pre><code class="linux" data-trim contenteditable>
+                    server {   
+    listen  192.168.1.1:80;
+    server_name www.example.*;
+}
+
+server {
+    listen  192.168.1.1:80;
+    server_name *.example.net;
+}
+
+server {
+    listen  192.168.1.1:80;
+    server_name ~^(www|host1).*\.example\.com$;
+}
+                   </code></pre>
+                    <aside class="notes">
+                        <p>Each IP address/port combo has a default server block that will be used when a course of action can not be determined with the above methods. For an IP address/port combo, this will either be the first block in the configuration or the block that contains the default_server pamater as part of the listen directive (which would override the first-found algorithm). There can be only one default_server declaration per each IP address/port combination.</p>
+                    </aside>
+                </section>
+                <section>
+                    <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">default_server</span></pre></h3>
+                    <ul>
+                    <li>Checks against "HOST" header field</li>
+                    <li>Overrides "first-found" algorithm</li>
+                    <li>Only one declaration per IP:Port combo</li>
+                </ul>
+                    <pre><code class="linux" data-trim contenteditable>
+                     server {
+    listen  80 default_server;
+    server_name example.net www.example.net;
+}
+
+                    </code>
+                  </pre>
+
+                    <aside class="notes">
+                        <p>You can actually set the default server with the default_server parameter on the listen directive.</p>
+                        <p>Again, the parameter checks against the HTTP request header “HOST” field and for each request that doesn’t match any of the hostnames defined in our server_name parameter, it will route the location to the server for the port. The reason it’s on the listen directive is because NGINX checks the listen port first before it attempts to match the host header against the server name. This way it builds a list of acceptable servers for that particular request</p>
+                    </aside>
+                </section>
+                <section>
+                    <h3>Bad Requests</h3>
+                    <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">server_name</span></pre> with an empty string value can prevent bad requests. 444 response code closes TCP connection</p>
+                    <pre><code class="linux" data-trim contenteditable>
+                     server {
+    listen  80;
+    server_name "";
+    return 444;
+}
+                    </code>
+                  </pre>
+                    <aside class="notes">
+                        <p>If requests without the “Host” header field should not be allowed, a server that just drops the requests can be defined:</p>
+
+                        <p>Here, the server name is set to an empty string that will match requests without the “Host” header field, and a special NGINX’s non-standard code 444 is returned that closes the connection.</p>
+
+                        <p>Since version 0.8.48, this is the default setting for the server name, so the server_name "" can be omitted. In earlier versions, the machine’s hostname was used as a default server name.</p>
+                    </aside>
+                </section>
+
+            <section>
+                <section>
+                    <h3>Location Block Example</h3>
+                    <p>Breaks down request further by URI</p>
+                    <pre>
+                    <code class="linux" data-trim contenteditable>
+                      location /application1 {
+    
+}
+                    </code>
+                  </pre>
+                    <p>Two most common types:</p>
                     <ul>
                         <li><strong>Prefix</strong></li>
                         <li><strong>Regex</strong></li>
@@ -527,7 +786,9 @@ index index.html index.htm index.php;
                 </section>
                 <section>
                     <h3>Prefix Location</h3>
-                    <p>Always checked first, and NGINX selects and remembers longest match</p>
+                    <ul>
+                        <li>Checked first, then longest match serves response</li>
+                        <li>Nested inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">server</span></pre> context</li>
                     <pre>
                     <code class="linux" data-trim contenteditable>
                       location /application1 {
@@ -540,7 +801,12 @@ location /application1/images {
 
                     </code>
                   </pre>
-                    <p>Second location is selected and matched if given request: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 32px;">http://somedomain.com/application1/images/?img2</span></pre></p>
+                    <p>Second prefix serves response if request is:</p>
+                         <pre><code class="linux" data-trim contenteditable>
+$ curl http://somedomain.com/application1/images/?img2
+ </code>
+                  </pre>
+
                     <aside class="notes">
                         <ul>
                             <p>Prefix locations are always checked first NGINX will always select and remember the longest matching location prefix Example: we have a request to http://
@@ -612,17 +878,13 @@ location ~* ^\.(gif|jpg|jpeg|png)$ {
                     <p>Selection Order:</p>
                     <ul>
                         <div class="fragment" data-fragment-index="0" style="vertical-align:right; margin-left: auto; margin-right: auto;">
-                            <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">location = / {
-</span></pre></li>
+                        <li>Location 1</li>
                         </div>
                         <div class="fragment" data-fragment-index="1" style="vertical-align:right; margin-left: auto; margin-right: auto;">
-                            <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">location ^~ /app1 {
-</span></pre></li>
+                        <li>Location 3</li>
                         </div>
                         <div class="fragment" data-fragment-index="2" style="vertical-align:right; margin-left: auto; margin-right: auto;">
-                            <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">location ~* ^\.(png|jpg)$ {
-
-</span></pre></li>
+                        <li>Location 2</li>
                         </div>
                     </ul>
                 </div>
@@ -638,121 +900,54 @@ location ~* ^\.(gif|jpg|jpeg|png)$ {
                 </aside>
             </section>
 
-            <section>
-                <section>
-                    <h3>Defining Server Names</h3>
-                    <pre>
-                    <code class="linux" data-trim contenteditable>
-                     server {
-    server_name mycompany.com *.mycompany.com;
-}
-
-server {
-    server_name mycompany.net *.mycompany.net;
-}
-                    </code>
-                  </pre>
-
-                    <aside class="notes">
-                        <p>Multiple server names can be useful for situations where you would serve mobile content or localized content within the same server</p>
-
-                        <p>Defining Server Names</p>
-                        <p>We use the server_name directive to define which server is to respond to a given request. For this is example, your organization would put the company’s domain name following the server_name directive. It’s possible to define many server names, and in addition to using exact name matching, we can also define servers using wildcards check this for accuracy: regular expressions. http://nginx.org/en/docs/http/ngx_http_core_module.html#server_name In this example it will search for anything ending in the host name: example.org, before going on to the location directives to search for matching URI requests.
-                        </p>
-                        <p>The server name is checked against the ”host” header field of the incoming HTTP request This is based on the HTTP host header when the user types in their host name and not on the interface on which we receive the request</p>
-
-                    </aside>
-                </section>
-                <section>
-                    <h3>Default Server</h3>
-                    <pre><code class="linux" data-trim contenteditable>
-                     server {
-    listen  80 default_server;
-    server_name example.net www.example.net;
-}
-
-                    </code>
-                  </pre>
-
-                    <aside class="notes">
-                        <p>You can actually set the default server with the default_server parameter on the listen directive.</p>
-                        <p>The parameter checks against the HTTP request header “HOST” field and for each request that doesn’t match any of the hostnames defined in our server_name parameter, it will route the location to the server for the port. The reason it’s on the listen directive is because NGINX checks the listen port first before it attempts to match the host header against the server name.</p>
-                    </aside>
-                </section>
-                <section>
-                    <h3>IP vs. Server_Name</h3>
-                    <pre><code class="linux" data-trim contenteditable>
-                     server {	
-    listen  192.168.1.1:80;
-    server_name example.org www.example.org;
-}
-
-server {
-    listen  192.168.1.1:80;
-    server_name example.net www.example.net;
-}
-
-server {
-    listen  192.168.1.2:80;
-    server_name example.com www.example.com;
-}
-                    </code>
-                  </pre>
-                    <aside class="notes">
-                        <p>In this configuration, NGINX first tests the IP address and port of the request against the listen directives of the server blocks. It then tests the “Host” header field of the request against the server_name entries of the server blocks that matched the IP address and port. </p>
-                        <p>If the server name is not found, the request will be processed by the default server. For example, a request for www.example.com received on the 192.168.1.1:80 port will be handled by the default server of the 192.168.1.1:80 port, i.e., by the first server, since there is no www.example.com defined for this port. You may be asking, why does it serve the response from the top server even though there is no default_server specified on the listen port? THat's because NGINX sets the server at the top of configuration file as the default default_server until one is otherwise specified, that way no connections are dropped</p>
-                    </aside>
-                </section>
-                <section>
-                    <h3>Bad Requests</h3>
-                    <p>Use empty string for server_name directive to prevent bad requests</p>
-                    <pre><code class="linux" data-trim contenteditable>
-                     server {
-    listen  80;
-    server_name "";
-    return 444;
-}
-                    </code>
-                  </pre>
-                    <aside class="notes">
-                        <p>If requests without the “Host” header field should not be allowed, a server that just drops the requests can be defined:</p>
-
-                        <p>Here, the server name is set to an empty string that will match requests without the “Host” header field, and a special NGINX’s non-standard code 444 is returned that closes the connection.</p>
-
-                        <p>Since version 0.8.48, this is the default setting for the server name, so the server_name "" can be omitted. In earlier versions, the machine’s hostname was used as a default server name.</p>
-                    </aside>
-                </section>
-            </section>
             <section data-state="lab">
-                <h3>Lab 1: Serve Pages and Images</h3>
+                <h3>Lab 1.1: Serve Pages and Images</h3>
+                <p>Note: commands in "/etc/nginx/conf.d" require "sudo" or "root" level privileges</p>
                 <ol>
-                    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</pre> and backup <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">default.conf</span></pre>.</li>
-                    <li>Create a new configuration called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre>.</li>
-                    <li>Create a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> listening on port <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">80</span></pre> and a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directive of <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/home/student1/public_html</span></pre></li>
-                    <li>Add three <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">location</span></pre> prefixes for:
-                        <ul>
-                            <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application1</span></pre></li>
-                            <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application2</span></pre></li>
-                            <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/images</span></pre></li>
-                        </ul>
-                    </li>
-                    <li>In <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/images</span></pre> prefix, add <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root /data;</span></pre></li>
-                    <li>Close and save the configuration. Then reload NGINX.</li>
-                    <li>Test your EC2 url with the following URIs <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application1</span></pre>, <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application2</span></pre>, and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/images/logo.png</span></pre> What do you observe?</li>
-                </ol>
+                    <li>Navigate to the NGINX configuration directory:
+<pre><code class="linux" data-trim contenteditable>
+    $ cd /etc/nginx/conf.d
+</code></pre></li>
+<li>Backup the default and ssl configurations:
+    <pre><code class="linux" data-trim contenteditable>
+    $ sudo mv default.conf default.conf.bak
+$ sudo mv example_ssl.conf example_ssl.conf.bak
+</code></pre></li>
+<li>Create a new configuration called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre>:
+    <pre><code class="linux" data-trim contenteditable>
+    $ sudo vim server1.conf
+</code></pre></li>
+</ol>
+
                 <aside class="notes">
-                    <ol>
-                        <li>Open /etc/nginx/conf.d and rename the default.conf to default.conf.bak</li>
-                        <li>Create a file called server1.conf in the conf.d folder in /etc/nginx</li>
-                        <li>Add two location blocks that match requests for /application1 and /application2</li>
-                        <li>Add a third location block that matches requests for /images</li>
-                        <li>Override the root directive in the /images location block to specify the folder where your images are stored (i.e /data/images)</li>
-                        <li>Open your browser to your server’s URL. What can you observe?</li>
-                        <li>Now open (server)/application1/app1.html. What can you observe?</li>
-                        <li>Now hit (server)/images/logo.png What can you observe?</li>
 
                 </aside>
 
+            </section>
+            <section data-state="lab">
+                <h3>Lab 1.2: Serve Pages and Images</h3>
+                <ol>
+                    <li>Create the following <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> block:
+<pre><code class="linux" data-trim contenteditable>
+server {
+    listen 80;
+    root /home/student1/public_html;
+}
+</code></pre></li>
+<li>Add the following three <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">location</span></pre> prefixes:
+    <pre><code class="linux" data-trim contenteditable>
+location /application1 {}
+location /application2 {}
+location /images {}
+</code></pre></li>
+<li>Add an overriding <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directive in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/images</span></pre>:
+    <pre><code class="linux" data-trim contenteditable>
+    root /data;
+</code></pre></li>
+</ol>
+
+                <aside class="notes">
+                </aside>
             </section>
 
             <!--Next Section-->
@@ -803,7 +998,7 @@ server {
             <section>
                 <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_pass</pre> Directive</h3>
                 <p>Sets the address, and protocol, of the proxied server(s)</p>
-                <p>Syntax:<pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_pass <i>url</i></span></pre></pr>
+                <p>Syntax:<pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_pass $protocol$host$uri</span></pre></pr>
                     <p>Example:
                         <pre><code class="linux" data-trim contenteditable>
     location / {
@@ -822,18 +1017,19 @@ server {
             </section>
 
             <section>
-                <h3>Proxy With/Without a Path</h3>
-                <h4>With a Path</h4>
-                <pre><code class="linux" data-trim contenteditable>
+                <h3>Proxy With a Path</h3>
+                <p>Replaces matched portion of the request uri, including location prefix:</p>
+                <pre><code class="apache" data-trim contenteditable>
+#curl request example:
+$ curl http://server/application1/
+
+#NGINX selects a matching location prefix
 location /application1 {
-    proxy_pass http://localhost:8080/otherapp/;
+    proxy_pass http://localhost:8080/otherapp;
 }
-	</code></pre>
-                <h4>Without a Path</h4>
-                <pre><code class="linux" data-trim contenteditable>
-location /application2 {
-    proxy_pass http://localhost:8080
-}
+
+#proxy request becomes
+http://server:8080/otherapp/app1.html;
 	</code></pre>
                 <aside class="notes">
                     <p>With a Path</p>
@@ -850,32 +1046,86 @@ location /application2 {
                 </aside>
 
             </section>
-
             <section>
+                <h3>Proxy Without a Path</h3>
+                <p>Replaces matched portion of the request uri, NOT including location prefix:</p>
+                <pre><code class="apache" data-trim contenteditable>
+#curl request example:
+$ curl http://server/application2/
+
+#NGINX selects a matching location prefix
+location /application2 {
+    proxy_pass http://localhost:8080
+}
+
+#proxy request becomes
+http://server:8080/application2/index.html
+    </code></pre>
+    <aside class="notes"></aside>
+</section>
+<section>
+    <h3> To <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">/</span></pre> or Not To <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">/</span></pre></h3>
+    <p>Beware of trailing slash request mismatches.</p>
+    <pre><code class="apache" data-trim contenteditable>
+#Example curl request with NO trailing slash
+$ curl http://example.com/app1
+#NGINX Proxy prefix with a trailing slash, but proxy_pass has none
+location /app1/ {
+    proxy_pass http://application1;
+}
+#NGINX Backend prefix with a trailing slash
+location /application1/ {
+}
+
+#NGINX log shows it appending the slash through too many redirects
+GET /app1 HTTP/1.1 301 /app1/
+GET /app1// HTTP/1.1 301 /app1//
+...
+#Correct response(s) should be
+GET /app1/ HTTP/1.1 200 /app1/
+GET /app1/ HTTP/1.1 304 /app1/
+</code></pre>
+<aside class="notes">
+<p>There are situations when using a trailing slash, either in the prefix location, or at the end of your proxy_pass declaration, that will cause internal redirects to occur. Be careful that the prefix matching also matches the proxied request so you don't end up with doubl slashes, or uneccessarily appened slashes</p>
+</aside>
+</section>
+
+            <!--<section>
                 <h3>Proxy Scenario</h3>
+                
+                   <div style="float:left;width:65%;padding-right:0px;">
                 <pre><code class="linux" data-trim contenteditable>
 server {
-    listen 80;
-    root /home/student1/public_html;
+listen 80;
+root /home/student1/public_html;
 
-	location / {
-	    proxy_pass http://localhost:8080;
-	}
+  location / {
+     proxy_pass http://localhost:8080;
+  }
 
-	location /application1 {
-	    proxy_pass http://localhost:8080/sampleApp/;
-	}
+  location /application1 {
+     proxy_pass http://localhost:8080/app/;
+  }
 
-	location /images {
-	    root /data;
-	}
+  location /images {
+     root /data;
+  }
 }
-
+</code></pre>
+</div>
+<div style="float:right;width:35%;padding-right:0px;">
+    <pre><code class="linux" data-trim contenteditable>
 server {
     listen 8080;
-    root /data/proxy;
+    root /data;
 }
 	</code></pre>
+    <ul>
+        <li> <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/</span></pre> = :8080/data/index.html</li>
+        <li> <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application1</span></pre> = :8080/data/app/index.html</li>
+        <li> <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/images</span></pre> = no proxy</li>
+    </ul>
+</div>
                 <aside class="notes">
                     <ul>
                         <li>http://server is proxied to http://server:8080. Will load the index.html page in /data/proxy</li>
@@ -885,17 +1135,27 @@ server {
                     </ul>
 
                 </aside>
-            </section>
+            </section>-->
 
             <section data-state="lab">
-                <h3>Lab 2: Setup a Reverse Proxy</h3>
+                <h3>Lab 2.1: Setup a Reverse Proxy</h3>
                 <ol>
-                    <li>Create a new configuration file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server2.conf</span></pre> inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</span></pre></li>
-                    <li>Define a server context that listens on port <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">90</span></pre> and has a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directive pointing to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/server2</span></pre></li>
-                    <li>Open <strong>server1.conf</strong> from the previous exercise and modify the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application1</span></pre> context by adding a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_pass</span></pre> with the URI: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://localhost:90/sampleApp/</span></pre></li>
-                    <li>Save and Reload NGINX</li>
-                    <li>Open your browser and test your server url/application1. What do you see?</li>
-                </ol>
+                    <li>Create a new configuration file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server2.conf</span></pre>:
+                        <pre><code class="apache" data-trim contenteditable>
+$ sudo vim /etc/nginx/conf.d/server2.conf
+                        </code></pre></li>
+                    <li>Define the following server context:
+                     <pre><code class="apache" data-trim contenteditable>
+server {
+    listen 90;
+    root /data/server2;
+}
+                        </code></pre></li>
+                    <li>Save and exit the file, then open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre>:
+                        <pre><code class="apache" data-trim contenteditable>
+$ sudo vim /etc/nginx/conf.d/server1.conf
+                        </code></pre></li>
+                    </ol>
                 <aside class="notes">
                     <ol>
                         <li>cd</li>
@@ -920,6 +1180,29 @@ server {
 
                     <p>Explain why the client isn’t seeing /sampleApp in their URI because we used a url path in our proxy pass directive, it overrides the prefix location and sends the requests to /data/sever2 with our sample app folder but it’s not reflected in the client’s browser.</p>
 
+                </aside>
+
+            </section>
+
+            <section data-state="lab">
+                <h3>Lab 2.2: Test Your Proxy</h3>
+                <ol>
+                    <li>Add a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_pass</span></pre> in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application1</span></pre> with the URI:
+                        <pre><code class="apache" data-trim contenteditable>
+location /application1 {
+    proxy_pass http://localhost:90/sampleApp/;
+}
+                        </code></pre></li>
+                    <li>Save and Reload NGINX
+                        <pre><code class="apache" data-trim contenteditable>
+$ sudo nginx -s reload
+                    </code></pre></li>
+                    <li>Open your browser (or use <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl</span></pre>) and test <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://ec2-hostname/application1</span></pre>, what do you see?
+                    <pre><code class="apache" data-trim contenteditable>
+$ curl http://ec2-hostname/application1
+                    </code></pre></li>
+                    </ol>
+                <aside class="notes">
                 </aside>
 
             </section>
@@ -953,6 +1236,7 @@ server {
 
             <section>
                 <h3>Proxy Busy Buffers Example</h3>
+                <p>This example increases available buffers per request, while trimming down buffers stored in responses</p>
                 <pre><code class="linux" data-trim contenteditable>
 	server {
     proxy_buffering on; 
@@ -1090,7 +1374,7 @@ server {
                     <li>Records all attempts to access the server</li>
                     <li>Default log type is <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;"><i>combined</i></span></pre></li>
                 </ul>
-                <pre><code class="linux" data-trim contenteditable>
+                <pre><code class="apache" data-trim contenteditable>
                 			#Example
 access_log /var/log/nginx/server3.access.log combined;
                 		</code></pre>
@@ -1104,17 +1388,33 @@ access_log /var/log/nginx/server3.access.log combined;
             </section>
 
             <section>
-                <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">access_log</span></pre> Rules</h3>
+                <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">log_format</span></pre> Directive</h3>
+                <ul>
+                <li>Defined in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http</span></pre> context</li>
+                <li>Uses pre-defined or custom variables</li>
+                <li>Overrides default log type i.e. <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">combined</span></pre></li>
+            </ul>
+                <pre><code class="apache" data-trim contenteditable>
+                    log_format test_log "$request $status $request_uri";
+
+server {
+    listen 80;
+    root /home/student1/public_html;
+    access_log /var/log/nginx/public.log test_log;
+}
+                </code></pre>
+            </section>
+
+            <section>
+                <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">access_log</span></pre> Locations</h3>
 
                 <ul>
                     <li>Default locations
                         <ul>
                             <li>From source: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">logs/access.log</span></pre></li>
-                            <li>Binary dist: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/var/log/nginx/access.log</span></pre></li>
+                            <li>Binary distro: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/var/log/nginx/access.log</span></pre></li>
                         </ul>
                     </li>
-                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">log_format</span></pre> overrides default setting</li>
-                    <li>Defined using variables</li>
                 </ul>
 
                 <aside class="notes">
@@ -1125,34 +1425,13 @@ access_log /var/log/nginx/server3.access.log combined;
             </section>
 
             <section>
-                <h3>Useful Troubleshooting Variables</h3>
-
-                <ul>
-                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$upstream_connect_time</span></pre></li>
-                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$upstream_header_time</span></pre></li>
-                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$upstream_response_time</span></pre></li>
-                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$request_time</span></pre></li>
-                </ul>
-
-                <aside class="notes">
-                    <ul>
-                        <li>The time spent on establishing a connection with an upstream server</li>
-                        <li>The time between establishing a connection and receiving the first byte of the response header from the upstream server</li>
-                        <li>The time between establishing a connection and receiving the last byte of the response body from the upstream server</li>
-                        <li>The total time spent processing a request</li>
-
-                    </ul>
-                </aside>
-            </section>
-
-            <section>
                 <h3>Reading the Logs</h3>
-                <p>Various time result values:</p>
+                <p>When log values are separated by:</p>
                 <ul>
-                    <li>Separated by <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">,</span></pre></li>
-                    <li>Separated by <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">;</span></pre></li>
-                    <li>Separated by <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">0</span></pre></li>
-                    <li>Contains <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">-</span></pre></li>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">,</span></pre> = request processed by multiple servers</li>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">;</span></pre> = internal redirect between upstreams</li>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">0</span></pre> = unable to reach upstream</li>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">-</span></pre> = internal error or cached value</li>
                 </ul>
 
                 <aside class="notes">
@@ -1234,18 +1513,26 @@ access_log syslog:server=[2001:db8::1]:12345,facility=local7,tag=nginx,severity=
             </section>
 
             <section data-state="lab">
-                <h3>Lab 3: Setup Logging</h3>
+                <h3>Lab 3.1: Setup Logging</h3>
                 <ol>
-                    <li>Open server1.conf at <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</span></pre> and add an <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">error_log</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">access_log</span></pre> directive</li>
-                    <li>Set the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">error_log</span></pre> to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">info</span></pre>, and the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">access_log</span></pre> to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">combined</span></pre></li>
+                    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre>
+                        <pre><code class="apache" data-trim contenteditable>
+                            $ sudo vim /etc/nginx/conf.d/server1.conf
+                        </code></pre></li>
+                        <li>Add an <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">error_log</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">access_log</span></pre> directive with log levels of <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">info</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">combined</span></pre>:
+                            <pre><code class="apache" data-trim contenteditable>
+error_log /var/log/nginx/server1.error.log info;
+access_log /var/log/nginx/server1.access.log combined;
+                        </code></pre></li>
                     <li>Repeat the same steps for <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server2.conf</span></pre></li>
-                    <li>Save and Reload NGINX</li>
-                    <li>Open a browser, test <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://server/</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://server:90/</span></pre></li>
-                    <li>Back in your terminal, run a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">tail -f</span></pre> command for each <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">access_log</span></pre>. What do you see?</li>
-                </ol>
+                    <li>Save and Reload NGINX
+                        <pre><code class="apache" data-trim contenteditable>
+$ sudo nginx -s reload
+                        </code></pre></li>
+                    </ol>
                 <aside class="notes">
                     <p>Solution</p>
-                    <pre><code class="linux" data-trim contenteditable>
+                    <pre><code class="apache" data-trim contenteditable>
 		  		server {
     listen 80;
     root /home/student1/public_html;
@@ -1273,23 +1560,54 @@ server {
 }
 		  	</pre></code>
                 </aside>
-
             </section>
-            <section>
-                <h3>Conditional Logging</h3>
-                <p>Use variables to determine "logability"</p>
-                <pre><code class="linux" data-trim contenteditable>
-				map $status $loggable {
-    ~^[23]  0;
-    default 1;
+
+             <section data-state="lab">
+                <h3>Lab 3.2: Test Logging</h3>
+                <ol>
+                    <li>Open a browser and test your instance: 
+<pre><code class="apache" data-trim contenteditable>
+    $ curl http://ec2-hostname/
+$ curl http://ec2-hostname:90/
+</pre></code></li>                    
+<li>Check the logs with the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">tail -f</span></pre> command:
+                        <pre><code class="apache" data-trim contenteditable>
+$ sudo tail -f /var/log/nginx/server1.access.log
+$ sudo tail -f /var/log/nginx/server2.access.log
+                        </code></pre></li>
+                </ol>
+                <aside class="notes">
+                    <p>Solution</p>
+                    <pre><code class="linux" data-trim contenteditable>
+                server {
+    listen 80;
+    root /home/student1/public_html;
+    error_log /var/log/nginx/server1.error.log info;
+    access_log /var/log/nginx/server1.access.log combined;
+
+    location /application1 {
+        proxy_pass http://localhost:90/sampleApp/;
+    }
+
+    location /application2 {
+
+    }
+
+    location /images {
+        root /data;
+    }
 }
 
-access_log /path/to/access.log combined if=$loggable;
-			</code></pre>
-                <aside class="notes">
-                    <p>We cover more on the map directive, and variables later in the course, but this example is to show how we can leverage the if parameter of the access_log in order to determine conditions for NGINX to write to the log file. The advantage with this technique is you can exclude specific status codes (in this case successful and redirects) so that your logfile only consists of failed attempts.</p>
+server {
+    listen 90;
+    root /data/server2;
+    error_log /var/log/nginx/server2.error.log info;
+    access_log /var/log/nginx/server2.access.log combined;
+}
+            </pre></code>
                 </aside>
             </section>
+
 
             <!--Security Module-->
             <section data-background="rgb(20, 149, 62)">
@@ -1632,14 +1950,16 @@ add_header X-Frame-Options DENY;
             <section data-state="lab">
                 <h3>Lab 4.1: SSL Certs</h3>
                 <ol>
-                    <li>Create a directory for your certificates and key signatures</li>
+                    <li>Create a directory for certs and keys
                     <pre><code class="linux" data-trim contenteditable>
 		    	  $ sudo mkdir /etc/nginx/ssl -p
-		    </code></pre>
-                    <li>Run the following openssl command to generate a self-signed cert and key</li>
+		    </code></pre></li>
+                    <li>Change directories and run the openssl command:
                     <pre><code class="linux" data-trim contenteditable>
-		    	$ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx.key -out nginx.crt
-		    </code></pre>
+                $ cd /etc/nginx/ssl
+$ sudo openssl req -x509 -nodes -days 365 \ 
+-newkey rsa:2048 -keyout nginx.key -out nginx.crt \
+		    </code></pre></li>
                 </ol>
 
                 </aside>
@@ -1649,7 +1969,7 @@ add_header X-Frame-Options DENY;
             <section data-state="lab">
                 <h3>Lab 4.2: Configure SSL Parameters</h3>
                 <ol>
-                    <li>In the new <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl</span></pre> directory, create and add the following to a new file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl.params.conf</span></pre></li>
+                    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre>, and add the following directives in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context:
                     <pre><code class="linux" data-trim contenteditable>
 		    	ssl_certificate /etc/nginx/ssl/nginx.crt; 
 ssl_certificate_key /etc/nginx/ssl/nginx.key;
@@ -1662,11 +1982,12 @@ ssl_session_cache shared:SSL:10m;
 ssl_session_timeout 10m;
 ssl_session_tickets off;
 
-add_header Strict-Transport-Security "max-age=63072000; includeSubdomains";
+add_header Strict-Transport-Security 
+    "max-age=63072000; includeSubdomains";
 add_header X-Frame-Options DENY;
 add_header X-Content-Type-Options nosniff;
 
-		    </code></pre>
+		    </code></pre></li>
                     <li>Save and Close the file</li>
                 </ol>
                 <aside class="notes">
@@ -1678,27 +1999,29 @@ add_header X-Content-Type-Options nosniff;
             <section data-state="lab">
                 <h3>Lab 4.3: Configure HTTPS</h3>
                 <ol>
-                    <li>Save and open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre></li>
-                    <li>Add a new <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">return</span></pre> directive in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context that redirects all traffic to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">https</span></pre></li>
+                    <li>Convert your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context to listen on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">433</span></pre> with <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl</span></pre>:
+                    <pre><code class="linux" data-trim contenteditable>
+                server { 
+    listen 443 ssl; 
+    root /home/student1/public_html;
+    error_log /var/log/nginx/server1.error.log info;
+    access_log /var/log/nginx/server1.access.log combined;
+    ...
+    }
+}
+</code></pre></li>
+                    <li>Add a new <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> block forcing <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http</span></pre> traffic to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">https</span></pre>:
                     <pre><code class="linux" data-trim contenteditable>
 		    	server {
     listen 80
-    listen [::]:80 default_server ipv6only=on;
     return 301 https://$host$request_uri;
 }
 
-		    </code></pre>
-                    <li>Add another <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context that listens on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">433</span></pre>, enables <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl</span></pre>, and includes <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ssl.params.conf</span></pre></li>
-                    <pre><code class="linux" data-trim contenteditable>
-		    	server { 
-    listen 443 ssl; 
-    include /etc/nginx/ssl/ssl.params.conf;
-    }
-}
-</code></pre>
+		    </code></pre></li>
+                    
                 </ol>
                 <aside class="notes">
-                    <pre><code class="linux" data-trim contenteditable>
+                    <pre><code class="apache" data-trim contenteditable>
 		  	server {
     listen 80;
     listen [::]:80 default_server ipv6only=on;
@@ -1728,13 +2051,35 @@ server {
                         <li>Save and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">reload</span></pre> NGINX</li>
                         <li>Test your site on <a href="https://www.ssllabs.com/ssltest/" target="_blank">SSL Labs.com</a></li>
                         <li>Share your results with the class</li>
-                        <li>You should receive a "T" rating</li>
                     </ol>
                 </div>
 
                 <div style="float:right;width:40%;padding-right:0px;">
                     <img src="assets/images/aPlus.png" style="border:0; background:none; width:80%">
                 </div>
+
+                <aside class="notes">
+                    <ol>
+                        <li>You should recieve a rating of "T," because we're using self-signed certificates (below the T rating in small print should tell you your score if all trust issues are resolved)</li>
+                    </ol>
+                </aside>
+            </section>
+
+            <section data-state="lab">
+                <h3>Lab 4.5: What the "F"</h3>
+                    <ol>
+                        <li>Your test should recieve an "F" rating</li>
+                        <li>To patch the Oracle padding error, run the following commands:
+                            <pre><code class="apache" data-trim contenteditable>
+    $ sudo apt-get install --only-upgrade libssl1.0.0 openssl
+$ sudo nginx -s stop
+$ sudo apt-get update
+$ sudo nginx
+                            </code></pre></li>
+                        </li>
+                        <li>Clear your cache in SSLlabs.com, and re-test</li>
+                        <li>You should receive a "T" rating</li>
+                    </ol>
 
                 <aside class="notes">
                     <ol>
@@ -1806,6 +2151,7 @@ name2:password2
 
             <section>
                 <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">auth_request</span></pre> Module</h3>
+                <p>Implements authentication based on the result of a sub-request, rather than the browser</p>
                 <pre><code class="linux" data-trim contenteditable>
          	server {
     listen 443 ssl;
@@ -1815,7 +2161,7 @@ name2:password2
         auth_request /auth;
         auth_request_set  $user $upstream_http_x_user;
         proxy_set_header x-user $user; 
-        proxy_pass http://backend_server;
+        proxy_pass http://ldap_backend;
     }
 }
          </code></pre>
@@ -1831,14 +2177,35 @@ name2:password2
             </section>
 
             <section data-state="lab">
-                <h3>Lab 5: Setup Basic Authentication</h3>
+                <h3>Lab 5.1: Create a User:Password</h3>
                 <ol>
-                    <li>Open the password file called “htpasswd” inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx</span></pre></li>
+                    <li>Open the password file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">htpasswd</span></pre> inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx</span></pre>
+                        <pre><code class="apache" data-trim contenteditable>
+                            $ sudo vim /etc/nginx/htpasswd
+                        </code></pre></li>
                     <li>Delete the password for the admin entry</li>
-                    <li>Close and save the file. Back in the terminal, run <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">openssl passwd</span></pre></li>
-                    <li>Specify any user and password. Copy the encrypted output to your clipboard and paste into htpasswd</li>
-                    <li>Open server1.conf and enable authentication on the server level</li>
-                    <li>Save and reload NGINX. Open a browser and hit http://server</li>
+                    <li>Close and save the file. Back in the terminal, run the following command:
+<pre><code class="apache" data-trim contenteditable>
+                            $ openssl passwd
+                        </code></pre></li>
+                    <li>Specify any user and password, copy the encrypted output to your clipboard, and paste it back into <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">htpasswd</span></pre></li>
+                    <aside class="notes"></aside>
+                </section>
+        <section data-state="lab">
+                <h3>Lab 5.2: Setup Basic Auth</h3>
+                <ol> 
+                    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre> and enable authentication on the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context. Then point to the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">htpasswd</span></pre> file:
+                        <pre><code class="apache" data-trim contenteditable>
+                            $ sudo vim /etc/nginx/conf.d/server1.conf
+
+server {
+    listen 443 ssl;
+    ...
+    auth_basic "protected";
+    auth_basic_user_file /etc/nginx/htpasswd;
+}
+                        </code></pre></li>
+                    <li>Save and reload NGINX. Open a browser and test your instance's home page</li>
                     <li>Login with your username and password you specified</li>
                 </ol>
                 <aside class="notes">
@@ -2061,7 +2428,7 @@ name2:password2
                 <h3>Variable Example</h3>
                 <p>Given URL: http://localhost:8080/test?arg=1</p>
                 <ul>
-                    <li class="fragment" data-fragment-index="0"><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$host</span></pre> = localhost</li>
+                    <li class="fragment" data-fragment-index="0"><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$host</span></pre> = localhost:8080</li>
                     <li class="fragment" data-fragment-index="1"><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$request_uri</span></pre> = /test?arg=1</li>
                     <li class="fragment" data-fragment-index="2"><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$uri</span></pre> = /test</li>
                     <li class="fragment" data-fragment-index="3"><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$scheme</span></pre> = http://</li>
@@ -2078,6 +2445,27 @@ name2:password2
             </section>
 
             <section>
+                <h3>Useful Troubleshooting Variables</h3>
+
+                <ul>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$upstream_connect_time</span></pre></li>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$upstream_header_time</span></pre></li>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$upstream_response_time</span></pre></li>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$request_time</span></pre></li>
+                </ul>
+
+                <aside class="notes">
+                    <ul>
+                        <li>The time spent on establishing a connection with an upstream server</li>
+                        <li>The time between establishing a connection and receiving the first byte of the response header from the upstream server</li>
+                        <li>The time between establishing a connection and receiving the last byte of the response body from the upstream server</li>
+                        <li>The total time spent processing a request</li>
+
+                    </ul>
+                </aside>
+            </section>
+
+            <section>
                 <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">set</pre> Directive</h3>
                 <p>Syntax:<pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">set $variable_name <i>value</i>;</span></pre></p>
                 <pre><code class="linux" data-trim contenteditable>
@@ -2090,6 +2478,22 @@ set $combo $foo
 
             <section>
                 <h3>Declaration and Scope</h3>
+                <ul>
+                    <li>Declared when NGINX loads the configuration file</li>
+                    <li>Assigned at runtime</li>
+                    <li>Every config can have access to a variable</li>
+                    <li>Similar to Java method invocation</li>
+                </ul>
+                <aside class="notes">
+<p>Variables must be declared when NGINX loads the configuration file</p>
+                    <p>Values are assigned at run time</p>
+                    <p>Can be accessed by entire configuration assuming the variable is declared in the appropritate context</p>
+                    <p>Each variable runs its own container, in other words variables are only calculated/processed when there's a request for one</p>
+                </aside>
+            </section>
+
+            <section>
+                <h3>Scope Example</h3>
                 <p></p>
                 <pre><code class="linux" data-trim contenteditable>
               	server {
@@ -2116,9 +2520,7 @@ server {
 }
 		  	</pre></code>
                 <aside class="notes">
-                    <p>Variables must be declared when NGINX loads the configuration file</p>
-                    <p>Values are assigned at run time</p>
-                    <p>Variables can be accessed across the entire configuration</p>
+
                     <p>Each request runs its own variable container</p>
                     <p>So given this example, which requests will actually server or print the variable name given our requests are:</p>
                     <ul>
@@ -2160,6 +2562,7 @@ server {
 
             <section>
                 <h3>Default Value</h3>
+                <p>Default values protect NGINX from translation errors</p>
                 <pre><code class="linux" data-trim contenteditable>
 	map $arg $value {
     default 1;
@@ -2178,6 +2581,7 @@ server {
 
             <section>
                 <h3>Regex in Maps</h3>
+                <p>Only named captures work in maps, no positional captures</p>
                 <pre><code class="linux" data-trim contenteditable>
 map $uri $path {
     ~*/test/.*\.php$ /path4;
@@ -2193,6 +2597,22 @@ map $uri $path {
                     <p>Regex starts with ~ for case sensitive matching</p>
                     <p>~* for case insensitive matching</p>
 
+                </aside>
+            </section>
+
+            <section>
+                <h3>Use Case: Conditional Logging</h3>
+                <p>Use variables to determine "loggability"</p>
+                <pre><code class="linux" data-trim contenteditable>
+                map $status $loggable {
+    ~^[23]  0;
+    default 1;
+}
+
+access_log /path/to/access.log combined if=$loggable;
+            </code></pre>
+                <aside class="notes">
+                    <p>Here's an example that shows how we can leverage the if parameter of the access_log in order to determine conditions for NGINX to write to the log file. The advantage with this technique is you can exclude specific status codes (in this case successful and redirects) so that your logfile only consists of failed attempts.</p>
                 </aside>
             </section>
 
@@ -2308,8 +2728,16 @@ curl http://localhost/test1, /test2, /test3, /test4, /test4241234
                 <section data-state="lab">
                     <h3>Lab 7: Alias Replacement</h3>
                     <ol>
-                        <li>Change directory to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</span></pre> and open<pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre>.</li>
-                        <li>In <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application2</span></pre> prefix, specify a replacement path of <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/test</span></pre> using the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">alias</span></pre> directive.</li>
+                        <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre>:
+<pre><code class="apache" data-trim contenteditable>
+    $ sudo vim /etc/nginx/conf.d/server1.conf
+</code></pre></li>
+                        <li>In the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/application2</span></pre> prefix, specify a replacement path of <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/test</span></pre> using the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">alias</span></pre> directive:
+                            <pre><code class="apache" data-trim contenteditable>
+location /application2 {
+    alias /data/test;
+}    
+                            </code></pre></li>
                         <li>Save the file and reload Nginx. Test against <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://server/application2/logo.png</span></pre> What do you observe? Try the other URIs</li>
                     </ol>
                     <aside class="notes">
@@ -2348,9 +2776,12 @@ location /images {
                 <section data-state="lab">
                     <h3>Lab 7.5: Regex Alias</h3>
                     <ol>
-                        <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre> and edit the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/images</span></pre> prefix to be a case insensitive regex, with a URI match of <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/pictures.</span></pre></li>
-                        <li>In the regular expression, ensure that the capture group includes 1 or more occurences of any character followed by a "." and ending in either <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">gif, jpeg, jpg,</span></pre> or, <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">png</span></pre></li>
-                        <li>Inside the location block, define the replacement path as: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/data/images/$1</span></pre></li>
+                        <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre> and edit the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/images</span></pre> prefix to be a case insensitive regex with a URI match of <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/pictures</span></pre>:
+<pre><code class="apache" data-trim contenteditable>
+    location ~ ^/pictures/(.+\.(gif|jpe?g|png))$ {
+    alias /data/images/$1;
+} 
+</code></pre></li>
                         <li>Save the file and reload Nginx. Test against <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://server/pictures/logo.png</span></pre> What do you observe?</li>
                     </ol>
                     <aside class="notes">
@@ -2429,11 +2860,19 @@ server {
                 <section data-state="lab">
                     <h3>Lab 8.1: Setting Up Rewrite Data</h3>
                     <ol>
-                        <li>Inside your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html</span></pre> folder, ensure that there are the following directories and files: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/shop/products/product1.html product2.html product3.html</span></pre></li>
-                        <li>Inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">product1.html</span></pre> edit the paragraph tag by removing <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">8080</span></pre> and replacing <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">&#60;server&#62;</span></pre> with your ec2 url</li>
+                        <li>Change directories to:
+                        <pre><code class="apache" data-trim contenteditable>
+                        $ cd /home/student1/public_html/shop/products
+                    </code></pre></li>
+                        <li>Ensure that the following files exist:
+                            <pre><code class="apache" data-trim contenteditable>
+                                $ ls
+product1.html product2.html product3.html
+</code></pre></li>
+                        <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">product1.html</span></pre> amd edit the paragraph tag by removing <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">8080</span></pre> and replacing <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">&#60;server&#62;</span></pre> with your ec2-hostname</li>
                         <pre><code class="html" data-trim contenteditable>
 				&#60;p&#62;
-&#60;img src="&#60;server&#62;/media/pics/logo.png"/&#62;
+&#60;img src="http://&#60;ec2-hostname&#62;/media/pics/logo.png"/&#62;
 &#60;/p&#62;
 
 			</pre></code>
@@ -3438,9 +3877,9 @@ server {
                     </aside>
                 </section>
                 <section data-state="lab">
-                    <h3>Lab 13.2: Server Maintenance Continued</h3>
+                    <h3>Lab 13.2: Health Check Params</h3>
                     <ol>
-                        <li>In the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">location</span></pre> prefix that matches all requests, add the following <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">match</span></pre> parameters:
+                        <li>In the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/</span></pre>, add the following <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">match</span></pre> parameters:
                             <pre><code class="linux" data-trim contenteditable>
 		    		location / {
     proxy_pass http://myServers;
@@ -3455,7 +3894,7 @@ server {
                         <li>A server is down. To fix it, change the text "maintenance" in the test.html for backend3</li>
                         <pre><code class="linux" data-trim contenteditable>
 		    	$ cd /data/server2/backend3/health/
-		    	$ sudo vim test.html
+$ sudo vim test.html
 		    		</code></pre>
                     </ol>
                     <aside class="notes">
@@ -3518,17 +3957,18 @@ server {
             </section>
 
             <section>
-                <h3>Configuring the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_cache_path</span></pre></h3>
+                <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_cache_path</span></pre></h3>
                 <ul>
-                    <li>Must define path to directory or mount point/disk in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">http</span></pre> context</li>
-                    <li>Uses hybrid persistent model via a two level directory system</li>
+                    <li>Defined in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http</span></pre> context</li>
+                    <li>Directive must point to directory or mount point/volume attached to instance</li>
+                    <li>Uses <a href="https://www.nginx.com/blog/cache-placement-strategies-nginx-plus/" target="_blank">hybrid persistent</a> model via a two level directory system</li>
                 </ul>
                 <pre><code class="linux" data-trim contenteditable>
 proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=img_cache:20m inactive=5m;
 </code></pre>
                 <aside class="notes">
                     <p>In order for the cache to work we must create a path to the directory or disk that will store the cached resource</p>
-                    <p>We also must add the levels parameter which sets up a two‑level directory hierarchy under our cache directory path. The reason we need this paramter is because otherwise or base path could potentially have a large number of files in a single directory, which can slow down file access. Setting it to a two‑level directory hierarchy for most deployments will tell NGINX to NOT put all files in the same directory. </p>
+                    <p>We also must add the levels parameter which sets up a two‑level directory hierarchy under our cache directory path. The reason we need this paramter is because otherwise or base path could potentially have a large number of files in a single directory, which can slow down file access. Setting it to a two‑level directory hierarchy for most deployments will tell NGINX to NOT put all files in the same directory. If they're in the same directory it can slow down cache reads and writes</p>
                     <p>The keys_zone paramter sets up the shared memory zone name and size allocated for storing the metadata and cache keys (md5 hash).</p>
                     <p>the inactive paramter is used for specifying the life cycle of a cached resource that's no longer accessed. Once that time limit is exceeded, the resource will be evicted from the cache.</p>
                 </aside>
@@ -3537,8 +3977,8 @@ proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=img_cache:20m inactive=5
             <section>
                 <h3>Configuring the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_cache</span></pre></h3>
                 <ul>
-                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_key</span></pre></li>
-                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache</span></pre></li>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_key</span></pre>: generates md5 hash</li>
+                    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache</span></pre>: writes to the cache</li>
                 </ul>
                 <pre><code class="linux" data-trim contenteditable>
 		location / {
@@ -3546,8 +3986,6 @@ proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=img_cache:20m inactive=5
 
     proxy_cache_key "$scheme$host$request_uri";
     proxy_cache my-cache;
-    proxy_cache_valid 1m;
-    proxy_cache_valid 404 1m;
 }
 </code></pre>
                 <aside class="notes">
@@ -3562,9 +4000,15 @@ proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=img_cache:20m inactive=5
 
             <section>
                 <h3>Validating the Cache</h3>
+                <p>Honors (or overrides) Cache-Control origin headers</p>
 
                 <pre><code class="linux" data-trim contenteditable>
 		location / {
+    proxy_pass http://application.com:8080;
+
+    proxy_cache_key "$scheme$host$request_uri";
+    proxy_cache my-cache;
+
     proxy_cache_valid any 1m;
     proxy_cache_valid 404 1m;
 }
@@ -3577,6 +4021,7 @@ proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=img_cache:20m inactive=5
 
             <section>
                 <h3>Passing Headers</h3>
+                <p>In order to audit client address, as well as proxy address, we can forward the hearders to the backend</p>
                 <pre><code class="linux" data-trim contenteditable>
 		proxy_set_header	Host	$host;
 proxy_set_header	X-Real-IP	$remote_addr;
@@ -3597,6 +4042,7 @@ proxy_set_header	X-Forwarded-For	$proxy_add_x_forwarded_for;
 
             <section>
                 <h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">add_header</span></pre> Directive</h3>
+                <p>Inserts response headers—can map to a variable</p>
                 <pre><code class="linux" data-trim contenteditable>
 		server {
 […]
@@ -4257,28 +4703,43 @@ http://&#60;server&#62;:8080/upstream_conf?upstream=myServers&#38;id=0&#38;serve
             </section>
 
             <section data-state="lab">
-                <h3>Lab 18: Persistent Dynamic Config</h3>
+                <h3>Lab 18.1: Persistent Changes</h3>
                 <ol>
-                    <li>Create a directory for <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/var/lib/nginx/state</span></pre> and change ownership of the path like so:
-                        <pre><code class="linux" data-trim contenteditable>
+                    <li>Create a directory for the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">state</span></pre> file and change ownership so NGINX has write permissions:
+                        <pre><code class="apache" data-trim contenteditable>
 $ sudo mkdir -p /var/lib/nginx/state
 $ sudo chown nginx:nginx /var/lib/nginx/state
-</code></pre>
-                    </li>
+</code></pre></li>
+<li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server1.conf</span></pre> and comment out each <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">upstream</span></pre>, then add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">state</span></pre> directive:
+<pre><code class="apache" data-trim contenteditable>
+    upstream myServers {
+    zone backend 64k;
+    state /var/lib/nginx/state/backend.state;
+    
+    #server 127.0.0.1:8081;
+    #server 127.0.0.1:8082;
+    #server 127.0.0.1:8083;
+}
+</code></pre></li>
+</ol>
+</section>
 
-                    <li>Comment out the existing servers in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">upstream</span></pre></li>
-                    <li>Add the state directive in it's place
-                        <pre><code class="linux" data-trim contenteditable>
-state /var/lib/nginx/state/backend.state;
-</code></pre>
-                    </li>
-                    <li> Save NGINX and reload</li>
-                    <li>Run in a new browser window enter the following urls:<pre><code class="linux" data-trim contenteditable>
-	&#60;server&#62;:9090/upstream_conf?add=&#38;upstream=myServers&#38;server=127.0.0.1:8081&#38;weight=5
-&#60;server&#62;:9090/upstream_conf?add=&#38;upstream=myServers&#38;server=127.0.0.1:8082&#38;weight=4
-&#60;server&#62;:9090/upstream_conf?add=&#38;upstream=myServers&#38;server=127.0.0.1:8083&#38;weight=3
+<section data-state="lab">
+                <h3>Lab 18.2: Changing the State</h3>
+                <ol>
+                    <li> Save NGINX and reload. Check <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">status.html</span></pre></li>
+                    <li>Your servers vanished!</li>
+                    <li>Create/edit the state file and add server details to create a new upstream:
+    <pre><code class="linux" data-trim contenteditable> 
+#Create and edit the state file:
+$ sudo vim /var/lib/nginx/state/backend.state
+
+        server 127.0.0.1:8081;
+        server 127.0.0.1:8082;
+        server 127.0.0.1:8083;
 	</code></pre></li>
-                    <li>Go to your status.html page and dynamically edit these server details</li>
+    <li>Go to your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">status.html</span></pre> page and edit these server details using the GUI</li>
+    <li>Reload and NGINX and see if the changes persist</li>
                 </ol>
                 <aside class="notes">
                     <p>Solution:</p>
@@ -4324,7 +4785,7 @@ state /var/lib/nginx/state/backend.state;
             <section>
                 <h3>NGINX Signing Key</h3>
                 <pre><code class="linux" data-trim contenteditable>
-		wget http://nginx.org/keys/nginx_singing.key
+		wget http://nginx.org/keys/nginx_signing.key
 		sudo apt-key add nginx_signing.key
 	</code></pre>
                 <aside class="notes">
@@ -4447,13 +4908,15 @@ sudo apt-get install nginx
             </section>
 
             <section>
-                <h3>Command Reference</h3>
-                <pre><code class="linux" data-trim contenteditable>
-		sudo wget &#60;nginx.org/en/download link address&#62;
-tar -xvf &#60;nginx_mainline_version&#62;.tar.gz
-cd &#60;nginx_mainline_verison&#62;
-./configure --with-http_ssl_module --with-debug --with-&#60;other_modules&#62;
-make &#38;&#38; sudo make install
+                <h3>Command Steps</h3>
+                <p>Copy the Mainline download link here: <a href="http://nginx.org/en/download.html" target="_blank">http://nginx.org/en/download.html</a></p>
+                <pre><code class="apache" data-trim contenteditable>
+		$ sudo wget http://&#60;nginx_mainline_verison&#62;
+$ tar -xvf &#60;nginx_mainline_version&#62;.tar.gz
+$ sudo apt-get install libpcre3-dev build-essential libssl-dev
+$ cd &#60;nginx_mainline_verison&#62;
+$ ./configure --with-http_ssl_module --with-debug --with-&#60;other_modules&#62;
+$ make &#38;&#38; sudo make install
 	</code></pre>
                 <aside class="notes"></aside>
             </section>
@@ -4468,9 +4931,10 @@ make &#38;&#38; sudo make install
                     <li>--conf-path=path</li>
                     <li>--error-log=path</li>
                     <li>--http-log=path</li>
-                    <pre><code class="linux" data-trim contenteditable>
-#Example
-./configure --sbin-path=/usr/local/nginx/nginx –-conf-path=/usr/local/nginx/nginx.conf
+                </ul>
+                    <pre><code class="apache" data-trim contenteditable>
+# Example
+./configure --sbin-path=/usr/local/nginx --error-log=/logs
 </code></pre>
                     <aside class="notes">
                         <p>NGINX will yell at you if you try to compile your binanry witha module that requires a dependency.</p>
