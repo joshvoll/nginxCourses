@@ -1,0 +1,2026 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>NGINX - Video Streaming</title>
+
+		 <meta name="description" content="Learn and practice with NGINX Plus!">
+    	<meta name="author" content="James Tacker">
+
+    	<meta name="apple-mobile-web-app-capable" content="yes">
+    	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    	<link rel="stylesheet" href="css/reveal.css">
+    	<link rel="stylesheet" href="css/theme/nginx.css" id="theme">
+
+    	<!--favicon-->
+    	<link rel="shortcut icon" href="assets/images/nginxfavicon.ico" type="image/x-icon" />
+
+    	<!-- Theme used for syntax highlighting of code -->
+    	<link rel="stylesheet" href="lib/css/zenburn.css">
+
+    	<!-- Printing and PDF exports -->
+   		<script>
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match(/print-pdf/gi) ? 'css/print/pdf.css' : 'css/print/paper.css';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    	</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+	  <div class="reveal">
+
+        <style>
+            .reveal .slides {
+                text-align: left;
+            }
+            
+            .reveal .slides h1 {
+                text-align: center;
+
+            }
+            
+            .reveal .slides h2 {
+                text-align: center;
+            }
+            
+            .reveal .slides h3 {
+                text-align: center;
+                font-variant: none;
+                text-transform: none;
+            }
+        </style>
+		<!-- Any section element inside of this container is displayed as a slide -->
+		<img src="assets/images/nginxlogo.png" style="border:0; width:100px; height:100px; background:none; position:absolute; left:0; top:0;">
+        <img id="lab_pic" src="assets/images/Laboratory3.png" style="visibility:hidden; border:0; width:200px; height:200px; background:none; position:absolute; right:0; top:0;">
+
+        <div class="footer">
+          <font size="1">© Copyright 2017 by ServiceRocket, Inc | Confidential | Prepared for NGINX Inc.</font>
+        </div>
+
+	        <div class="slides">
+
+            <section data-background="rgb(20, 149, 62)">
+            	
+                <h1>Video Streaming</h1>
+
+                <p style="text-align:center">
+	              <small><i>Flawless Application Delivery</i></small>
+                </p>
+              </section>
+
+ <!--IF James IS TEACHING-->
+           
+			<section>              
+					<h3>Trainer Intro</h3>
+
+                    <div style="float:left;width:50%;" class="centered">
+                      <p>
+                      <strong>James Tacker</strong>
+                      <p>Technology Consultant & Content Developer</p>
+                      <p>Previous Training Work:</p>
+                      <ul>
+                      	<li>Sauce Labs</li>
+                      	<li>New Relic</li>
+                      	<li>Salesforce</li>
+                      	<li>Atlassian</li>
+                      </ul>
+                      <p><a href="mailto:james.tacker@servicerocket.com">james.tacker@servicerocket.com</a></p>
+
+					  </p>
+                    </div>
+
+                    <div style="float:right;width:40%;padding-right:0px;">
+                      <img src="assets/images/Picture1.png" style="border:0;background:none; left:0; top:0;">
+                    </div>
+				</section>
+
+	      <section>
+		<h3>Prerequisites/Expectations</h3>
+		<ul>
+		  <li>Sysadmin, DevOps, Solution Architect</li>
+		  <li>Completed NGINX Core</li>
+		  <li>Some familiarity with Linux</li>
+		  <li>Text Editor: Vim, Vi, Emacs etc.</li>
+		  <li>Solid understanding of Network topologies</li>
+		</ul>
+		<aside class="notes">
+			<p>This course is designed for those who want to take their understanding and skills with nginx to the next level.</p>
+<p>This course is the next step in your roadmap to become a certified NGINX solutions architect.
+This course assumes you have basic Linux command line knowledge as well as how to use a text editor like vim or nano.a
+For those of you using Windows, you’ll want to a Linux OS on a virtual machine of your choosing.</p>
+
+		</aside>
+	      </section>
+	      
+              <section>
+                <h3>The Training Environment</h3>
+		
+                <ul>
+                  <li>AWS EC2 Instances</li>
+                  <li>Ubuntu</li>
+                  <li>NGINX Plus</li>
+                  <li>Flowplayer (Flash)</li>
+                </ul>
+		
+                <aside class="notes">
+                 
+		  
+                </aside>
+              </section>
+
+	      <section>
+		<h3>Log Into VM</h3>
+		<p>If you haven't done so already, please take the time to SSH into your EC2 Instances (Windows users use <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html" target="_blank">PuTTY</a>).</p>
+		<p>Check your email for the login credentials, check your spam folder!</p>
+		<pre><code class="linux" data-trim contenteditable>
+                        ssh student&#60;number&#62;&#64;&#60;ec2-server-hostname&#62;
+                  </code></pre>
+	      </section>
+	      
+	      <section>
+		<h3>Course Administration</h3>
+		<ul>
+			<li>Course Duration: 4 hours</li>
+			<li>Ask questions at any time!</li>
+		</ul>
+	      </section>
+	      
+              <section>
+                <h3>Agenda</h3>
+
+                <div style="text-align:left;">
+                    <img src="assets/images/NGINXVideoStreamingAgenda.png" style="border:0;background:none; left:0; top:0;">
+                </div>
+		
+		<aside class="notes">
+		<p>So for this first day we're going to continue our understanding of how to lock down NGINX to a greater degree than what we learned in NGINX Core, then we will explore the web server use case and learn about the configuration file, then we will usetup a proxy server, as well as learn about logging. Eventually we will setup our site to use ssl, and then we will round out the day learning about variables</p>
+
+		</aside>
+              </section>
+
+              <section data-background="rgb(20, 149, 62)">
+                <h2>Video Streaming Concepts</h2>
+              </section>
+
+                <section>
+                  <h3>Module Objectives</h3>
+                  <p>This module reviews the following topics:</p>
+                  <ul>
+                    <li>Outline various streaming methods:
+                    	<ul>
+                    		<li>Progressive Download</li>
+                    		<li>Pseudo-Streaming</li>
+                    		<li>RTMP/RTSP Streaming</li>
+                    		<li>Adaptive HTTP Streaming</li>
+                    	</ul>
+                    <li>Explore Pros and Cons</li>
+                    
+		  </ul>
+                  <aside class="notes"></aside>
+                </section>
+
+		<section>
+		  <h3>Progressive Download</h3>
+		  <img src="assets/images/progDownload.png" style="border:none; background:none; width:100%">
+		  <aside class="notes">
+		    <ul>
+		    	<li>Simplest form of video delivery</li>
+<li>Point a video player to a file and it will download and play the file</li>
+<li>Playback begins when enough of the file has been downloaded</li>
+<li>Video player will continue to download the rest of the file</li>
+</ul>
+
+<p>Without progressive download, a client has to download the entire media file before video playback can start. Media files are typically large, so users must wait a significant time before they can watch the video, resulting in a disappointing user experience. With progressive download, only a small part of the video file has to be dowloaded before playback begins. (Even with progressive download, low bandwidth can make the download lag behind the rate of play, in which case playback pauses until enough material is downloaded for viewing to continue.)
+
+Progressive download is possible because at the start of the download the media server sends metadata about the video file to the video player. The metadata functions like a table of contents, enabling playback to begin without all the data being available.</p>
+		  </aside>
+		</section>
+
+		<section>
+			<h3>Progressive Download</h3>
+			<div style="float:left;width:50%;" class="centered">
+				<h4>PROS</h4>
+			<ul>
+				<li>Simple Setup</li>
+				<li>Works with every HTTP Web Server</li>
+			</ul>
+		</div>
+
+		<div style="float:right;width:50%;padding-right:0px;">
+			<h4>CONS</h4>
+			<ul>
+				<li>Low bandwidth can disrupt playback</li>
+				<li>Video quality is locked</li>
+				</ul>
+		</div>
+
+			
+			<aside class="notes">
+Even with progressive download, low bandwidth can make the download lag behind the rate of play, in which case playback pauses until enough material is downloaded for viewing to continue. Also, because of the metadata structure of progressive download, it doesn't enable adaptive bitrates so video quality is usually locked.
+			</aside>
+		</section>
+
+
+		<section>
+			<h3>Pseudo-Streaming</h3>
+			 <img src="assets/images/streaming.png" style="border:none; background:none; width:100%">
+			<aside class="notes">
+<p>Pseudo-streaming is an extension of the progressive download method. It allows the player to “seek” to a part of the video that has not been downloaded yet and start the playback from that point</p>
+<p>The way it works is when the video is initially loaded, the player reads and stores a list of seekpoints as part of the video's metadata. These seekpoints are offsets in the video (both in seconds and in bytes) at which a new keyframe starts.</p>
+
+<p>When a user seeks to a not-yet-downloaded part of the video, the player maps this seek to the nearest seekpoint. Next, the player does a request to the server, adding the seekpoint as a querystring parameter:</p>
+
+<p>the Webserver modules to enable psuedo-streaming out of the box for NGINX are the FLV and MP4 (H.264 codec support) modules</p>
+			</aside>
+		</section>
+
+		<section>
+			<h3>RTMP/RTSP Protocols</h3>
+			<ul>
+				<li>Provides true real time streaming</li>
+				<li>No data downloaded in advance</li>
+				<li>Video frames are ephemeral</li>
+				<li>No third party support for RTSP</li>
+			</ul>
+			<aside class="notes"></aside>
+		</section>
+
+		<section>
+			<h3>Pseudo-Streaming</h3>
+			<div style="float:left;width:50%;" class="centered">
+				<h4>PROS</h4>
+			<ul>
+				<li>Start at "seekpoint"</li>
+				<li>Scrub the Playhead</li>
+			</ul>
+		</div>
+
+		<div style="float:right;width:50%;padding-right:0px;">
+			<h4>CONS</h4>
+			<ul>
+				<li>Manifest File</li>
+				</ul>
+		</div>
+			<aside class="notes">
+				<ul>
+<li>Download of a video file can start at the "seekpoint" rather than the beginning</li>
+<li>Skip to any part of the video and only download from that point onwards</li>
+</ul>
+
+<ul>
+	<li>Files have to be prepared in advance to allow for seeking i.e. the manifest file</li>
+</ul>
+			</aside>
+		</section>
+
+
+		<section>
+			<h3>Adaptive HTTP Streaming</h3>
+			<img src="assets/images/adaptiveStream.png" style="border:none; background:none; width:100%">
+			<aside class="notes">
+<p>Adaptive Streaming is a technique where video files are split into many fragments and the client requests for the file one fragment at a time</p>
+<ul>
+	<li>Fragments are typically 5-10 seconds</li>
+<li>When the player reaches the end of a fragment it will request for the next one</li>
+<li>Multiple competing technology stacks
+<ul>
+Apple HLS (HTTP Live Streaming)
+Adobe HDS (HTTP Dynamic Streaming)
+</ul>
+</li>
+</ul>
+			</aside>
+		</section>
+
+		<section>
+			<h3>Adaptive HTTP Streaming</h3>
+			<div style="float:left;width:50%;" class="centered">
+				<h4>PROS</h4>
+			<ul>
+				<li>Compatible with most HTTP servers</li>
+				<li>Combines Progressive Download and Pseudo-streaming</li>
+				<li>Efficient Bandwidth</li>
+				<li>Adaptive Bitrate</li>
+			</ul>
+		</div>
+
+		<div style="float:right;width:50%;padding-right:0px;">
+			<h4>CONS</h4>
+			<ul>
+				<li>Competing Standards</li>
+				<li>No Cross-Platform (HLS)</li>
+				<li>Conversion difficulties</li>
+				</ul>
+		</div>
+			<aside class="notes">
+<h4>Pros</h4>
+<ul>
+<li>Combines the best advantages of the progressive download and RTMP/RTSP streaming methods</li>
+<li>Works with standard HTTP web servers (no special media servers required)</li>
+<li>More efficient use of bandwidth</li>
+<li>Ability to switch video quality on the fly</li>
+</ul>
+<h4>Cons</h4>
+<ul>
+<li>Lack of agreed standards</li>
+<li>HLS vs HDS</li>
+<li>HLS more effective for iOS devices but lacks support on other platforms</li>
+<li>Existing MP4 files have to be converted into their fragmented form</li>
+</ul>
+
+			</aside>
+		</section>
+		
+		<section data-background="rgb(20, 149, 62)">
+                  <h2>NGINX Streaming Modules</h2>
+                 </section>
+
+		<section>
+                  <h3>Module Objectives</h3>
+                  <p>This module enables you to:</p>
+                  <ul>
+                    <li>Outline NGINX-supported Streaming Modules
+                    	<ul>
+                    		<li>FLV Module</li>
+                    		<li>MP4 Module</li>
+                    		<li>HLS Module</li>
+                    		<li>F4F Module</li>
+                    	</ul></li>
+                    <li>Outline 3rd Party Options</li>
+                    </ul>
+                  <aside class="notes"></aside>
+        </section>
+
+    <section>
+		<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">ngx_http_flv_module</span></pre> Module</h3>
+		<ul>
+			<li>Psuedo-Streaming support</li>
+			<li>Allows "Seekpoints" and "Scrubbing"</li>
+		</ul>
+<pre><code class="linux" data-trim contenteditable>
+		location ~ \.flv$ {
+    flv;
+}
+</code></pre>
+		<aside class="notes">
+<p>Provides pseudo-streaming server side support for flash video files, allows clients to make requests for a flash video starting at a particular point, and allows the user to scrub the playhead for the video file</p>
+<p>It handles requests with the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">start</span></pre> argument in the request URI’s query string specially, by sending back the contents of a file starting from the requested byte offset and with the prepended FLV header.</p>
+</aside>
+	</section>
+
+<section>
+		<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">ngx_http_mp4_module</span></pre> Module</h3>
+		<ul>
+			<li>Psuedo-Streaming support</li>
+			<li>Video must use H.264 codec</li>
+			<li>Requires HTML5 or Flash Player on client side</li>
+		</ul>
+<pre><code class="linux" data-trim contenteditable>
+		location /video/ {
+    mp4;
+}
+</code></pre>
+		<aside class="notes">
+			<p>The ngx_http_mp4_module module provides pseudo-streaming server-side support for MP4 files. Such files typically have the .mp4, .m4v, or .m4a filename extension</p>
+<p>Pseudo-streaming works in alliance with a compatible Flash player. The player sends an HTTP request to the server with the start time specified in the query string argument (named simply start and specified in seconds), and the server responds with the stream such that its start position corresponds to the requested time, for example:</p>
+<pre><code class="linux" data-trim contenteditable>
+http://example.com/elephants_dream.mp4?start=238.88
+</code></pre>
+		</aside>
+	</section>
+
+	<section>
+		<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">ngx_http_hls_module</span></pre> Module</h3>
+		<ul>
+			<li>HTTP Live Streaming support</li>
+			<li>On-the-fly-segmentation</li>
+			<li>Note: NGINX only supports VOD</li>
+		</ul>
+		<aside class="notes">
+			<ul>
+			<li>HTTP Live Streamin Support for MP4 or .MOV files using the H.264/AAC codec</li>
+			<li>On-the-Fly Segmentation for MP4 files</li>
+			<li>Note: Apple’s HTTP Live Streaming technology stack can support both live videos and video on demand (VOD). NGINX HLS module only supports VOD</li>
+		</ul>
+		</aside>
+	</section>
+
+	<section>
+		<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">ngx_http_f4f_module</span></pre> Module</h3>
+		<ul>
+			<li>Adobe HTTP Dynamic Streaming Support</li>
+			<li>Files need to be pre-processed</li>
+			
+		</ul>
+		<aside class="notes">
+<ul>
+	<li>Provides server side support for Adobe HTTP Dynamic Streaming</li>
+	<li>Video files need to be pre-processed with Adobe’s f4f packager</li>
+</ul>
+<p>This module implements handling of HTTP Dynamic Streaming requests in the “/videoSeg1-Frag1” form — extracting the needed fragment from the videoSeg1.f4f file using the videoSeg1.f4x index file. This module is an alternative to the Adobe’s f4f module (HTTP Origin Module) for Apache.</p>
+
+		</aside>
+	</section>
+	
+ <!--Next Section-->
+		<section data-background="rgb(20, 149, 62)">
+                  <h2>Progressive Downloading and Pseudo-Streaming</h2>
+                 </section>
+
+         <section>
+                  <h3>Module Objectives</h3>
+                  <p>This module enables you to:</p>
+                  <ul>
+                    <li>Create a progressive download solution</li>
+                    <li>Create a pseudo-streaming solution</li>
+                    <li>Utilize the NGINX+ HLS Module</li>
+                    <li>Utilize the NGINX+ F4F Module</li>
+		  </ul>
+                  <aside class="notes"></aside>
+                </section>
+
+                <section data-state="lab">
+		  <h3>Lab 1.1: Setup Folder Structure</h3>
+		  <ol>
+		    <li>Create the following directory tree <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">videos/flv</span></pre> in your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html</span></pre> directory
+<pre><code class="linux" data-trim contenteditable>
+	$ cd /home/student1/public_html
+$ sudo mkdir -p videos/flv
+</code></pre>
+		    </li>
+<li>Move the flash video in your home directory (<pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">wildlife.flv</span></pre>) to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">videos/flv</span></pre>
+	<pre><code class="linux" data-trim contenteditable>
+		$ cd
+$ sudo mv wildlife.flv public_html/videos/flv
+</code></pre>
+</li>
+<li>Rename the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">index.html</span></pre> file inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html</span></pre> to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">flvdemo.html</span></pre>
+<pre><code class="linux" data-trim contenteditable>
+	$ cd /home/student1/public_html
+$ sudo mv index.html flvdemo.html
+</code></pre>
+</li>
+		  </ol>
+		  <aside class ="notes">
+</aside>
+
+		</section>
+<section data-state="lab">
+		  <h3>Lab 1.2: Setup NGINX</h3>
+		  <ol>
+		    <li>Change directory to  <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">conf.d.</span></pre>, back up <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">default.conf</span></pre>, and create a new file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">media-server.conf</span></pre>
+		    <pre><code class="linux" data-trim contenteditable>
+	$ cd /etc/nginx/conf.d
+$ sudo mv default.conf default.conf.bak
+$ sudo vim media-server.conf
+			</code></pre></li>
+		    <li>Configure a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> block listening on port <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">80</span></pre> and serving content from <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html</span></pre>
+		    	<pre><code class="linux" data-trim contenteditable>
+server {
+	listen 80;
+	root /home/student1/public_html;
+}
+			</code></pre></li>
+		    <li>Reload the Configuration
+		    	<pre><code class="linux" data-trim contenteditable>
+$ sudo nginx -s reload
+			</code></pre></li>
+		  </ol>
+		  <aside class ="notes">
+		  	<ol>
+		  	
+</ol>
+</aside>
+
+		</section>
+
+<section data-state="lab">
+		  <h3>Lab 1.3: Test the Video</h3>
+		  <ol>
+		    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">flvdemo.html</pre> and find the following section:
+		    	<pre><code class="html" data-trim contenteditable>
+$ cd ~/public_html/
+$ sudo vim flvdemo.html
+
+&#60;a  
+    href="&#60;path to your video.flv&#62;"
+    style="display:block;width:520px;height:330px"  
+    id="player"&#62;
+&#60;/a&#62;
+
+</code></pre>
+		    </li>
+		    <li>Replace <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">&#60;path to your video.flv&#62;</span></pre> with path to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">wildlife.flv</span></pre> and insert the path to flowplayer
+		    	<pre><code class="html" data-trim contenteditable>
+flowplayer("player", “flowplayer/flowplayer-3.2.18.swf");
+		    </code></pre>
+		    	</li>
+		    <li>In browser, test: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http//&#60;server&#62;/flvdemo.html</span></pre></li>
+		  </ol>
+		  <aside class ="notes">
+		  	<p>ANSWERS</p>
+		  	<ol>
+		  		<li>href=“/videos/flv/&#60;video&#62;.flv”
+</li>
+<li>flowplayer("player", “flowplayer/flowplayer-3.2.18.swf");</li>
+		  	
+</ol>
+</aside>
+
+		</section>
+
+
+    <section>
+		<h3>Pseudo-Streaming with Flash™</h3>
+		<ul>
+			<li>Skipping forward while downloading</li>
+			<li>Start playback at specific time</li>
+			<li>Extra Configuration required on Server-Side
+				<ul>
+					<li>FLV module (NGINX)</li>
+					<li>Metadata</li>
+					<li>Flash Player Enablement</li>
+				</ul>
+			</li>
+		</ul>
+		<aside class="notes">
+<ol>
+	<li>Pseudo-streaming allows clients to skip forward to parts of the video before it has finished downloading (seeking)</li>
+<li>Clients can also start the playback at a designated time by inserting a parameter into the request</li>
+<li>Requirements for pseudo-streaming with Flash
+<ul>
+<li>Turn on pseudo-streaming support in NGINX Flv module</li>
+<li>Insert metadata into flv files</li>
+<li>Enable pseudo-streaming in Flash player</li>
+</ul></li>
+</ul>
+
+		</aside>
+	</section>
+
+	 <section>
+		<h3>Inserting Metadata</h3>
+		<ul>
+			<li>Required for pseudo-streaming</li>
+			<li>Metadata Defines keyframe information</li>
+			<li>Many insertion tools available:<ul>
+				<li><a href="http://www.flvmeta.com/" target="_blank">Flvmeta</a></li>
+			</ul>
+		</li>
+		
+		<aside class="notes">
+			<ul>
+<li>Flv files must contain Flv metadata in order to allow for pseudo-streaming</li>
+<li>The metadata defines the keyframe information, which is necessary in order to allow video players to perform a seek request</li>
+
+		</aside>
+	</section>
+
+	 <section>
+		<h3>Using <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">flvmeta</span></pre></h3>
+		<p>Simple Command Line Options</p>
+<pre><code class="linux" data-trim contenteditable>
+	#To insert metadata
+flvmeta &#60;input file&#62; &#60;output file&#62;
+
+#To output metadata for given file
+flvmeta &#60;input file&#62;
+		    </code></pre>
+		    <div style="text-align:center;"><small>Documentation: <a href="https://flvmeta.com/flvmeta.1.html" target="_blank">flvmeta User Manual</a></small></div>
+		<aside class="notes">
+
+		</aside>
+	</section>
+
+
+<section data-state="lab">
+		  <h3>Lab 2.1: Insert Metadata</h3>
+		  <ol>
+		    <li>Change directory to your flv directory
+		    	<pre><code class="linux" data-trim contenteditable>
+		    	$ cd public_html/videos/flv
+		    	</code></pre>
+		    </li>
+		    <li>Run the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">flvmeta</span></pre> executable against your flash video</li>
+		    	<pre><code class="linux" data-trim contenteditable>
+		    	$ flvmeta wildlife.flv wildlife_meta.flv
+		    	</code></pre>
+		    <li>Inspect the metadata on both files</li>
+		    	<pre><code class="linux" data-trim contenteditable>
+		    	$ flvmeta wildlife.flv
+$ flvmeta wildlife_meta.flv
+		    	</code></pre>
+		    <li>Compare the output difference in the keyframe data</li>
+		  </ol>
+		  <aside class ="notes">
+		  	<ol>
+		  	
+</ol>
+</aside>
+
+		</section>
+
+<section>
+		<h3>Enabling Pseudo-Streaming in NGINX</h3>
+		<ul>
+			<li>Add the flv directive to the location block where flv files will be processed</li>
+			<li>Video player must support pseudo-streaming, otherwise, playback runs as progressive download</li>
+		</ul>
+		<pre><code class="linux" data-trim contenteditable>
+		    	server {
+	root /home/user/public_html;
+
+	location ~ \.flv$ {
+		flv;
+	}
+}
+
+		    	</code></pre>
+		
+		<aside class="notes">
+
+		</aside>
+	</section>
+		<section data-state="lab">
+		  <h3>Lab 2.2: Setup the Content</h3>
+		  <ol>
+		    <li>Locate the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">flvstreamdemo.html</pre> in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html</span></pre></li>
+		    <li>Open the file and look for the line:
+		    	<pre><code class="linux" data-trim contenteditable>
+		    		&#60;a href=“&#60;insert path …”&#62;
+		    	</code></pre>
+		    </li>	
+		    <li>Replace the placeholder with
+		    	<pre><code class="linux" data-trim contenteditable>
+		    href="/videos/flv/wildlife.flv"
+		    	</code></pre>
+		    </li>
+		    <li>replace the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">baseUrl</span></pre> with
+				<pre><code class="linux" data-trim contenteditable>
+		    'http://&#60;ec2-url&#62;/videos/flv/'
+		    	</code></pre>
+		    </li>
+		  </ol>
+		  <aside class ="notes">
+		  	
+</aside>
+
+		</section>
+
+		<section data-state="lab">
+		  <h3>Lab 2.3: Enable Pseudo-Streaming</h3>
+		  <ol>
+		    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">media-server.conf</pre> and define a regex location to process files ending in  <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.flv</span></pre></li>
+		    <li> Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">flv</span></pre> directive in this location block</li>	
+		    <li>Save the configuration and reload NGINX</li>
+		    <li>Open your browser and point to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;ec2-url&#62;/flvstreamdemo.html</span></pre></li>
+		   	<li>Play the video and try "seeking" to different video timeline postions</li>
+		  </ol>
+		  <aside class ="notes">
+		  	<p>Solution</p>
+		  	<pre><code class="linux" data-trim contenteditable>
+		  		server {
+    root /home/student1/public_html;
+
+    location ~* \.flv$ {
+        flv;
+    }
+}
+		    	</code></pre>
+</aside>
+
+		</section>
+
+	<section>
+		<h3>Progressive Download with MP4</h3>
+		<p>Requirements</p>
+		<ul>
+			<li>Video codec H.264</li>
+			<li>Audo codec AAC</li>
+		</ul>
+		
+		<aside class="notes">
+			<ul>
+<li>Simply place the file in a folder accessible by NGINX</li>
+<li>Video playback can be achieved with HTML 5 or Flash</li>
+<li>"video" tag in HTML 5</li>
+
+		</aside>
+	</section>
+
+	<section>
+		<h3>The Moov Atom</h3>
+		<ul>
+			<li>Atoms: Units of data regarding video file</li>
+			<li>MPEG-4 consists of "moov" atom
+			<ul>
+			<li>Defines timescale and duration</li>
+			<li>Also contains "subatoms"</li>
+		</ul></li>
+		</ul>
+		
+		<aside class="notes">
+			<ul>
+				<li>Atom’s are self contained units of data that can contain information about the video file</li>
+<li>The MPEG-4 container consists of many atoms, one of which is called “moov”</li>
+<li>The “moov” atom contains the instructions for playing the video data </li>
+<li>Defines the timescale and duration of the video</li>
+<li>The “moov” atom also contains additional subatoms that store metadata</li>
+			</ul>
+
+		</aside>
+	</section>
+
+	<section>
+		<h3>Moov Atom Location</h3>
+		<ul>
+			<li>Location depends on streaming method</li>
+			<li>Playback begins after 'moov' atom data read</li>
+			<li>Moov at end of file is suboptimal</li>
+		</li>
+		</ul>
+		
+		<aside class="notes">
+			<ul>
+				<li>The location of the moov atom is crucial depending on your chosen video delivery method</li>
+<li>Video players will not start playback of a file until it has read the data contained in the ‘moov’ atom</li>
+<li>If the “moov” atom is placed at the end of a file, the player must read the entire file before playback begins</li>
+<li>For progressive download and pseudo-streaming, this is not ideal since the entire file will have to be downloaded first</li>
+			</ul>
+
+		</aside>
+	</section>
+
+	<section>
+		<h3>Example Atom Structure</h3>
+		<div style="float:left;width:50%;" class="centered">
+				<p>Moov at Front</p>
+				<img src="assets/images/moovFront.png" style="border:0;background:none; left:0; top:0;">
+
+		</div>
+
+		<div style="float:right;width:48%;padding-right:0px;">
+			<p>Moov at Back</p>
+			<img src="assets/images/moovBack.png" style="border:0;background:none; left:0; top:0;">
+			
+		</div>
+		
+		<aside class="notes">
+
+		</aside>
+	</section>
+
+	<section>
+		<h3>MP4 Encoding Tools</h3>
+		<ul>
+			<li>Some tools have "fast start", "streaming" options</li>
+			<li>Tool that inspects atom: <a href="http://atomicparsley.sourceforge.net/)" target="_blank">Atomic Parsley</a></li>
+		</ul>
+		
+		<aside class="notes">
+<ul>
+	<li>Some encoding programs will place the “moov” atom at the end of a file</li>
+	<li>Others contain options called “fast start” or “streaming” which will place the moov atom at the beginning</li>
+	<li>Tools to inspect the atom structure</li>
+	<li>Atomic Parsley (http://atomicparsley.sourceforge.net/)</li>
+</ul>
+		</aside>
+	</section>
+
+	<section>
+		<h3>Moving the Moov</h3>
+		<p>Tools to Adjust the Moov location:</p>
+		<ul>
+			<li><a href="http://gpac.wp.mines-telecom.fr/mp4box/mp4box-documentation/" target="_blank">MP4Box</a></li>
+			<li><a href="http://www.datagoround.com/lab/" target="_blank">MP4 FastStart</a></li>
+			<li><a href="http://renaun.com/blog/2010/06/qtindexswapper-2/" target="_blank">QTIndexSwapper</a></li>
+		</ul>
+		
+		<aside class="notes">
+<p>Many tools available for adjusting the location of the moov atom</p>
+		</aside>
+	</section>
+
+<section data-state="lab">
+		  <h3>Lab 3.1: HTML5 Video Setup</h3>
+		  <ol>
+		    <li>Inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html/videos</pre> create a directory called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">mp4</span></pre></li>
+		    <li>Place <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">wildlife264.mp4</span></pre> in this directory</li>	
+		    <li>Create an html file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">html5demo.html</span></pre> in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_pass</span></pre> to your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html</span></pre> directory</li>
+		    <li>Write the following html:</li>
+		    <pre><code class="linux" data-trim contenteditable>
+		    	&#60;html&#62;
+&#60;body&#62;
+    &#60;video width="640" height="480" controls&#62;
+        &#60;source src="/videos/mp4/wildlife264.mp4" type="video/mp4"&#62;
+    &#60;/video&#62;
+&#60;/body&#62;
+&#60;/html&#62;
+
+		    </code></pre>
+</aside>
+
+		</section>
+
+		<section data-state="lab">
+		  <h3>Lab 3.2: HTML5 Video Playback</h3>
+		  <ol>
+		    <li>Open browser and go to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;server&#62;/html5demo.html</pre></li>
+		    <li>Play the video and try seeking to a position in the timeline that is still downloading</li>	
+		  </ol>
+		  <p>Note: HTML5 playback doesn't work with IE9 or below</p>
+		  <aside class ="notes">
+		  	
+</aside>
+
+		</section>
+
+
+	<section>
+		<h3>Enabling MP4 Playback with Flash™</h3>
+		<ul>
+			<li>Modern Websites use Flash™ as a fallback</li>
+			<li>Flash Player locates the file</li>
+		</ul>
+		<aside class="notes">
+			<ul>
+<li>To provide compatibility with older browsers, many websites will use a fall back to a flash based player in the event that HTML 5 video is not supported</li>
+<li>The flash player just needs to be able to locate your video file</li>
+</ul>
+
+		</aside>
+	</section>
+
+	<section data-state="lab">
+		  <h3>Lab 3.3: Enable Flash™ Playback</h3>
+		  <ol>
+		    <li>Create a copy of <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">flvstreamdemo.html</pre> and renamie it to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">mp4demo.html</span></pre></li>
+		    <li>Look for the path to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">wildlife_meta.flv</span></pre> and replace the URL to reference the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">wildlife264.mp4</span></pre> video with inserted metadata</li>	
+		    <li>Open a browser and test <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;server&#62;/mp4demo.html</span></pre></li>
+		    <li>Play the video and try seeking. What do you notice?</li>
+		  </ol>
+		  <aside class ="notes">
+		  	
+</aside>
+
+		</section>
+
+
+	<section>
+		<h3>Add Streaming Support</h3>
+		<ul>
+			<li>mp4 module supports pseudo-streaming through Flash player</li>
+			<li>start parameter indicates playback beginning</li>
+		</ul>
+		<pre><code class="linux" data-trim contenteditable>
+		    	http://&#60;server&#62;/myvideo.mp4?start=10.5
+		    </code></pre>
+		
+		<aside class="notes">
+<ul>
+<li>NGINX MP4 Module provides pseudo-streaming support for mp4 videos when played through a Flash player</li>
+<li>Key directive is mp4, which turns on module processing</li>
+<li>Allows requests for the video to be made with the start parameter, indicating where playback should begin</li>
+<li>For example http://&#60;server&#62;/myvideo.mp4?start=10.5</li>
+</ul>
+		</aside>
+	</section>
+
+	<section>
+		<h3>MP4 Module Example</h3>
+		<pre><code class="linux" data-trim contenteditable>
+		    	#process all files ending in .mp4
+location ~ \.mp4$ {
+	mp4;
+}
+		    </code></pre>
+		<aside class="notes">
+
+		</aside>
+	</section>
+
+<section data-state="lab">
+		  <h3>Lab 4: Enable Streaming Support</h3>
+		  <ol>
+		    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">media-server.conf</pre> and add the prefix <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/videos/mp4</span></pre></li>
+		    <li>Place the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">mp4</span></pre> directive in the prefix </li>	
+		    <li>Open a browser and test: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;server&#62;/mp4demo.html</span></pre></li>
+		    <li>Play the video and try seeking. What do you observe?</li>
+		  </ol>
+		  <aside class ="notes">
+		  <pre><code class="linux" data-trim contenteditable>
+		    	server {
+    listen 80;
+    root /home/student1/public_html;
+
+    location ~* \.flv$ {
+        flv;
+    }
+
+    location /videos/mp4 {
+        mp4;
+    }
+}
+		    </code></pre>
+</aside>
+</section>
+
+		
+
+<!--Next Section-->
+<section data-background="rgb(20, 149, 62)">
+     <h2>Adpative Streaming with HLS</h2>
+ </section>
+
+ <section>
+    <h3>Module Objectives</h3>
+       <p>This module enables you to:</p>
+          <ul>
+          	<li>Understand Basic HLS Concepts</li> 
+          	<li>Understand Adaptive Bitrate</li>
+    		<li>Utilize Dynamic Segmentation</li>
+		  </ul>
+    <aside class="notes">
+
+    </aside>
+    </section>
+
+    <section>
+		<h3>Introduciton to HLS</h3>
+		<div style="float:left;width:50%;" class="centered">
+			<ul>
+			<li>Developed for iOS/OSX</li>
+			<li>HTTP Connection</li>
+			<li>MP4 H.264/AAC encoding</li>
+			<li><a href="https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/StreamingMediaGuide/HTTPStreamingArchitecture/HTTPStreamingArchitecture.htmlMPEG-2 transport streams" target="_blank">MPEG-2 Transport Streams</a></li>
+			</ul>	
+		</div>
+
+		<div style="float:right;width:50%;padding-right:0px;">
+			<img src="assets/images/appleHLS.png" style="border:0;background:none; left:0; top:0;">	
+		</div>
+		
+		<aside class="notes">
+<p>HTTP Live Streaming (HLS) is a streaming technology which breaks down a media file into a number of small segments, which are then sent to the client one at a time</p>
+<ul>
+<li>Developed by Apple for iOS devices and OSX</li>
+<li>Works over standard HTTP connection</li>
+<li>Supports playback of MP4 video with H.264 and AAC encoding</li>
+<li>Video is segmented into MPEG-2 transport streams</li>
+</ul>
+		</aside>
+	</section>
+
+    <section>
+		<h3>How HLS Works</h3>
+			<p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.m3u8</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.ts</span></pre> files</p>
+			<ul>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.m3u8</span></pre> is index for segments</li>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.ts</span></pre> files are segments</li>
+			</ul>
+		<aside class="notes">
+<ul>
+	<li>MP4 video file is split up into multiple .m3u8 and .ts files</li>
+<li>The .ts files represent a segment of the video</li>
+<li>The .m3u8 file acts as the index and glues the segments together</li>
+<li>The .m3u8 file tells the client which segment to retrieve based on the requested playback time</li>
+<li>segments are usually 10 seconds in length</li>
+</ul>
+		</aside>
+	</section>
+
+	<section>
+		<h3>Adaptive Bitrate</h3>
+		<p>Video Quality based on client and bandwidth</p>
+		<p>Advantages:</p>
+		<ul>
+		<li>Quality adjusted on the fly</li>
+		<li>Video playback uninteruptted</li>
+	</ul>
+		<aside class="notes">
+<p>HLS compatible devices can automatically select the video quality based on the bandwidth on the client machine</p>
+<p>Advantages</p>
+<ul> 
+<li>Video playback will not be hampered if using a slow internet connection</li>
+<li>Quality can be adjusted on the fly, which is effective for a mobile connection</li>
+</ul>
+		</aside>
+	</section>
+
+	<section>
+		<h3>HLS File Structure Example</h3>
+		<img src="assets/images/hlsFileStructure.png" style="border:0;background:none; left:0; top:0;">	
+		<aside class="notes">
+<p>Transcoding is dependant on tool. Change diagram to have source mp4 in front of each playlist</p>
+		</aside>
+	</section>
+
+
+	<section>
+		<h3>Segmentation Tools</h3>
+		<ul>
+			<li>Apple Developer Tools</li>
+			<ul>
+				<li>Media stream segmenter</li>
+<li>Media file segmenter</li>
+<li>Media stream validator</li>
+<li>Variant playlist creator</li>
+			</ul>
+			<li>Cloud-Based Tools</li>
+			<ul>
+<li><a href="www.encoding.com" target="_blank">encoding.com</a></li>
+<li><a href="http://zencoder.com/en/" target="_blank">zencoder.com</a></li>
+			</ul>
+		</ul>
+		<aside class="notes">
+		</aside>
+	</section>
+
+	<section>
+		<h3>Serving Videos with HLS</h3>
+		<ul>
+			<li>No special NGINX configuration</li>
+			<li>Player points to .m3u8 file</li>
+			<li>Compativility on iOS, Apple TV and Mac OSC</li>
+		</ul>
+		<pre><code class="linux" data-trim contenteditable>
+		 &#60;video&#62;
+	&#60;source src=“&#60;server&#62;/videos/&#60;video&#62;.m3u8” type=“video/mp4”/&#62;
+&#60;/video&#62;
+
+		    </code></pre>
+		<aside class="notes">
+<ul>
+	<li>If video files are already segmented, no special NGINX configuration is needed</li>
+<li>HTML5 Video player simply points to the main .m3u8 file</li>
+<li>Compatibility on iOS, Apple TV and Mac OS X (Safari browser only)</li>
+</ul>
+		</aside>
+	</section>
+
+	<section>
+		<h3>Playback on Non-Apple Devices</h3>
+		<ul>
+			<li>Fallback to HTML5</li>
+			<li>3rd party plugins add HLS</li>
+			<ul>
+				<li><a href="http://flowplayer.electroteque.org/httpstreaming-hls" target="_blank">flowplayer</a></li>
+				<li><a href="https://github.com/mangui/flashls" target="_blank">flashls</a></li>
+			</ul>
+		</ul>
+		<pre><code class="linux" data-trim contenteditable>
+		 &#60;video&#62;
+	&#60;source src=“&#60;server&#62;/videos/&#60;video&#62;.m3u8” 
+		type=“application/x-mpegURL”/>
+	&#60;source src=“&#60;server&#62;/videos/&#60;video&#62;.mp4” type=“video/mp4”/&#62;
+
+&#60;/video&#62;
+
+		    </code></pre>
+		<aside class="notes">
+		<ul>
+<li>Use a fallback option to standard HTML 5 video or flash using progressive download or pseudo-streaming method</li>
+<li>Use 3rd party plugins to add HLS compatibility to flash player</li>
+<li>http://flowplayer.electroteque.org/httpstreaming-hls</li>
+<li>https://github.com/mangui/flashls </li>
+</ul>
+
+		</aside>
+	</section>
+
+	<section data-state="lab">
+		  <h3>Lab 5.1: Setup HLS Video</h3>
+		  <ol>
+		    <li>Navigate to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html/videos</pre> and create the sub-tree: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hls/sample</span></pre>
+		    <pre><code class="linux" data-trim contenteditable>
+		    	cd public_html/videos
+sudo mkdir -p hls/sample
+		    </code></pre></li>
+		    <li>Copy and extract wildlife.tar <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">wildlife.tar</span></pre></li>	
+		    <li>Inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html</span></pre> copy <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">html5demo.html</span></pre> and rename it to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hls_html5demo.html</span></pre></li>
+		    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hls_html5demo.html</span></pre> and edit the video source tag to point to the mainifest (<pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Wildlife_87721638.m3u8</span></pre>)</li>
+		   	<li>Set the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">type</span></pre> attribute to  <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">"application/x-mpegURL"</span></pre></li>
+		  </ol>
+		  <aside class ="notes">
+		  	<pre><code class="linux" data-trim contenteditable>
+		 &#60;video&#62;
+	&#60;source src="/videos/hls/sample/Wildlife_87721638.m3u8" type="application/x-mpegURL"/&#62;
+
+&#60;/video&#62;
+
+		    </code></pre>
+</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 5.2: Play Video (Non Apple Users)</h3>
+		  <ol>
+		    <li>Copy the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">flashls-0.2.0</span></pre> folder into your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html</span></pre> folder and rename the folder to: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">flashls</span></pre></li>
+		    <li> Go to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">flashls/examples/flowplayer</span></pre> and open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">index.html</span></pre> and look for section:
+		    	<pre><code class="linux" data-trim contenteditable>
+		    		clip: {
+    url: “http:// ...
+		    	</code></pre>
+		    </li>	
+		    <li>Replace the URL with the path to the main <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.m3u8</span></pre> playlist file in the pre-segmented video</li>
+		    <li>Test <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;server&#62;/flashls/examples/flowplayer</span></pre></li>
+		   	<li>Open Chrome developer tools and observe the individual requests for each <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.ts</span></pre> segment</li>
+		  </ol>
+		  <aside class ="notes">
+		  	
+</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 5.3: Play Video (Apple Users)</h3>
+		  <ol>
+		    <li>For Mac OS X, open Safari and go to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;server&#62;/hls_html5demo.html</span></pre></li>
+		    <li>Enable developer tools on Safari (look under <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Preferences>Advanced</span></pre>), then go to the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Develop</span></pre> menu and click <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Show Web Inspector</span></pre></li>	
+		    <li>On the Web Inspector, click the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">timelines</span></pre> tab</li>
+		    <li>Observe the requests and responses and note the individual segments (<pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.ts</span></pre> files)</li>
+			<li>Try the same URL above on your iPhone and/or iPad browser</li>
+		  </ol>
+		  <aside class ="notes">
+		  	<img src="assets/images/lab5.3Solution.png" style="border:0;background:none; left:0; top:0;">	
+</aside>
+</section>
+
+<section>
+		<h3>Dynamic Segmentation</h3>
+		<ul>
+			<li>Segment mp4 files on the fly</li>
+			<li>hls: Enables streaming support for prefix/regex</li>
+			<li>hls_fragment: segment duration</li>
+			<li>Stream bitrate = encoded bitrate</li>
+		</ul>
+		<aside class="notes">
+			<ul>
+<li>NGINX Plus HLS Module provides the ability to segment mp4 files on the fly</li>
+<li>hls directive turns on HLS streaming support for a given location block</li>
+<li>hls_fragment directive configures the duration of each segment</li>
+<li>Bitrate of the video stream will be the bitrate of the encoded source file</li>
+</ul>
+		</aside>
+</section>
+
+<section>
+		<h3>Dynamic Segmentation Example</h3>
+
+		<pre><code class="linux" data-trim contenteditable>
+			# Turns on HLS processing for all files (MP4) within # the location path 
+location /videos/hls {
+    hls;
+    hls_fragment 10s;
+} 
+		</code></pre>
+		
+		<aside class="notes">
+<ul>
+<li>Files can be referenced by appending the .m3u8 extension</li>
+<li>Example: http://&#60;server&#62;/videos/hls/sample.mp4.m3u8 </li>
+<li>Can also use the “len” parameter on the request URL to specify segment length</li>
+<li>e.g. http://&#60;server&#62;/videos/hls/sample.mp4.m3u8?len=10.0</li>
+</ul>
+		</aside>
+</section>
+
+<section>
+		<h3>Multiple Bitrate Support</h3>
+		<ul>
+			<li>NGINX's segmentation uses bitrate of source file</li>
+			<li>Must have MP4 file encoded to each bitrate
+			<ul>
+			<li>Segment into .ts files and creates a playlist</li>
+			<li>Master playlist references files for each bitrate</li>
+		</ul></li>
+	</ul>
+		
+		<aside class="notes">
+<ul>
+	<li>When NGINX is used to perform the segmentation of the video it will use the bitrate of the source video file</li>
+<li>To provide a stream via multiple bitrates:</li>
+<li>Must have the MP4 file encoded to each bitrate</li>
+<ul>
+<li>For each bitrate, segment the MP4 file into the individual .ts segments and create a playlist file</li>
+<li>Create a master playlist file which references the playlist files of each supported bitrate</li>
+</ul>
+</ul>
+
+		</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 6.1: Setup Dynamic Segmentation</h3>
+		  <ol>
+		    <li>Copy the MP4 video in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">videos/mp4</span></pre> to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">videos/hls</span></pre></li>
+		    <li>In <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">media-server.conf</span></pre>, add the prefix <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">videos/hls</span></pre></li>	
+		    <li>Enable <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hls</span></pre> and configure the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hls_fragment</span></pre> length to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">5s</span></pre></li>
+		    <li>Save and reload NGINX</li>
+		   	<li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html/hls_html5video.html</span></pre></li>
+		   	<li>Edit the video tag so the source points to the MP4 inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">videos/hls</span></pre></li>
+		    <li>Read the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">access_log</span></pre> to see request destinations</li>
+		    <li>Add a fallback option to play the same MP4 video location in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">videos/mp4</span></pre></li>
+		  </ol>
+		  <aside class ="notes">
+		  	<p>media-server.conf</p>
+		  	<pre><code class="linux" data-trim contenteditable>
+		  		server {
+    listen 80;
+    root /home/student1/public_html;
+
+    location ~* \.flv$ {
+        flv;
+    }
+
+    location /videos/mp4 {
+        mp4;
+    }
+
+    location /videos/hls {
+        hls;
+        hls_fragment 5s;
+    }
+}		  	</code></pre>
+		  	<p>hls_html5demo.html</p>
+		  	<pre><code class="linux" data-trim contenteditable>
+		  	&#60;video&#62;
+	&#60;source src="/videos/hls/sample/Wildlife_87721638.m3u8" type="application/x-mpegURL"/&#62;
+
+&#60;/video&#62;
+		  	</code></pre>
+</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 6.2: Video Playback</h3>
+		  <p>For Mac Users</p>
+		  <ol>
+		    <li>For Mac OS X, open Safari and go to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;server&#62;/hls_html5demo.htmlmain.conf</span></pre></pre></li>
+		    <li>Open Developer Tools. Observe requests and responses and note the individual segments (<pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.ts</span></pre> files)</li>
+		    </ol>
+		    <p>For Windows/Linux Users</p>
+		    <ol>
+		    <li>Test <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;server&#62;/hls_html5demo.html</span></pre></li>
+<li>Modify <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">url</span></pre> for <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">flashls/examples/flowplayer/index.html</span></pre> to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/videos/hls/wildlife264.mp4.m3u8</span></pre></li>
+<li>Test: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;server&#62;/flashls/examples/flowplayer</span></pre></li>
+		</ol>
+		  <aside class ="notes">
+		  	<p>Windows</p>
+		  	<ol>
+		    <li>Test <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;server&#62;/hls_html5demo.html</span></pre></li>
+<li>Use the developer tools to inspect the requests. Notice how it is playing the mp4 file instead of individual segments</li>
+<li>Open index.html inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">flashls/examples/flowplayer</span></pre> and modify the “url” property to point to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/videos/hls/wildlife264.mp4.m3u8</span></pre></li>
+<li>Open your browser and go to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;server&#62;/flashls/examples/flowplayer</span></pre></li>
+<li>Inspect the requests using the browser developer tools and notice the fragments</li>
+		</ol>
+
+
+		  
+</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 6.2: Video Playback</h3>
+		  <p>Example</p>
+	<center><img src="assets/images/windowSolution.png" style="border:0;background:none;width:70%; left:0; top:0;"></center>
+</section>
+
+<!--Next Section-->
+
+<section data-background="rgb(20, 149, 62)">
+     <h2>Adpative Streaming with HDS</h2>
+ </section>
+
+ <section>
+    <h3>Module Objectives</h3>
+       <p>This module enables you to:</p>
+          <ul>
+          	<li>Understand Basic HDS Concepts</li> 
+          	<li>Configure manifest for Multiple Bitrate</li>
+		  </ul>
+    <aside class="notes">
+
+    </aside>
+    </section>
+
+<section>
+		<h3>Intro to HDS</h3>
+		<ul>
+			<li>HTTP Connections</li>
+			<li>mp4 fragments</li>
+			<li>H.264 or VP6, ACC or MP3</li>
+			<li>On-the-fly bitrate</li>
+		</ul>
+		
+		<aside class="notes">
+			<p>HTTP Dynamic Streaming is an adaptive bitrate streaming technology developed by Adobe</p>
+			<ul>
+				<li>Works over HTTP connection</li>
+				<li>Delivery via fragmented mp4 files</li>
+				<li>Supported video codecs are H.264 or VP6</li>
+				<li>Supported audio codecs are AAC or mp3</li>
+				<li>Video quality can be adjusted on the fly</li>
+			</ul>
+
+		</aside>
+</section>
+
+<section>
+		<h3>How HDS Works</h3>
+		<ul>
+			<li>Adobe File Packager Segments</li>
+			<ul>
+<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.f4f</span></pre> = MP4
+	</ul></li>
+<li>Each segment is further divided into smaller fragments
+	<ul>
+<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.f4m</span></pre> = Flash Manifest</li>
+<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.f4x</span></pre> = index file</li>
+<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.bootstrap</span></pre> = segment bootstrap</li>
+</ul></li>
+</ul>
+		
+		<aside class="notes">
+<ul>
+			<li>MP4 file is split into segments using the File Packager provided by Adobe</li>
+<li>There are 4 file types involved in the output (.f4f, .f4m, .f4x and .bootstrap)</li>
+<li>.f4f file represents a segment of the MP4 source file.</li>
+<li>Each segment is further divided into smaller fragments</li>
+<li>.f4m file is the Flash Media Manifest file. It stores metadata about the codec, resolution and whether multi-bitrate is available</li>
+<li>.f4x is the index file</li>
+<li>.bootstrap contains bootstrap information for each segment</li>
+</ul>
+		</aside>
+</section>
+
+<section>
+		<h3>Example HDS File Structure</h3>
+		<center><img src="assets/images/exampleHDSstructure.png" style="border:0;background:none;width:70%; left:0; top:0;"></center>
+		<aside class="notes">
+
+		</aside>
+</section>
+
+<section>
+		<h3>Segmenting MP4 Files</h3>
+		<pre><code class="linux" data-trim contenteditable>
+		  	#Create a f4m, f4v and f4f file using video.mp4 as the source 
+#(Note: command is all on one line)
+f4fpackager.exe 
+--input-file=C:\videos\video.mp4 
+--output-path=C:\encodedvids
+
+		  	</code></pre>
+		<aside class="notes">
+<ul>
+	<li>F4fpackager comes with Adobe Media Server</li>
+<li>Look for f4fpackager.exe inside &#60;root installation&#62;/tools/f4fpackager</li>
+<li>Run .exe file on command line</li>
+</ul>
+
+		</aside>
+</section>
+
+<section>
+		<h3>HDS Playback Support</h3>
+		<center><img src="assets/images/hdsPlayback.png" style="border:0;background:none;width:50%; left:0; top:0;"></center>
+		<aside class="notes">
+<ul>
+	<li>Flash player must support HDS to be able to read the contents of the manifest (.f4m) file</li>
+<li>NGINX Plus F4F Module uses the index file to extract the correct fragment from the video segment file and send the fragment to the client</li>
+<li>Should see requests being made for each individual fragment when monitoring HTTP traffic</li>
+</ul>
+		</aside>
+</section>
+
+<section>
+		<h3>Enabling HDS on NGINX</h3>
+		<pre><code class="linux" data-trim contenteditable>
+	location /videos/hds {
+    f4f;
+}
+
+		  	</code></pre>
+		<aside class="notes">
+<p>Use the f4f directive on the appropriate location block that matches a path to your segmented video files</p>
+		</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 6.1: Setup HDS Files</h3>
+		  <ol>
+		    <li>In <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html/videos</pre> create the directory: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hds</span></pre></li>
+		    <li>Move <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">HDS_concert_h264.tar</span></pre> archive into <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hds</span></pre> and extract the .tar file
+		    	<pre><code class="html" data-trim contenteditable>
+		    		sudo tar xvf HDS_concert_h264.tar
+		    	</code></pre>
+		    </li>
+		   	<li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">HDS_concert_h264.tar</span></pre> and verify the presence of the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.f4m</span></pre>, <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.f4f</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">.f4x</span></pre> files</li>
+		  </ol>
+		  <aside class ="notes">
+		  	<ul>
+		  	<li>Create folder “hds” underneath public_html/videos</li>
+<li>Move the HDS_concert_h264.tar archive into this folder</li>
+<li>Extract the video file</li>
+<li>tar xvf HDS_concert_h264.tar</li>
+<li>Open the HDS_concert_h264 folder and verify the presence of the .f4m, .f4f and .f4x files</li>
+</ul>
+
+</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 6.2: Configure HDS for NGINX</h3>
+		  <ol>
+		    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">media-server.conf</pre></li>
+		    <li> Add a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">location</span></pre> block with a prefix <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/videos/hds</span></pre> and enable the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">f4f</span></pre> directive
+<pre><code class="html" data-trim contenteditable>
+	server {
+	...
+    location /videos/hds {
+        f4f;
+    }
+}
+</code></pre>
+		    </li>
+		    <li>Save and reload NGINX</li>	
+		  </ol>
+		  <aside class ="notes">
+		  	<ul>
+		  	<li>Open media-server.conf </li>
+<li>Add a location block with a prefix path of /videos/hds</li>
+<li>Put the f4f directive in this location</li>
+<li>Save and reload NGINX</li>
+</ul>
+<pre><code class="html" data-trim contenteditable>
+		    		server {
+listen 80;
+root /home/student1/public_html;
+
+    location ~* \.flv$ {
+        flv;
+    }
+
+    location /videos/mp4 {
+        mp4;
+    }
+
+    location /videos/hls {
+        hls;
+        hls_fragment 5s;
+    }
+
+    location /videos/hds {
+        f4f;
+    }
+}
+		    	</code></pre>
+</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 6.3: Configure Flash Player</h3>
+		  <ol>
+		    <li>Inside <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">public_html</pre> open the file <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hdsdemo_template.html</span></pre></li>
+		    <li>Find all sections which say <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">'insert video path'</span></pre> and replace them with the path of the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">f4m</span></pre> file</li>	
+		    <li>Find the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">baseUrl</span></pre> property which has the placeholder <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">'insert server URL'</span></pre> and replace the placeholder with your AWS server URL</li>
+		    <li>Open your browser (recommended Chrome) and go to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;server&#62;/hdsdemo_template.html</span></pre></span></pre></li>
+		   	<li>Save and reload NGINX</li>
+		   	<li>Test in a local browser (refresh multiple times)</li>
+		    <li>Read the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">access_log</span></pre> to see destination of request</li>
+		  </ol>
+		  <aside class ="notes">
+		  	<ol>
+		  	</ol>
+</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 6.3: Configure Flash Player</h3>
+		<center><img src="assets/images/flashPlayerExample.png" style="border:0;background:none;width:70%; left:0; top:0;"></center>
+		
+		<aside class="notes">
+
+		</aside>
+</section>
+
+<section>
+		<h3>Manifest File for Multiple Bitrate</h3>
+		<ul>
+			<li>Source video encoding</li>
+			<li>Start from lowest to highest</li>
+			<li>Highest bitrate used</li>
+		</ul>
+		
+		<aside class="notes">
+			<ul>
+				<li>For multiple bitrates, the source video needs to be encoded to each bitrate</li>
+<li>Run f4fpackager on each source file starting from lowest to highest bitrate</li>
+<li>Manifest file for each bitrate is joined with the manifest file of the previous lower bitrate</li>
+<li>Client makes request for the manifest file of the highest bitrate, since that file contains the details for all other bitrates</li>
+</ul>
+
+
+		</aside>
+</section>
+
+<section>
+		<h3>Handling Multiple Bitrate</h3>
+		<center><img src="assets/images/handlingBitrate.png" style="border:0;background:none;width:70%; left:0; top:0;"></center>
+		
+		<aside class="notes">
+
+		</aside>
+</section>
+
+<section>
+		<h3>Example Multiple Bitrate Configuration</h3>
+		<pre><code class="linux" data-trim contenteditable>
+			#Assume we have 3 source files called video_750kbps.mp4, #video_1500kbps.mp4 and video_2500kbps.mp4
+f4fpackager.exe 
+--input-file=video_750kbps.mp4 
+--bitrate=750
+
+f4fpackager.exe 
+--input-file=video_1500kbps.mp4 
+--manifest-file=C:\vids\video_750kbps.f4m
+--bitrate=1500
+
+f4fpackager.exe 
+--input-file=video_2500kbps.mp4 
+--manifest-file=C:\vids\video_1500kbps.f4m
+--bitrate=2500
+
+		</code></pre>
+		<aside class="notes">
+
+		</aside>
+</section>
+
+
+<!--Next Section-->
+		<section data-background="rgb(20, 149, 62)">
+                  <h2>Video Streaming Tips and Tricks</h2>
+                 </section>
+
+ <section>
+		<h3>Limit Rate: Download Speeds</h3>
+		<pre><code class="linux" data-trim contenteditable>
+			location /media {
+	limit_conn ipzone 5;
+	limit_rate 50k;
+}
+		</code></pre>
+		<aside class="notes">
+<ul>
+	<li>Apply limit_rate directive in the HTTP, server or location contexts<li>
+<li>Syntax:</li>
+<li>limit_rate speed</li>
+<li>speed is defined in bytes per second</li>
+<li>rate limit is applied to each connection</li>
+<li>Can be used in conjunction with limiting connections</li>
+</ul>
+		</aside>
+</section>
+
+<section>
+		<h3>Limit Rate: Build Buffer</h3>
+		<pre><code class="linux" data-trim contenteditable>
+			location /videos {
+	limit_rate_after 500k;
+	limit_rate 50k;
+}
+
+		</code></pre>
+		<aside class="notes">
+<ul>
+	<li>Download speeds can be capped after a certain amount has been transmitted to a client</li>
+<li>Use limit_rate_after directive and specify the amount after which speeds will be limited</li>
+<li>Useful for video streaming delivery</li>
+<li>Allow client to use max download speeds to build a buffer</li>
+<li>Then limit download based on bitrate of the video file to allow smooth playback without excessive use of bandwidth</li>
+</ul>
+		</aside>
+</section>
+
+<section>
+		<h3>MP4 Limit Rates</h3>
+		<p>Syntax: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">mp4_limit_rate on | off | factor;</span></pre> </p>
+		<pre><code class="linux" data-trim contenteditable>
+			location /videos/mp4 {
+	mp4;
+	mp4_limit_rate on;
+}
+		</code></pre>
+		<aside class="notes">
+<ul>
+	<li>MP4 Module contains a specialised limit rate directive called mp4_limit_rate</li>
+<li>Limits the response rate to a client to the average bitrate of the mp4 video file being served, multiplied by a specified factor</li>
+<li>Syntax: mp4_limit_rate on|off|factor</li>
+<li>Default factor of 1.1</li>
+<li>Rate is limited per request</li>
+</ul>
+		</aside>
+</section>
+
+<section>
+		<h3>MP4 Limit Rate After</h3>
+		<p>Syntax: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">mp4_limit_rate_after &#60;time&#62;</span></pre> </p>
+		<pre><code class="linux" data-trim contenteditable>
+			location /videos/mp4 {
+	mp4;
+	mp4_limit_rate on;
+	mp4_limit_rate_after 60s;
+}
+		</code></pre>
+		<aside class="notes">
+<ul>
+	<li>Rate limitation of MP4 file will only apply after a specified playback time</li>
+<li>Use mp4_limit_rate_after directive and specify the time in seconds</li>
+<li>Example: Download the video at full speed for 1 minutes, then apply limitation based on average bitrate
+</li>
+</ul>
+		</aside>
+</section>
+
+<section>
+		<h3>Caching HLS Segments</h3>
+		<ul>
+			<li>Suggested for on-the-fly segmentation</li>
+			<li>HLS backend with frontend reverse proxy</li>
+		</ul>
+		
+		<aside class="notes">
+<ul>
+	<li>When using on the fly segmentation, caching should be enabled to ensure NGINX operates more efficiently</li>
+<li>Subsequent requests for individual segments can be retrieved from the cache as opposed to NGINX having to perform the segmentation again</li>
+<li>Setup a server to act as the HLS backend and put another server in front as a reverse proxy</li>
+</ul>
+		</aside>
+</section>
+
+<section>
+		<h3>Example Cache Backend Node</h3>
+		<pre><code class="linux" data-trim contenteditable>
+#Cache (at HTTP context)
+    proxy_cache_path /data/nginx/cache levels=1:2 
+        keys_zone=vid_vache:20m max_size=1000m inactive=600m;
+    proxy_temp_path /tmp/nginx;
+
+#Backend server
+    server {
+    listen 8080;
+    root /data/nginx/cache;
+
+    location / {
+        hls;
+        hls_fragment 10s;
+    }
+}    
+		</code></pre>
+		
+		<aside class="notes">
+
+		</aside>
+</section>
+
+<section>
+		<h3>Example Reverse Proxy</h3>
+		<pre><code class="linux" data-trim contenteditable>
+		server {
+    listen 80;
+    root /home/student1/public_html;
+    error_log /var/log/nginx media-server.error.log; 
+
+
+    location /videos/hls {
+        proxy_pass http://myHLSBackend;
+        proxy_cache vid_cache;
+        proxy_cache_valid 10m;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	}
+}
+</code></pre>
+		<aside class="notes">
+
+		</aside>
+</section>
+
+
+<section data-state="lab">
+		  <h3>Lab 7.1: NGINX+ Backend Setup</h3>
+		  <ol>
+		    <li>On NGINX+ backend, create the directory tree:
+<pre><code class="linux" data-trim contenteditable>
+	sudo mkdir -p /usr/share/nginx/media/videos
+</code></pre>
+		    </li>
+		    <li>Download the video files into the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">videos</span></pre> directory</li>
+		    <li>In <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/etc/nginx/conf.d</pre> create conf file: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hls-server.conf</pre></li>
+		    <li>Define a server block with the following details:
+<pre><code class="linux" data-trim contenteditable>
+	server {
+    listen 8080;
+    root /usr/share/nginx/media/videos;
+    access_log /var/log/nginx/hls-server.access.log combined;
+
+    location / {
+        hls;
+        hls_fragment 5s;
+    }
+}
+</code></pre>
+		    </li>
+		  </ol>
+		  <aside class ="notes">
+		  	<ol>
+		  	<li>Create a new directory in your NGINX+ Backend Node called /usr/share/nginx/media/videos and place your mp4 video files inside by downloading them from the following link</li>
+<li>Inside conf.d, create a new configuration file called hls-server.conf</li>
+<li>Define a server listening on port 8080 with root directive of /usr/share/nginx/media/videos</li>
+<li>Define an access_log for the server and set the log type to combined</li>
+<li>Define a location block for all requests and turn on HLS processing in this location block</li>
+<li>Set the HLS fragment length to 5 seconds</i>
+</ol>
+</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 7.2: Reverse Proxy Cache</h3>
+		  <ol>
+		    <li>On NGINX+ proxy, create a directory for cached files
+<pre><code class="linux" data-trim contenteditable>
+	sudo mkdir -p /data/nginx/cache
+</code></pre>
+		    </li>
+		    <li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">media-server.conf</span></pre> and define a cache path
+<pre><code class="linux" data-trim contenteditable>
+	proxy_cache_path /data/nginx/cache levels=1:2
+keys_zone=vid_cache:20m max_size=1000m inactive=600m;
+</code></pre>
+</li>
+<li>In <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/videos/hls</span></pre> prefix, configure <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_pass</span></pre>
+<pre><code class="linux" data-trim contenteditable>
+	proxy_pass http://&#60;ec2-backend-hostname&#62;:8080;
+</code></pre>
+		    </li>
+		    <li>Delete <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hls</span></pre> directives and add the following:
+<pre><code class="linux" data-trim contenteditable>
+	proxy_cache vid_cache;
+proxy_cache_valid 10m;
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+</code></pre>
+		    </li>
+		  </ol>
+		  <aside class ="notes">
+		  	<ol>
+		  	</ol>
+
+</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 7.2: Setup Status Page</h3>
+		  <ol>
+		    <li>Create a new conf called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">staus.conf</span></pre> </li>
+<pre><code class="linux" data-trim contenteditable>
+	sudo vim /etc/nginx/conf.d/status.conf
+</code></pre>
+		    </li>
+		    <li>Define a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> block that listens on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">9090</span></pre> with a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">root</span></pre> directory of <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">/usr/share/nginx/html</span></pre></li>
+		    <li>Create <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">location = /status</span></pre> prefix and enable the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">status</span></pre> directive.</li>
+		    <li>In a local terminal, make a series of requests:
+<pre><code class="linux" data-trim contenteditable>
+	curl http://&#60;ec2-proxy-hostname&#62;/videos/hls/&#60;name_of_video_file&#62;
+</code></pre>
+		    </li>
+		    <li>Test the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">status.html</span></pre> page to view the cache tab
+<pre><code class="linux" data-trim contenteditable>
+	http://&#60;ec2-proxy-hostname&#62;:9090/status.html
+</code></pre>
+		    </li>
+		  </ol>
+		  <aside class ="notes">
+		  	<ol>
+		  	</ol>
+
+</aside>
+</section>
+
+<section>
+		<h3>Session Log Aggregation</h3>
+		<ul>
+			<li>Aggregates fragment requests into a single entry</li>
+			<li>Reduces overall size</li>
+			<li>Saves log space, makes debugging easier</li>
+		</ul>
+		
+		<aside class="notes">
+<ul>
+	<li>When serving segmented videos over HLS or HDS, the access log will contain entries for each fragment served</li>
+<li>Log files can become excessively large in short time</li>
+<li>NGINX Plus Session Log Module allows access log entries for each session to be aggregated into a single entry</li>
+<li>Saves log space and makes log file much easier to filter and debug</li>
+</ul>
+		</aside>
+</section>
+
+<section>
+		<h3>Session Log Setup</h3>
+		<ul>
+			<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">sesison_log_zone</span></pre>: defines shared memory zone
+			<ul>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">path</span></pre>: path to logs</li>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">format</span></pre>: format of logs</li>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">zone</span></pre>: name and size of zone</li>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">timeout</span></pre>: inactive parameter for requests</li>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">md5</span></pre>: hash value</li>
+			</ul>
+		</li>
+	</ul>
+		
+		<aside class="notes">
+			<ul>
+				<li>Use session_log_zone directive to define a shared memory zone for the session</li>
+<li>Must be defined in HTTP context</li>
+<li>Requests are mapped to sessions by applying an MD5 hash on a specific value (i.e. clients’ IP address and user agent string)</li>
+<li>Uses the following parameters</li>
+<li>path – path to log file</li>
+<li>format – format of log file</li>
+<li>zone – name and initial size of the zone</li>
+<li>timeout – specifies the time after which a session is considered inactive if no requests are received</li>
+<li>md5 – the md5 hash value</li>
+</ul>
+
+		</aside>
+</section>
+
+<section>
+		<h3>Session Log Example</h3>
+		<pre><code class="linux" data-trim contenteditable>
+	session_log_zone /path/to/log format=combined zone=one:1m 	
+    timeout=30s md5=$binary_remote_addr$http_user_agent;
+	
+server {
+    listen 80;
+
+    location /hls {
+	    session_log one;
+    }
+}
+</code></pre>
+		
+		<aside class="notes">
+Use the session_log directive in either the HTTP, Server or Location context and reference the name of the shared memory zone defined
+
+		</aside>
+</section>
+
+<section>
+		<h3>Session Log Comparison</h3>
+		<div style="float:left;width:50%;" class="centered">
+				<h4>Standard Access Log</h4>
+				<center><img src="assets/images/standardAccessLog.png" style="border:0;background:none;width:50%; left:0; top:0;"></center>
+		</div>
+
+		<div style="float:right;width:50%;padding-right:0px;">
+			<h4>Session Log</h4>
+			<pre><code class="linux" data-trim contenteditable>
+59.167.165.193 - - 
+[22/Sep/2016:00:48:26 +0000] 
+"GET" /videos/hls/soudwave264_meta.mp4.m3u8 
+HTTP/1.1" 200 18029463 
+"http://ec2-23-32-161-170.compute-1.amazonaws.com/flashls/examples/flowplayer/"
+"Mozilla/5.0 (Windows NT 6.1 WOW64) 
+AppleWebKit/537.36 (KHTML, like Gecko)
+Chrome/37.0.2062.120 Safari/537.36"
+			</code></pre>
+		</div>
+		
+		<aside class="notes">
+
+		</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 8: Session Logging</h3>
+		  <ol>
+		    <li>Open<pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">media-server.conf</span></pre> and setup a shared memory zone for <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hls</span></pre></li>
+<pre><code class="linux" data-trim contenteditable>
+	session_log_zone /var/log/nginx/hls_sessions.log 
+    format=combined zone=one:1m 
+    timeout=15s md5-$binary_remote_addr$http_user_agent;
+</code></pre>
+		    </li>
+		    <li>Enable session logging for /videos/hls
+<pre><code class="linux" data-trim contenteditable>
+	session_log one;
+</code></pre>
+</li>
+		    <li>Play your video by hitting <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://&#60;ec2-proxy-hostname&#63;/videos/hls/&#60;video_file&#62;</span></pre></li>
+		    <li>View each video fragment: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">media-server.access.log</span></pre></li>
+		    <li>Terminate the current session by closing the browser/tab and open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">hls_sessions.log</span></pre>, what do you notice?</li>
+		  </ol>
+		  <aside class ="notes">
+		  	<ol>
+		  	</ol>
+
+</aside>
+</section>
+
+
+
+<!--Next Section-->
+		<section data-background="rgb(20, 149, 62)">
+                  <h2>Additional Resources</h2>
+                 </section>
+
+		<section>
+                  <h3>Further Information</h3>
+                  <li><a href="https://nginx.org/en/docs/" target="_blank">NGINX Documentation</a></li>
+                  <li><a href="https://www.nginx.com/resources/admin-guide/" target="_blank">NGINX Admin Guides</a></li>
+                  <li><a href="https://www.nginx.com/blog/" target="_blank">NGINX Blog</a></li>
+                  <aside class="notes"></aside>
+                 </section>
+
+                 <section>
+                   <h3>Q&A</h3>
+                   <li>Please take the Survey! Email to follow</a></li>
+                   <li>Sales: <a href="mailto:nginx-inquiries@nginx.com" target="_top">nginx-inquiries@nginx.com</a></li>
+                   <aside class="notes"></aside>
+                 </section>
+		</div>
+	  </div>
+	  
+      <script src="lib/js/jquery-2.2.4.min.js"></script>
+      <script src="lib/js/head.min.js"></script>
+	  <script src="js/reveal.js"></script>
+
+	  <script>
+
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+            //width: 1200,
+
+
+            controls: true,
+				progress: true,
+				history: true,
+				center: true,
+                slideNumber: true,
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+          			{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'lib/js/jquery-2.2.4.min.js'},
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/external/external.js', condition: function() { return !!document.querySelector( '[data-external]' ); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+            Reveal.addEventListener( 'slidechanged', function( event ) {
+//            console.log(event.currentSlide.getAttribute("data-state"))
+// if we're on a lab slide, unhide the lab image, otherwise hide it.
+
+
+            if(event.currentSlide.getAttribute("data-state") === "lab"){
+                //document.getElementById("lab_pic").style.visibility="visible";
+
+
+            if(document.getElementById("lab_pic").style.visibility=="visible"){
+                document.getElementById("lab_pic").style.visibility="visible";
+            }else{
+      $("#lab_pic").css({opacity: 0.0, visibility: "visible"}).animate({opacity: 1}, 200);
+            }
+
+            }else{
+               //(document.getElementById("lab_pic").style.visibility=="hidden";
+               $("#lab_pic").css({opacity: 1.0, visibility: "hidden"}).animate({opacity: 0}, 200);
+            }
+
+            } );
+
+		</script>
+
+	</body>
+</html>
