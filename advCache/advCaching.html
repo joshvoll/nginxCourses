@@ -1,0 +1,2573 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>NGINX - Advanced Caching</title>
+
+		<meta name="description" content="Learn and practice with NGINX Plus!">
+		<meta name="author" content="James Tacker">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/nginx.css" id="theme">
+
+        <!--favicon-->
+        <link rel="shortcut icon" href="assets/images/nginxfavicon.ico" type="image/x-icon" />
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+	  <div class="reveal">
+
+        <style>
+          .reveal .slides { text-align: left; }
+          .reveal .slides h1 { text-align: center; }
+          .reveal .slides h2 { text-align: center; }
+          .reveal .slides h3 { text-align: center; font-variant: none; text-transform: none;}
+        </style>
+		<!-- Any section element inside of this container is displayed as a slide -->
+		<img src="assets/images/nginxlogo.png" style="border:0; width:100px; height:100px; background:none; position:absolute; left:0; top:0;">
+        <img id="lab_pic" src="assets/images/Laboratory3.png" style="visibility:hidden; border:0; width:200px; height:200px; background:none; position:absolute; right:0; top:0;">
+
+        <div class="footer">
+          <font size="1">© Copyright 2017 by ServiceRocket, Inc | Confidential | Prepared for NGINX Inc.</font>
+        </div>
+
+	        <div class="slides">
+
+              <section data-background="rgb(20, 149, 62)">
+                <h1>Advanced Caching</h1>
+
+                <p style="text-align:center">
+	              <small><i>Flawless Application Delivery</i></small>
+                </p>
+              </section>
+
+              <section>
+ <!--IF James IS TEACHING-->
+           
+              
+					<h3>Trainer Intro</h3>
+
+                    <div style="float:left;width:50%;" class="centered">
+                      <p>
+                      <strong>James Tacker</strong>
+                      <p>Technology Consultant & Content Developer</p>
+                      <p>Previous Training Work:</p>
+                      <ul>
+                      	<li>Sauce Labs</li>
+                      	<li>New Relic</li>
+                      	<li>Salesforce</li>
+                      	<li>Atlassian</li>
+                      </ul>
+                      <p><a href="mailto:james.tacker@servicerocket.com">james.tacker@servicerocket.com</a></p>
+
+					  </p>
+                    </div>
+
+                    <div style="float:right;width:40%;padding-right:0px;">
+                      <img src="assets/images/Picture1.png" style="border:0;background:none; left:0; top:0;">
+                    </div>
+				</section>
+
+	      <section>
+		<h3>Prerequisites/Expectations</h3>
+		<ul>
+		  <li>Sysadmin, DevOps, Solution Architect</li>
+		  <li>Some familiarity with Web Servers</li>
+		  <li>Some familiarity with Linux</li>
+		  <li>Text Editor: Vim, Vi, Emacs etc.</li>
+		  <li>Some knowledge of Networking</li>
+		</ul>
+		<aside class="notes">
+			<p>This course is designed for those curious about nginx. Maybe you’re a system administrator or developer. </p>
+<p>This course is the first step in your roadmap to understanding the ins and outs of NGINX.
+This course assumes you have basic Linux command line knowledge as well as how to use a text editor like vim or nano.a
+For those of you using Windows, you’ll want to a Linux OS on a virtual machine of your choosing.</p>
+
+		</aside>
+	      </section>
+	      
+              <section>
+                <h3>The Training Environment</h3>
+		
+                <ul>
+                  <li>AWS EC2 Instances</li>
+                  <li>Ubuntu 16.04</li>
+                  <ul>
+                  	<li>Apache 2</li>
+                  	<li>Wordpress</li>
+                  <li>NGINX Plus r11</li>
+              </ul>
+                </ul>
+		
+                <aside class="notes">
+                 
+		  
+                </aside>
+              </section>
+
+	      <section>
+		<h3>Log Into AWS</h3>
+		<p>If you haven't done so already, please take the time to SSH into your EC2 Instances (Windows users use <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html" target="_blank">PuTTY</a>).</p>
+		<p>Check your email for the login credentials, check your spam folder!</p>
+		<pre><code class="linux" data-trim contenteditable>
+                        ssh student&#60;number&#62;&#64;&#60;ec2-server-hostname&#62;
+                  </code></pre>
+	      </section>
+	      
+	      <section>
+		<h3>Course Administration</h3>
+		<ul>
+			<li>Course Duration: 4 hours</li>
+			<li>Ask questions at any time!</li>
+		</ul>
+	      </section>
+	      
+              <section>
+                <h3>Agenda</h3>
+
+                <div style="text-align:left;">
+                    <img src="assets/images/NGINXAdvCachingAgenda.png" style="border:0;background:none; left:0; top:0;">
+                </div>
+		
+		<aside class="notes">
+		<p>So for this first day we're going to cover a general overview of what NGINX is, then we will explore the web server use case and learn about the configuration file, then we will usetup a proxy server, as well as learn about logging. Eventually we will setup our site to use ssl, and then we will round out the day learning about variables</p>
+
+		</aside>
+              </section>
+
+           
+	
+
+		<section>
+		  <h3>NGINX Use Cases</h3>
+		  <img src="assets/images/NGINX_Diagram.png" style="border:none; background:none; width:100%">
+		  <aside class="notes">
+		    <p></p>
+		  </aside>
+		</section>
+	      
+<!--Adv. Scripts Module-->
+              <section data-background="rgb(20, 149, 62)">
+                <h2>Caching Overview</h2>
+              </section>
+
+                <section>
+                  <h3>Module Objectives</h3>
+                  <p>This module enables you to:</p>
+                  <ul>
+                    <li>Understand RFC Caching Guidelines</li>
+                    <li>Review Basic NGINX Cache Configuration</li>
+                    <li>Debugging the Cache</li>
+		  </ul>
+                  <aside class="notes"></aside>
+                </section>
+
+                <section>
+		<h3>How Caching Works</h3>
+			<p>Basic Principles</p>
+			<ul>
+				<li>Browser Cache</li>
+				<li>CDN</li>
+				<li>Reverse Proxy Cache</li>
+			</ul>
+
+			<img src="assets/images/cachingBasics.png" style="border:none; background:none; width:100%">
+	</section>
+
+			<section>
+			<h3>HTTP <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">Cache-Control</span></pre></h3>
+			<p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Cache-Control</span></pre> header dictates behavior</p>
+			<pre><code class="apache" data-trim contenteditable>
+	"public"                             
+"private" 
+"no-cache"
+"no-store"                           
+"no-transform"              
+"must-revalidate"        
+"proxy-revalidate"
+			</code></pre>
+			<div style="text-align:center;"><small>Documentation: <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html" target="_blank">RFC Guidelines</a></small></div>
+
+			<aside class="notes">
+			<p>The Cache-Control general-header field is used to specify directive that MUST be honored by all caching mechanisms.
+
+			</aside>
+		</section>
+
+		<section>
+			<h3>HTTP Headers</h3>
+			<pre><code class="apache" data-trim contenteditable>
+				Expires: Tue, 6 May 2017 03:18:12 GMT
+Cache-Control: public, max-age=60
+X-Accel-Expires: 30
+Last-Modified: Tue, 29 April 2017 02:28:11 GMT
+ETag: "3e74-215-3105fbbc"
+			</code></pre>
+			<div style="text-align:center;"><small>Documentation: <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html" target="_blank">HTTP Header Definitions</a></small></div>
+			<aside class="notes">
+				<p>Origin server usually declares cacheability of content</p>
+				<p>Requesting client honors that cacheability, may issue conditional GET requests</p>
+				<p>Header details:</p>
+				<ul>
+					<li><strong>Expires</strong> is the expiration time set by the origin server. Here you can set a date and time down to the second and time zone</li>
+					<li><strong>Cache-Contrl</strong> header allows you to specific specific directives to control cache behavior. For example, if a <strong>"max-age"</strong>directive is present along with an <strong>Expires</strong> header, the max-age will  overrides the Expires. Max-age essentially directive determines the stale age of the content if the current age is greater than the value of max-age at the time of a new request for that specific resource. A use case for using both Expires and Max age is if you want to provide a longer expiration time for HTTP1.1 cache implementations in case an HTTP 1.0 implementation has incorrectly synchronized clocks</li>
+					<li><strong>X-Accel-Expires</strong> X-accel utilizes the X-sendfile feature, which allows for internal redirection to a location determined by a header returned from a backend server. Use cases for this allows you to handle authentication, logging, or whatever on the backend, and have NGINX handle serving the content from a redirected location to the end user. We will cover this special header in more detail in the next slide</li>
+					<li><strong>Last Modified</strong> entity-header field indicates the date and time at which the origin server believes the content was last modified. This is a highly questionable header field because it relys on the origin erver's interpretation of time and of the content. The best practices are to make sure the origin server obtains the header value as close as possible to the time generated by the Date value</li>
+					<li><strong>Etag</strong> response header fields provide current value of the cached content. It basically adds more validity to the cached content and concurrency control - meaning the same piece of content is updated and checked against this hash value</li>
+				</ul>
+			</aside>
+
+		</section>
+
+		<section>
+			<h3>X-Accel</h3>
+			<pre><code class="apache" data-trim contenteditable>
+# When passed URI /protected_files/myfile.pdf
+location /protected_files {
+  internal;
+  alias /var/www/files/;
+}
+
+# Or proxy to another server
+location /protected_files {
+  internal;
+  proxy_pass http://127.0.0.1:8080/;
+}
+			</code></pre>
+			<div style="text-align:center;"><small>Documentation: <a href="https://www.nginx.com/resources/wiki/start/topics/examples/x-accel/" target="_blank">X-Accel</a></small></div>
+			<aside class="notes">
+				<p>As stated before x-accel allows for <strong>internal</strong> redirection to a backend. The feature differs a bit with NGINX, the way it works is it sends the header <strong> x-accel.redirect</strong> with a URI.</p>
+				<p>NGINX will then match this URI against location prefixes and regexs, and it will then serve the location that matches the root directory + the URI passed in the header</p>
+
+			</aside>
+		</section>
+		<section>
+			<h3>Special Headers</h3>
+			<ul>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">X-Accel-Redirect</span></pre></li>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">X-Accel-Buffering</span></pre></li>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">X-Accel-Charset</span></pre></li>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">X-Accel-Expires</span></pre></li>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">X-Accel-Limit-Rate</span></pre></li>
+			</ul>
+			<aside class="notes">
+				<ul>
+				<li>X-Accel-Redirect: Sets the URI for NGINX to serve</li>
+				<li>X-Accel-Buffering: Sets the proxy buffering for this connection. Setting this to “no” will allow unbuffered responses suitable for Comet and HTTP streaming applications. Setting this to “yes” will allow the response to be cached.</li>
+				<li>X-Accel-Charset: Sets the charset of the file.</li>
+				<li>X-Accel-Expires: Sets when to expire the file in the internal NGINX cache, if one is used.</li>
+				<li>X-Accel-Limit-Rate: Sets the rate limit for this single request. Off means unlimited.</li>
+			</ul>
+			</aside>
+		</section>
+
+		<section>
+			<h3>Etag</h3>
+<pre><code class="apache" data-trim contenteditable>
+			location ~* ^/static/images/$ {
+    add_header Cache-Control must-revalidate; 
+    etag on;
+}
+</code></pre>
+			<aside class="notes">
+				<p>When defining your origin server cache-policies using "must-revalidate", The "Last-Modified" and "ETag" headers are stored along witht he resource so that the client can check later if the resource has changed</p>
+				<p>In nginx, it's as simple as setting the etag directive to on, then the client will continually check if the content has been modified and if not, a 304 (not modified) will be sent back to the client.</p>
+			</aside>
+		</section>
+
+		
+			<section>
+			<h3>Caching Process Part 1</h3>
+
+ <div style="float:left;width:50%;" class="centered">
+ 	<ol>
+ 		<li>Client makes request</li>
+ 		<li>Request hits NGINX</li>
+ 	</ol>
+ </div>
+  <div style="float:right;width:40%;" class="centered">
+			<img src="assets/images/cache1.png" style="border:none; background:none; width:100%">
+		</div>
+			<aside class="notes">
+<ul>
+	<li>Client makes a request for a page or piece of content</li>
+	<li>Request hits the NGINX proxy before reaching the application</li>
+</ul>
+			</aside>
+		</section>
+
+	
+		<section>
+		<section>
+			<h3>Caching Process Part 2</h3>
+			<div style="float:left;width:50%;" class="centered">
+				<ol>
+ 		<li>NGINX generates hash</li>
+ 		<li>NGINX checks if hash exists in memory</li>
+ 		<ul>
+ 			<li>If not, then request proceeds to app</li>
+ 		</ul>
+ 	</ol>
+			</div>
+			  <div style="float:right;width:40%;" class="centered">
+			<img src="assets/images/cache2.png" style="border:none; background:none; width:100%">
+		</div>
+			<aside class="notes">
+<ul>
+	<li>Based on the details from this sample HTTP GET request, NGINX will generate a md5 hash key.</li>
+	<li>NGINX will then check to see if that hash already exists in memory. If not the request will proceed to the backend application</li>
+</ul>
+			</aside>
+		</section>
+		<section>
+			<h3>HTTP Header Details</h3>
+			<pre><code class="Linux" data-trim contenteditable>
+#Hash Key
+dcc2daea797a0dfd7bac7eec4e33a4a
+___________________________________
+
+#md5
+(http + example.com + /index.php)
+
+#Request
+GET /index.php HTTP.1/1
+
+#Headers
+User-Agent: curl/7.35.0
+Host: example.com
+Accept: &#42; / &#42;
+
+#Body
+11101001 10101011 000000000 11101010 
+                  </code></pre>
+			<aside class="notes"></aside>
+		</section>
+	</section>
+
+		<section>
+			<section>
+			<h3>Caching Process Part 3</h3>
+			<div style="float:left;width:50%;" class="centered">
+				<ol>
+ 		<li>App sends response</li>
+ 		<li>Hash saved in memory</li>
+ 		<li>File saved in file system</li>
+ 	</ol>
+			</div>
+			 <div style="float:right;width:40%;" class="centered">
+			<img src="assets/images/cache3.png" style="border:none; background:none; width:100%">
+		</div>
+			<aside class="notes">
+				<ul>
+					<li>The application answers with a response, and that response is saved to the file system</li>
+					<li>Also, that hash key generated earlier is also saved into memory.<li>
+					</ul>
+					<p>It's best to visualize the hash key value and the file being saved together but in different places. THe file on the file system and the hashing key in memory.</p>
+			</aside>
+		</section>
+		<section>
+			<h3>In Memory Details</h3>
+			<pre><code class="Linux" data-trim contenteditable>
+				#In Memory
+dcc2daea797a0dfd7bac7eec4e33a4a
+
+#In File System
+/tmp/cache/a/a4/daea797a0dfd7bac7eec4e33a4a
+			</code></pre>
+			<aside class="notes"></aside>
+		</section>
+	</section>
+
+		<section>
+			<h3>Caching Process Part 4</h3>
+			<div style="float:left;width:50%;" class="centered">
+				
+				<ol>
+ 		<li>Subsequent request</li>
+ 		<li>NGINX checks if hash exists in memory</li>
+ 		<li>Hash points to file</li>
+ 		<li>Client response sent from cache</li>
+ 		
+ 	</ol>
+			</div>
+			 <div style="float:right;width:40%;" class="centered">
+			<img src="assets/images/cache4.png" style="border:none; background:none; width:100%">
+		</div>
+			<aside class="notes">
+				<p>Client/User will finally recieve the response and when the client makes a second request to the same URL NGINX will again generate a hash key. If the hashing key arleady exists in memory it will serve the file from the cache.</p></aside>
+		</section>
+
+		<section>
+			<h3>NGINX Caching Basics</h3>
+			<ul>
+			<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_path</span></pre>: sets path</li>
+			<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache</span></pre>: invokes the cache</li>
+			<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_key</span></pre>: sets key</li>
+
+		</ul>
+		<pre><code class="apache" data-trim contenteditable>
+			proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=my_cache:20m inactive=5m;
+
+server {
+    proxy_cache_key $scheme$host$request_uri;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+...
+    location /application1 {
+        proxy_cache my_cache;
+        proxy_cache_valid any 10m;
+        proxy_pass https://backend.server;
+    }
+}	
+</code></pre>
+			<aside class="notes"></aside>
+		</section>
+
+		<section>
+			<h3>Cache Instrumentation</h3>
+			<pre><code class="apache" data-trim contenteditable>
+				add_header X-Cache-Status $upstream_cache_status;
+			</code></pre>
+			<div style="float:left;width:50%;padding-left:10px;">
+                		<div class="fragment" data-fragment-index="0" style="vertical-align:right; margin-right: auto; margin-right: auto;"><p><pre style="display:inline; color:rgb(250,250,250);"><span style="font-size: 30px;">MISS</span></pre></p></div>
+
+                		<div class="fragment" data-fragment-index="1" style="vertical-align:right; margin-right: auto; margin-right: auto;"><p><pre style="display:inline; color:rgb(250,250,250);"><span style="font-size: 30px;">BYPASS</span></pre></p></div>
+
+                		<div class="fragment" data-fragment-index="2" style="vertical-align:right; margin-right: auto; margin-right: auto;"><p><pre style="display:inline; color:rgb(250,250,250);"><span style="font-size: 30px;">EXPIRED</span></pre></p></div>
+
+                		<div class="fragment" data-fragment-index="3" style="vertical-align:right; margin-right: auto; margin-right: auto;"><p><pre style="display:inline; color:rgb(250,250,250);"><span style="font-size: 30px;">STALE</span></pre></p></div>
+
+                		<div class="fragment" data-fragment-index="4" style="vertical-align:right; margin-right: auto; margin-right: auto;"><p><pre style="display:inline; color:rgb(250,250,250);"><span style="font-size: 30px;">UPDATING</span></pre></p></div>
+
+                		<div class="fragment" data-fragment-index="5" style="vertical-align:right; margin-right: auto; margin-right: auto;"><p><pre style="display:inline; color:rgb(250,250,250);"><span style="font-size: 30px;">REVALIDATED</span></pre></p></div>
+
+                		<div class="fragment" data-fragment-index="6" style="vertical-align:right; margin-right: auto; margin-right: auto;"><p><pre style="display:inline; color:rgb(250,250,250);"><span style="font-size: 30px;">HIT</span></pre></p></div>
+                	
+                </div>
+                	<div style="float:right;width:40%;padding-right:0px;">
+		  <div class="fragment" data-fragment-index="0" style="vertical-align:right; margin-right: auto; margin-right: auto;"> <p>Written to cache</p>
+		  </div>
+		  	<div class="fragment" data-fragment-index="1" style="vertical-align:right; margin-right: auto; margin-right: auto;"> <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_bypass</span></pre>
+		  </div>
+		  <div class="fragment" data-fragment-index="2" style="vertical-align:right; margin-right: auto; margin-right: auto;"> <p>Expired entry</p>
+		  </div>
+		  <div class="fragment" data-fragment-index="3" style="vertical-align:right; margin-right: auto; margin-right: auto;"> <p>Problem with upstream</p>
+		  </div>
+		  <div class="fragment" data-fragment-index="4" style="vertical-align:right; margin-right: auto; margin-right: auto;"> <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_use_stale</span></pre></p>
+		  </div>
+		  <div class="fragment" data-fragment-index="5" style="vertical-align:right; margin-right: auto; margin-right: auto;"> <p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_revalidate</span></pre></p>
+		  </div>
+		  <div class="fragment" data-fragment-index="6" style="vertical-align:right; margin-right: auto; margin-right: auto;"> <p>Valid, fresh content</p>
+		  </div>
+		</div>
+			<aside class="notes">
+				<p>So what does Cache Instrumentation mean? Well, the term instrumentation refers to an ability to monitor or measure the level of a product's performance and to diagnose errors. In this case we're referring to the success of the cache entries and whether or not they're being served to the client</p> <p>The way we instrument our cache is by using the X-Cache-Status special response header, and use the $upstream_cache_status variable as our value</p>
+				<p>Some of these values and what they're corresponding meanings regarding nginx are:</p>
+				<ol>
+					<li>MISS - Response not found in cache; got from upstream. Response is then saved to cache</li>
+					<li>BYPASS - proxy_cache_bypass got response from upstream.</li>
+					<li>EXPIRED - Entry in cache has expired; we return a fresh content from upstream</li>
+					<li>STALE - Takes control and serves stale content from cache because upstream is not responding correctly</li>
+					<li>UPDATING - nginx will serve stale content from cache because cache_lock directive has timed out, and proxy_use_stale directive takes over</li>
+					<li>REVALIDATED - proxy_cache_revalidate verified that the currently cached content was still valid. Based off of if-modified-since HTTP header</li>
+					<li>HIT - We serve valid, fresh content directly from cache</li>
+
+			</aside>
+		</section>
+
+		<section data-state="lab">
+			<h3>Lab 1.0: WordPress DNS Modification </h3>
+			<ol>
+				<li>SSH into your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">backend</span></pre> EC2 Instance</li>
+			 <li>Download the WordPress cli (1st command below)</li>
+		    	<li>Replace the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">New-backend-url</span></pre> section and run command to search and replace old URL (2nd command below)</li>
+		    	<li>Add content as needed via WordPress admin portal (login is <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">admin:admin</span></pre>)</li>
+		</ol>
+		<pre><code class="linux" data-trim contenteditable>
+			$ sudo curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+$ sudo php wp-cli.phar search-replace 'http://ec2-54-205-18-28.compute-1.amazonaws.com' '&#60;New-backend-url&#62;' --path=/var/www/html --skip-columns=guid --allow-root
+		    		</code></pre>
+		<aside class = "notes">
+
+		</aside>
+	</section>
+	<section>
+		<h3>Lab 1.0: Successful Replace</h3>
+			<center><img src="assets/images/WordPressDNSreplace.png" style="border:none; background:none; width:35%"></center>
+		<aside class = "notes">
+
+		</aside>
+	</section>
+
+<section data-state="lab">
+			<h3>Lab 1.1: Reverse Proxy </h3>
+			<ol>
+				<li>SSH into your NGINX Plus Instance</li>
+			 <li>Backup <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">default.conf</span></pre>, and create <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy.conf</span></pre>
+			 	<pre><code class="linux" data-trim contenteditable>
+		    		$ cd /etc/nginx/conf.d/
+$ sudo mv default.conf default.conf.bak
+$ sudo vim /etc/nginx/conf.d/proxy.conf
+		    		</code></pre>
+		    	</li>
+		    <li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy.conf</span></pre> configuration details:
+		    	<pre><code class="apache" data-trim contenteditable>
+   server {
+    listen 80;
+    root /usr/share/nginx/html;
+    index index.php index.html;
+
+    location / {
+        proxy_pass http://&#60;New-backend-url&#62;/;
+    }
+}
+		    		</code></pre>
+		    	</li>
+		</ol>
+		<aside class = "notes">
+
+		</aside>
+	</section>
+
+<section data-state="lab">
+			<h3>Lab 1.2: Reverse Proxy Cache</h3>
+			<ol>
+				<li>Reload and test <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http://Nginx-frotend-url/</span></pre> to ensure the proxy is working</li>
+			 <li>Define a cache path in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http</span></pre> context of <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy.conf</span></pre>
+		    	<pre><code class="apache" data-trim contenteditable>
+		    		proxy_cache_path /data/nginx/cache levels=1:2
+keys_zone=wordpress_cache:20m inactive=5m;
+		    		</code></pre>
+		    </li>
+		    <li>In the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context, set the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_key</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_set_header</span></pre>:
+		    	<pre><code class="apache" data-trim contenteditable>
+proxy_cache_key $scheme$host$request_uri;
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		    	</code></pre>
+		</ol>
+		<aside class = "notes">
+
+		</aside>
+	</section>
+<section data-state="lab">
+			<h3>Lab 1.3: Instrument and Test </h3>
+			<ol>
+				<li>Use a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">map</span></pre> to instrument the cache on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">localhost</span></pre>
+					<pre><code class="apache" data-trim contenteditable>
+						map $remote_addr $cache_status {
+    127.0.0.1   $upstream_cache_status;
+    default         "";
+}
+server {
+    ...
+    add_header X-Cache-Status $cache_status;
+}
+					</code></pre></li>
+			<li>Set the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache</span></pre> and the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_valid</span></pre> for <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">10m</span></pre>
+				<pre><code class="apache" data-trim contenteditable>
+					location / {
+...
+    proxy_cache wordpress_cache;
+    proxy_cache_valid any 10m;
+}
+				</code></pre>
+			</li>
+			<li>Save and reload NGINX. Test using <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl -I http://localhost</span></pre>
+		</li>
+		    
+		</ol>
+		    <aside class="notes">
+		    	<p>Full Solution:</p>
+		    	<pre><code class="apache" data-trim contenteditable>
+		    		proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=wordpress_cache:20m inactive=5m;
+
+map $remote_addr $cache_status {
+        127.0.0.1       $upstream_cache_status;
+        default         "";
+}
+
+server {
+        listen 80;
+        root /var/wwwl/html;
+        index index.php index.html;
+
+        proxy_cache_key $scheme$host$request_uri;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        add_header X-Cache-Status $cache_status;
+
+        location / {
+                proxy_cache wordpress_cache;
+                proxy_cache_valid any 10s;
+                proxy_pass http://127.0.0.1:8080/;
+        }
+}
+
+		    	</code></pre>
+		    </aside>
+		</section>
+	
+
+		<section>
+			<h3>NGINX Cache Types</h3>
+			<ul>
+				<li>GET and HEAD with no Set-Cookie response</li>
+				<li>Caches based on:
+					<ul>
+						<li>raw URL</li>
+						<li>key values</li>
+					</ul>
+					<pre><code class="apache" data-trim contenteditable>
+						#Example
+proxy_cache_key $scheme$host$request_uri;
+					</code></pre>
+				</li>
+				<li>Cache time defined by:
+					<ul>
+						<li>X-Accel-Expires</li>
+						<li>Cache-Control</li>
+						<li>Expires</li>
+					</ul>
+				</li>
+			</ul>
+			<aside class="notes">
+				<p>The basic behavior of NGINX is to cache all GET and HEAD request methods that are indicated by the orign server as cacheable</p>
+				<p>If those headers possess a Set-Cookie header, nginx won't cache the content because Set-Cookie usually includes some sort of unique data specific for each request.</p>
+
+				<p>NGINX identifies which resources to cache by a particular key value, either a raw URL like www.myexample.com, or by predefined variables assigned in the proxy_cache_key directive such as $scheme$host$request_uri
+			</aside>
+		</section>
+		<section>
+			<h3>Alternative Caches</h3>
+			<ul>
+				<li>FastCGI</li>
+				<li>Memcache</li>
+				<li>uwsgi and SCGI</li>
+			</ul>
+			<aside class="notes">
+<ul>
+	<li>fastcgi functions much like an http cache, like for example if you want to cache all of your processed php files to disk</li>
+	<li>for memcache, you can retrieve content from a memcached server - assuming it's prepopulated with content)</li>
+	<li>And NGINX also has proxy_pss equivalents for other protocols such as uwsgi and SCGI</li>
+</ul>
+
+			</aside>
+		</section>
+
+		<section data-state="lab">
+			<h3>Lab 2.0 Status Page </h3>
+			<ol>
+			<li>Create a new conf called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">status.conf</span></pre></li>
+			<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">status.conf</span></pre> configuration details
+				<pre><code class="apache" data-trim contenteditable>
+		server {
+    listen 9090;
+    root /usr/share/nginx/html;
+
+    location = /status {
+        status;
+    }
+}
+				</code></pre>
+			</li>
+			<li>Add the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">status_zone</span></pre> directive in your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy.conf</span></pre>
+				<pre><code class="apache" data-trim contenteditable>
+				server {
+    ...
+    status_zone wordpress_proxy;
+}
+			</code></pre>
+		</li>
+			<li>Save, reload, then visit <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">status.html</span></pre></li>
+				
+		    
+		</ol>
+		    <aside class="notes">
+		    	<p>Full Solution:</p>
+		    	<pre><code class="apache" data-trim contenteditable>
+		    		proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=img_cache:20m inactive=5m;
+…
+proxy_cache_key $scheme$host$request_uri;
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+...
+location /application1 {
+	proxy_cache img_cache;
+	proxy_cache_valid 10m;
+	proxy_pass http://localhost:90/sampleApp;
+
+		    	</code></pre>
+		    </aside>
+		</section>
+
+		<section>
+			<h3>Selective Caching</h3>
+				<p>Separate Cache Placement through keys and regex</p>
+				<pre><code class="apache" data-trim contenteditable>
+					# Define caches and their locations
+proxy_cache_path /mnt/ssd/cache keys_zone=ssd_cache:10m levels=1:2 inactive=600s
+max_size=700m;
+proxy_cache_path /mnt/disk/cache keys_zone=disk_cache:100m levels=1:2 inactive=24h
+max_size=80G;
+
+# Requests for .mp4 and .avi files go to disk_cache
+# All other requests go to ssd_cache
+map $request_uri $cache {
+    ~\.mp4(\?.*)?$  disk_cache;
+    ~\.avi(\?.*)?$  disk_cache;
+
+    default ssd_cache;
+}
+
+server {
+    # select the cache based on the URI
+    proxy_cache $cache;
+      ...
+}
+				</code></pre>
+		<aside class="notes">
+			<p>NGINX can manage multiple cache locations, each mapped to a different filesystem location, and you can configure NGINX to choose which cache to use on a per-request basis.</p>
+			<p>In the following sample configuration, the proxy_cache_path directives create two caches, ssd_cache and disk_cache, mounted on the local directories /mnt/ssd/cache and /mnt/disk/cache respectively. The map directive inspects the request URL and selects disk_cache for all requests that appear to be video downloads (have .mp4 or .avi in the URL). The default ssd_cache location is selected for all other requests.</p>
+			<p>Note: For a simple deployment, you could create separate location blocks for different URLs and use the proxy_cache directive within each to specify a different cache location.</p>
+			<p>Later in the course we will talk about Cache Placement Strategies and some of he uses caes for each</p>
+		</aside>
+		</section>
+
+		
+
+		<section>
+			<h3>Debugging the Cache</h3>
+			<p>The cache server</p>
+			<pre><code class="apache" data-trim contenteditable>
+				http {
+    ...
+    server {
+    error_log /path2/to/log debug;
+    ...
+    }
+}
+			</code></pre>
+			<p>The connection from the load balancer</p>
+			<pre><code class="apache" data-trim contenteditable>
+...
+events {
+    debug_connection 192.168.1.1;
+    debug_connection 192.168.10.0/24;
+}
+			</code></pre>
+			<div style="text-align:center;"><small>Documentation: <a href="https://www.nginx.com/resources/admin-guide/debug/" target="_blank">Debugging NGINX</a></small></div>
+			<aside class="notes">
+				<p>Must have the debug module compiled from source</p>
+				<p>There are various options on how to correctly log debug connections and debug log levels because they take up a lot of overhead due to the detailed output. For more detailed information, as well as how to perform a core dump, check the documentation link provided in this slide.</p>
+				<p>Basically, the idea here is you can debug the log of the cache server for connections received. Or you can debug incoming connections, typically the load balancer to see if there's something lost in translation.</p>
+			</aside>
+		</section>
+		<section>
+			<h3>Extended Status</h3>
+			<p>Leverage the status module to view cache stats</p>
+			 <img src="assets/images/extendedStatus.png" style="border:none; background:none; width:100%">
+                    
+                    <aside class="notes">
+                      
+
+                    </aside>
+                </section>
+
+<section data-state="lab">
+		  <h3>Lab 2.1: Load Generator</h3>
+		  <ol>
+		  	<li>Open a new shell on your local computer. Don't perform the test on the same machine i.e. your ec2 instance</li>
+		  	<li>Ensure you have <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ab</span></pre> or similar load generator
+		  		<pre><code class="apache" data-trim contenteditable>
+		  			$ ab -V
+This is ApacheBench, Version 2.3 &#60;$Revision: 1757674 $&#62;
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+</code></pre></li>
+<li>Installation steps <a href="http://httpd.apache.org/docs/current/install.html" target="_blank">here</a>, or use <a href="https://github.com/Homebrew/homebrew-apache" target="_blank">homebrew</a>
+	<pre><code class="apache" data-trim contenteditable>
+		$ -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+$ brew tap homebrew/dupes
+$ brew install homebrew/dupes/ab
+	</code></pre></li>
+	<li>If necessary, you may have to rehash path to your shell</li>
+</ol>
+</section>
+<section data-state="lab">
+		  <h3>Lab 2.2: Perform Benchmark Test</h3>
+		  <ol>
+		  	<li>Test WordPress server directly (no NGINX) using <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ab</span></pre>:
+		  	<pre><code class="apache" data-trim contenteditable>
+		  		ab -c 10 -t 30 -k http://wordpress-backend-url/;
+		  	</code></pre></li>
+		    <li>Comment out all <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache</span></pre> directives in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy.conf</span></pre></li>
+		    <li>Test the NGINX Proxy (without caching)
+		  <pre><code class="apache" data-trim contenteditable>
+		  	ab -c 10 -t 30 -k http://frontend-nginx-url/;
+		  </code></pre></li>
+		  <li>Compare the results, then enable caching and re-test
+		  <pre><code class="apache" data-trim contenteditable>
+		  	ab -c 10 -t 30 -k http://frontend-nginx-url/;
+		  </code></pre></li>
+		</ol>
+		  <aside class ="notes">		  
+</aside>
+</section>
+		
+		
+		<!--Actions Module-->
+              <section data-background="rgb(20, 149, 62)">
+                <h2>Managing Cached Content</h2>
+              </section>
+              
+              <section>
+                  <h3>Module Objectives</h3>
+                  <p>This module enables you to:</p>
+                  <ul>
+                    <li>Identify where cache data is stored</li>
+                    <li>Modify location (external disc, tmpfs etc.)</li>
+                    <li>Purge cache entries</li>
+                    <li>Load instrumented cache data</li>
+		  </ul>
+                  <aside class="notes"></aside>
+                </section>
+		
+		  <section>
+		  	<h3>Persistent Cache</h3>
+		  	<p>NGINX uses a persistent disk-based cache</p>
+		  	<p>Options:</p>
+		  	<ul>
+		  		<li>Load cache data at startup</li>
+		  		<li>Prune the cache over time</li>
+		  		<li>Manually purge content entries</li>
+		  	</ul>
+		  	<aside class="notes">
+		  		<p>The content cache is stored on disk in a persistent cache, NGINX works in conjunction with the OS to swap that disk cache into memory, providing hints to the OS page cache as to what content should be stored in memory. This means that when we need to serve content from the cache, we can do so extremely quickly.</p>
+
+<p>The cache metadata information about what is there and its expiration time, is stored separately in a shared memory zone across all the NGINX processes and is always present in memory. So NGINX can query the cache, search the cache, extremely fast; it only needs to go to the page cache when it needs to pull the response and serve it back to the end user.</p>
+
+<p>This gives us the flexibility to look at how the persistenc cache is loaded on startup, how we can prune content in particular situation, or even purge entire cache entries if we want to be absolutely sure the client gets the most updated version. </p>
+		  	</aside>
+		  </section>
+
+		  <section>
+		    <h3>Identifying Location</h3>
+		    
+		   <ol>
+		   	<div class="fragment" data-fragment-index="0"><li>Set content path</li>
+		   	<pre><code class="apache" data-trim contenteditable>
+		  	proxy_cache_path /var/cache/nginx keys_zone=one:10m levels=1:2 max_size=40m;
+		  </code></pre></div>
+		   	<div class="fragment" data-fragment-index="1"> <li>Define cache key</li>
+		   	<pre><code class="apache" data-trim contenteditable>
+		  	proxy_cache_key $scheme$host$request_uri;
+		  </code></pre></div>
+		   	<div class="fragment" data-fragment-index="2"> <li>Get the content into the cache, then check md5</li>
+		   	<pre><code class="apache" data-trim contenteditable>
+		  	$ echo -n "httplocalhost:8080/index.html" | md5sum
+6d91blec887b7965d6a926cff19379ba -
+		  </code></pre></div>
+		   	<div class="fragment" data-fragment-index="3"> <li>Verify presence of content</li>
+		   	<pre><code class="apache" data-trim contenteditable>
+		  	cat /var/cache/nginx/4/9b/6d91blec887b7965d6a926cff19379ba
+		  </code></pre></div>
+		   </ol>
+		    
+		    <aside class="notes">
+		     <p>Now let's do a quick mental test to see if we remember how NGINX stores both it's content cached data, and the in memory metadata?</p>
+
+		     <p>The content cache location is declared using a directive called proxy_cache_path— which specifies the number of parameters: where the cache is stored on your file system, the name of the cache, the size of the cache in memory for the metadata, and the size of the cache on disk. In this case there’s a 40 MB cache on disk.</p>
+
+<p>The key to understanding where the content is stored is understanding the cache key – the unique identifier that NGINX assigns to each cacheable resource. By default that identifier is built up from the basic parameters of the request: the scheme, Host header, the URI, and any string arguments.</p>
+
+<p>You can extend that if you want using things like cookie values or authentication headers or even values that you’ve calculated at runtime. Maybe you want to store different versions for users in the UK than for users in the US. This all possible by configuring the proxy_cache_key directive.</p>
+
+<p>When NGINX handles a request, it will calculate the proxy_cache_key and from that value, then it will then calculate an MD5 sum. You can replicate that yourself using the command line example I’ve shown here. We take the cache key httplocalhost:8080/index.html and pump that through md5sum. Be careful, when you’re doing this from the shell, not to pump a new line through as well.</p>
+
+<p>That will calculate the MD5 hash value that corresponds to that cacheable content. NGINX uses that hash value to calculate the location on disk that content should be stored. You’ll see in the proxy_cache_path that we specify a two‑level cache with a one‑character and then a two‑character directory. We pull those characters off the end of the string to create a directory called 4 and subdirectory called 9b, and then we drop the content of the cache (plus the headers and a small amount of metadata) into a file on disk.</p>
+
+<p>You can test the content caching. You can print out the cache key as one of the response headers, you can pump it through md5sum to calculate the hash correspondence of that value. Then you can inspect the value on disk to see it’s really there and the headers that NGINX cached, to understand how this all fits together.</p>
+
+
+		    </aside>
+		  </section>
+<section data-state="lab">
+		  <h3>Lab 3: Map Files to Disc</h3>
+		  <ol>
+		  	<li>Map content to disc by using <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">echo</span></pre> or a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl</span></pre> command</li>
+		  	<pre><code class="linux" data-trim contenteditable>
+		  		$ echo -n "httplocalhost/" | md5sum
+$ curl -I http://localhost/
+		  	</code></pre>
+		    <li>Verify the content is now in the cache directory</li>
+		    <pre><code class="linux" data-trim contenteditable>
+		    	$ cat /data/nginx/cache/&#60;last 3&#62;/&#60;char of&#62;/&#60;md5 string&#62;
+#example
+$ cd /data/nginx/cache/5/46/
+$ ls
+f7fbc9561a3975ce1ecff55583e50465
+
+</code></pre>
+		    <li>Restart NGINX</li>
+		    <pre><code class="linux" data-trim contenteditable>
+		  		$ nginx -s reload</code></pre>
+		  </ol>
+		  <aside class ="notes">
+		  	Run sudo chmod -R 777 if you can't enter the directory
+</aside>
+		</section>
+
+		  <section>
+			<h3>Load Previous Instrumentation</h3>
+			<pre><code class="apache" data-trim contenteditable>
+		proxy_cache_path /data/nginx/cache keys_zone=one:10m 
+loader_files=100;
+loader_threshold=200 
+loader_sleeps=50;
+			</code></pre>
+			<ul>
+				<li>Loads files in blocks of 100</li>
+				<li>Takes no longer than 200ms</li>
+				<li>Pauses for 50ms, then repeats</li>
+			</ul>
+			<aside class="notes">
+<p>Now that content is stored on disk and is persistent, when NGINX starts it needs to load that content into memory – or rather, it needs to work its way through that disk cache, extract the metadata, and then load the metadata into memory in the shared memory segment used by each of the worker processes. This is done using a process called the cache loader.</p>
+
+<p>A cache loader spins up at startup and runs once, loading metadata onto disk in small chunks: 100 files at a time, sandboxed to 200 ms, and then pausing for 50 ms in between, and then repeating until it’s worked its way through the entire cache and populated the shared memory segment.</p>
+
+<p>The cache loader then exits and doesn’t need to run again unless NGINX is restarted or reconfigured and the shared memory segment needs to be reinitialized.</p>
+
+<p>You can tune the operation of the cache loader, which may be appropriate if you have very fast disks and a light load. You can make it run faster or perhaps you might want to wind it back a little bit if you’re storing a cache with a huge number of files and slow disks and you don’t want the cache loader to use excessive amounts of CPU when NGINX starts up.</p>
+			</aside>
+		</section>
+
+		<section>
+			<h3>Pruning the Cache</h3>
+			<p>The Cache Manager is a background process that operates based on:</p>
+			<ul>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">inactive</span></pre> parameter</li>
+				<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">max_size</span></pre> parameter</li>
+			</ul>
+			<pre><code class="apache" data-trim contenteditable>
+				proxy_cache_path /path/to/cache keys_zone=name:size levels=1:2
+inactive=time
+max_size=size;
+			</code></pre>
+<aside class="notes">
+<p>Once the cache is in memory and files are stored on disk, there’s a risk that cached files that are never accessed may hang around forever. NGINX will store them the first time it sees them, but if there are no more requests for a file, then [the file] will just sit there on disk until something comes along and cleans it out.</p>
+<p>This something is the cache manager; it runs periodically, purging files from the disk that haven’t been accessed within a certain period of time, and it deletes files if the cache is too big and has overflowed its declared size. It deletes them in a least‑recently‑used fashion. You can configure this operation using parameters to the proxy_cache_path [directive], just as you configure the cache loader:</p>
+
+<p>The inactive time defaults to 10 minutes.</p>
+<p>The max-size parameter has no default limit. If you impose a max‑size limit on the cache, at times it may exceed that limit but when the cache manager runs it will then prune the least recently used files to take it back underneath that limit.</p>
+</aside>
+		</section>
+		
+		<section data-state="lab">
+		  <h3>Lab 4.1: Load Cache Data</h3>
+		  <ol>
+		  	<li>Stop Nginx by running:</li>
+		  	<pre><code class="linux" data-trim contenteditable>
+		  		$ nginx -s stop</code></pre>
+		    <li>Use the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">loader_files</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">loader_threshold</span></pre> to load previous cache data</li>
+		    <pre><code class="linux" data-trim contenteditable>
+		    	proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=wordpress_cache:20m 
+	inactive=5m loader_files=100 loader_threshold=200;
+</code></pre>
+		    <li>Restart NGINX</li>
+		    <pre><code class="linux" data-trim contenteditable>
+		  		$ nginx -s reload</code></pre>
+		  		<li>Check cache capacity in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">status.html</span></pre> page</li>
+		  		<li>Run a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl</span></pre> request to see if there is a <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">HIT</span></pre></li>
+		  </ol>
+		  <aside class ="notes">
+</aside>
+		</section>
+
+		  <section>
+		  	<h3>Mounting to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">tmpfs</span></pre></h3>
+		  	<ol>
+		  	<li>Create a mount point</li>
+		  	<pre><code class="linux" data-trim contenteditable>
+$ mount -t tmpfs -o size=2G tmpfs /var/cache/nginx
+
+</pre></code>
+		  	<li>Match the cache directory in <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_path</span></pre> or <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">fastcgi_cache_path</span></pre></li>
+		  	<pre><code class="linux" data-trim contenteditable>
+http {
+    proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=one:10m;
+    fastcgi_cache_path /var/cache/nginx levels=1:2 keys_zone=one:10m;
+...
+}
+</pre></code>
+		  	<li>Test the RAM directory</li>		  	
+<pre><code class="linux" data-trim contenteditable>
+$ df -ah | grep tmpfs
+tmpfs 2.0G 29M 1996M 1% /var/cache/nginx
+		  	</code></pre>
+		  	<aside class="notes">
+<h4>Not recommended by support team!</h4>
+
+<p>It is possible to cache to tmpfs – a transient in-memory filesystem – but that brings some challenges, beyond the obvious lack of persistence across reboots.</p>
+
+<p>tmpfs filesystems are by necessity small because they are limited by the available RAM. NGINX can overfill the cache, because the worker processes add new resources to the cache, and the cache manager process then prunes the cache in the background to maintain the configured max_size. Therefore, it’s necessary to allow for spare capacity when sizing a cache, and this can be wasteful on a small cache file system.</p>
+
+<p>Furthermore, tmpfs filesystems are swapped out to disk when memory is constrained. The memory used by a tmpfs cache could just as effectively be used by the page cache for a larger on-disk cache.</p>
+
+<p>Here are the commands to a). partition your tmpfs to serve nginx cache data, b) reference that directory on disc using proxy_cache_path, c). test the RAM partition to see that is indeed serving and storing data from that temp filesystem</p>
+		  	</aside>
+		  </section>
+
+
+
+		  <section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_cache_purge</span></pre> Directive</h3>
+	<p>Allows you to remove full cache entries that match a configured value.</p>
+	<pre><code class="linux" data-trim contenteditable>
+		server {
+    proxy_cache myCache;
+    proxy_pass http://localhost:8081;
+    proxy_cache_purge $purge_method;
+}
+
+</code></pre>
+	<aside class="notes">
+<p>One side effect of caching content is that content updates may not terminate the existing content in a client’s browser.</p>
+<p>proxy_cache_purge allows you to remove full cache entries that match a configured value.
+Syntax: proxy_cache_purge "string"</p>
+
+	</aside>
+</section>
+
+<section>
+	<h3>Purge Methods</h3>
+	<p>Partial Purge</p>
+	<ul>
+		<li>use <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl</span></pre> command to send <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">PURGE HTTP</span></pre> request, <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">map</span></pre> evaluates request and enables the directive</li>
+	</ul>
+	<p>Full Purge</p>
+	<ul>
+		<li>turn <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">purger</span></pre> parameter on in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_path</span></pre>, all wildcard pages will also be purged</li>
+	</ul>
+	<aside class="notes">
+<p>Partial Purge: The map directive stores the PURGE HTTP request, then references the request method in a specific caching location.
+</p>
+<p>Full Purge: In addition to purging the specific location, by enabling purger=on all files matching the wildcard key (*) are completely removed from cache.</p>
+	</aside>
+</section>
+
+<section>
+	<h3>HTTP PURGE Example</h3>
+
+	<p>Request: <pre><code class="bash" data-trim contenteditable>$ curl –X PURGE –D – “http://www.mysite.com"</code></pre></p>
+
+	<pre><code class="linux" data-trim contenteditable>
+		# setting the default purge method will only delete matching URLs.
+map $request_method $purge_method {
+    PURGE 1;
+    default 0;
+	}
+server {
+    listen 80;
+    server_name www.mysite.com
+    proxy_cache myCache;
+    proxy_pass http://localhost:8081;
+    proxy_cache_purge $purge_method;
+}
+
+	</code></pre>
+	<aside class="notes"></aside>
+</section>
+
+<section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">purger</span></pre> Example</h3>
+
+	<p>Request: <pre><code class="bash" data-trim contenteditable>$ curl –X PURGE –D – “http://www.mysite.com/*"</code></pre></p>
+
+	<pre><code class="linux" data-trim contenteditable>
+		proxy_cache_path /data/nginx/cache levels=1:2 keys=myCache:10m purger=on;
+
+server {
+    listen 80;
+    server_name www.mysite.com;
+    location / {
+
+        proxy_cache_purge $purge_method;
+    }
+}
+
+	</code></pre>
+	<aside class="notes"></aside>
+</section>
+
+<section data-state="lab">
+			<h3>Lab 4.2: Configure Cache Purge</h3>
+			<ol>
+<li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy.conf</span></pre> and create the following <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">map</span></pre>:</li>
+<pre><code class="linux" data-trim contenteditable>
+map $request_method $purge_method {
+	default  0;
+	PURGE    1;
+}
+	</code></pre>
+<li>Specify the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_purge</span></pre> directive</li>
+<pre><code class="linux" data-trim contenteditable>
+location / {
+	proxy_cache_purge $purge_method;
+	...
+	proxy_cache wordpress_cache;
+}
+	</code></pre>
+<li>Save and reload NGINX</li>
+<li>Send the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl</span></pre> command using <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">PURGE</span></pre></li>
+<pre><code class="linux" data-trim contenteditable>
+$ curl –X PURGE –I http://localhost/
+</code></pre>
+
+		</ol>
+		    <aside class="notes">
+		    	<p>Solution:</p>
+		    	<pre><code class="linux" data-trim contenteditable>
+		    		proxy_cache_path /data/nginx/cache2 levels=1:2 keys_zone=upstreamCache:10m max_size=60m inactive=60m;
+
+map $request_method $purge_method {
+	default  0;
+	PURGE    1;
+}
+server {
+…
+location / {
+	proxy_cache wordpress_cache;
+	proxy_cache_valid 10s;
+	proxy_cache_purge $purge_method;
+	proxy_pass http://127.0.0.1/;
+
+		    	</code></pre>
+
+		    	<div style="text-align:center;"><small>Note: Successful PURGE will result in a HTTP 204 code</small></div>
+		    </aside>
+		</section>
+
+		<section>
+			<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">exprires</span></pre> Directive</h3>
+			<p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Expires</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Cache-Control</span></pre> response header modification</p>
+			<pre><code class="linux" data-trim contenteditable>
+			map $sent_http_content_type $expires {
+    
+    default                  off;
+    application/pdf          42d;
+    ~image/                  max;
+    css/javascript           modified +24h;
+    text/html                epoch;
+}
+
+expires $expires;
+</code></pre>
+			<aside class="notes">
+				<p>Enables or disables adding or modifying the “Expires” and “Cache-Control” response header fields provided that the response code equals 200, 201, 204, 206, 301, 302, 303, 304, or 307. The parameter can be a positive or negative time.</p>
+
+<p>The time in the “Expires” field is computed as a sum of the current time and time specified in the directive. If the modified parameter is used then the time is computed as the sum of the file’s modification time (Last-Modified) and the time specified in the directive.</p>
+
+<p>In addition, it is possible to specify a time of day using the “@” prefix. e.g. <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">expires @15h30m</span></pre></p>
+
+<p>The epoch parameter refers to the absolute time - meaning day, time, and year stamp. In other words you're deferring to what's stated in the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Cache-Control max-age</span></pre> headers</p>
+
+<p>Sometimes you will see the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">expires</span></pre> directive with a negative value, this relates to the absolute time parameter in the Cache-Control headers. So if time is a negative value then the Cache-Control equals no-cache, if it's positive or zero, then Cache-Control equals the time parameter</p>
+			</aside>
+		</section>
+		
+	
+	
+
+<!--Next Section-->
+
+		<section data-background="rgb(20, 149, 62)">
+                  <h2>Cache Tuning</h2>
+                 </section>
+
+		<section>
+                  <h3>Module Objectives</h3>
+                  <p>This module enables you to:</p>
+                  <ul>
+                    <li>Interpret and modify headers</li>
+                    <li>Configure caching resources</li>
+                    <li>Bypass cache tier </li>
+		  </ul>
+                  <aside class="notes"></aside>
+                </section>
+
+<section>
+	<h3>Header Interpretation</h3>
+	<p>Example 1</p>
+	<pre><code class="linux" data-trim contenteditable>
+		location /images/ {
+    proxy_cache my_cache;
+    proxy_ignore_headers Cache-Control;
+    proxy_cache_valid any 30m;
+    ...
+}
+	</code></pre>
+	<p>Example 2</p>
+	<pre><code class="linux" data-trim contenteditable>
+		location /images/ {
+    proxy_cache my_cache;
+    add_header Cache-Control public;
+    ...
+}
+	</code></pre>
+	<div style="text-align:center;"><small>Warning!: <a href="https://blog.g3rt.nl/nginx-add_header-pitfall.html" target="_blank">add_header Pitfall!</a></small>
+</div>
+	
+	<aside class="notes">
+		<p>Using proxy_ignore_headers, you can instruct NGINX to either ignore the Cache-Control header for everything under a specific prefix. Which will require you to enforce your own expirtation policies via proxy_cache_valid.</p>
+		<p> Or you can choose to set the Cache-Control headers to public via the add_header directive. This essentially allows any system to cache proxied responses, rather than just the client's browser. And it also owners the additional header information passed from the origin server such as max-age.</p>
+		<p>This is useful if you have an external cache server like memcache to store on an external disc, or if you want to rely on the origin server for what's cacheable vs. what's not</p>
+
+		<p>Beware about the add_header configuration pitfall! the add_header directive inherits directives from the previous level, and only if there are no add_headers at the current level</p>
+
+	</aside>
+</section>
+
+<section>
+	<h3>Caching Resources</h3>
+	<p>Directives that control cached responses:</p>
+	<ul>
+		<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_min_uses</span></pre></li>
+		<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_methods</span></pre></li>
+	</ul>
+	<p>Caching limit rates:</p>
+	<ul>
+		<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_bypass</span></pre></li>
+		<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_no_cache</span></pre></li>
+	</ul>
+	<p></p>
+	<div style="text-align:center;"><small>Documentation: <a href="https://www.nginx.com/resources/admin-guide/content-caching/" target="_blank">Cache Admin Guide</a></small></div>
+
+	<aside class="notes"></aside>
+</section>
+
+<section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_cache_min_uses</span></pre></h3>
+<pre><code class="linux" data-trim contenteditable>
+		server {
+    proxy_cache myCache;
+    proxy_pass http://localhost:8081;
+    proxy_cache_min_uses 5;
+}
+</code></pre>
+
+	<aside class="notes">
+Proxy_cache_min_uses sets the number of times an item must be requested by clients before NGINX caches it.
+ By default proxy_cache_min_uses is set to 1.
+Further requests are evicted from cache when not accessed within the timeout duration or when max_size upper limit is reached.
+
+This directive counts the number of requests after which the response from the upstream is cached.
+This directive is useful if you have a lot of concurrent requests and you don’t want to cache every response or if your cache is constantly hitting it’s upper limits and you want to regulate the most frequently accessed  items.
+
+
+	</aside>
+</section>
+<section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_cache_methods</span></pre></h3>
+	<p>Syntax: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_methods $request_method</span></pre></p>
+	<pre><code class="linux" data-trim contenteditable>
+map $request_method $cache_method {
+	default 0;
+	GET     1;
+	POST    1;
+	HEAD    1;
+	PUT     0;
+}
+
+server {
+	proxy_cache_methods $cache_method;
+	proxy_cache my_cache;
+	proxy_cache valid any 4s;
+	proxy_pass http://localhost:8080/;
+}
+
+</code></pre>	
+
+	<aside class="notes"></aside>
+</section>
+
+
+    <section>
+		<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_cache_bypass</span></pre></h3>
+		<pre><code class="apache" data-trim contenteditable>
+		  			proxy_cache_bypass $cookie_nocache $http_pragma $http_authroization;
+		  		</code></pre>
+                  <aside class="notes">
+                  	<p>
+<p>This directive defines conditions where NGINX Plus does not send cached data to the client.</p> <p>Each parameter defines a condition and consists of a number of variables. If at least one parameter is not empty and does not equal “0” (zero), NGINX Plus does not look up the response in the cache, but instead forwards the request to the backend server immediately.</p>
+<p>Popular use cases for this directive include http_auth headers, and secure data that should always be the most up to date when a client makes a request</p>
+</aside>
+  </section>
+
+  <section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_cache_no_cache</span></pre></h3>
+		<p>Syntax: <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_no_cache $arg$arg_comment</span></pre></p>
+<pre><code class="linux" data-trim contenteditable>
+	map $request_uri $no_cache;
+    /default	0;
+    /test       1;
+
+server {
+    proxy_cache_methods GET HEAD POST;
+    proxy_cache my_cache;
+    proxy_cache_valid any 10m;
+    proxy_no_cache $no_cache;
+    proxy_pass http://localhost:8080/;
+}
+
+</code></pre>
+		<aside class="notes">
+<p>Similar to the proxy_cache_bypass directive,  we can define parameters where under no situation should any content be cached given the proxy_no_cache directive is present</p>
+<p>here in this use case we're storing request_uri where we don't want to cache responses. This configuration assumes that the $request_uri is part of the caching key, so when a subsequent or new request is made for '/test' the responses won't be cached</p>
+</aside>
+
+  </section>
+
+ <section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_cache_use_stale</span></pre></h3>
+	<pre><code class="linux" data-trim contenteditable>
+		location / {
+    ...
+    proxy_cache_use_stale error timeout http_500 http_502 http_503 http_504;
+}
+	</code></pre>
+	
+	<aside class="notes">
+		<p>Let's say there's a scenario where you're origin server is down, but rather than serve a 500 code error page , you want to continue to serve outdated content to the client for a period of time.</p>
+		<p>Using the proxy_cache_use_stale directive we can provide an extra level of fault tolerance, for the servers that NGINX is proxying, and ensure uptime in the case of server failures or traffic spikes.</p>
+		<p>Here in this example, if NGINX receives an error, timeout, or any equivalent response from the backend server, and as long as there is a stale cache entry for the request key stored on the NGINX box, NGINX will relay the cached file to the content rather than an error page.</p>
+	</aside>
+
+</section>
+
+<section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_cache_revalidate</span></pre></h3>
+	<pre><code class="linux" data-trim contenteditable>
+location / {
+    proxy_cache my_cache;
+    proxy_cache_min_uses 3;
+    proxy_cache_use_stale error http_500 http_503 http_502;
+    proxy_cache_revalidate on;
+
+    proxy_pass http://myUpstream/;
+}
+	</code></pre>
+	<aside class="notes">
+<p>proxy_cache_revalidate instructs NGINX to use conditional GET requests when refreshing content from the origin servers.</p> <p>If a client requests an item that is cached but expired as defined by the cache control headers, NGINX includes the If‑Modified‑Since field in the header of the GET request it sends to the origin server.</p> <p>This saves on bandwidth, because the server sends the full item only if it has been modified since the time recorded in the Last‑Modified header attached to the file when NGINX originally cached it.</p>
+	</aside>
+</section>
+
+<section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">proxy_cache_lock</span></pre></h3>
+	<pre><code class="linux" data-trim contenteditable>
+location / {
+    proxy_cache my_cache;
+    proxy_cache_min_uses 3;
+    proxy_cache_use_stale error http_500 http_503 http_502;
+    proxy_cache_revalidate on;
+
+    proxy_cache_lock on;
+    proxy_pass http://myUpstream/;
+}
+	</code></pre>
+	<aside class="notes">
+<p>With proxy_cache_lock enabled, if multiple clients request a file that is not current in the cache (basically a MISS X-Proxy-Cache status), only the first of those requests is allowed through to the origin server.</p> 
+<p>The remaining requests wait for a response to appear in the cache or the cache lock for the request element to be released. This is key to avoid cache lock contention</p>
+	</aside>
+</section>
+
+<section>
+	<h3>SwR/SiE</h3>
+	
+	<p>Origin Servers</p>
+	<pre><code class="apache" data-trim contenteditable>
+		Cache-Control: max-age=3600 stale-while-revalidate=120 stale-if-error=900
+	</code></pre>
+	<p>NGINX Servers</p>
+	<pre><code class="apache" data-trim contenteditable>
+		proxy_cache_path /path/to/cache levels=1:2 keys_zone=my_cache:10m 
+		max_size=10g inactive=60m use_temp_path=off;
+
+server {
+    # ...
+    location / {
+        proxy_cache my_cache;
+        proxy_cache_use_stale updating;
+        proxy_cache_background_update on;
+        proxy_pass http://my_upstream;
+    }
+}
+	</code></pre>
+
+	<aside class="notes">
+		<ul>
+		<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">stale‑while‑revalidate</span></pre></li>
+		<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">stale‑if‑error</span></pre></li>
+	</ul>
+
+<pre><code class="apache" data-trim contenteditable>
+		proxy_cache_path /path/to/cache levels=1:2 keys_zone=my_cache:10m max_size=10g inactive=60m use_temp_path=off;
+
+server {
+    # ...
+    location / {
+        proxy_cache my_cache;
+
+        # Serve stale content when updating
+        proxy_cache_use_stale updating;
+
+        # In addition, don’t block the first request that triggers the update
+        # and do the update in the background
+        proxy_cache_background_update on;
+
+        proxy_pass http://my_upstream;
+    }
+}
+	</code></pre>
+	</aside>
+</section>
+
+
+<section>
+	<h3>Cache-Control Review</h3>
+	<ul>
+	<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_valid</span></pre></li>
+	<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_bypass</span></pre></li>
+	<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_no_cache</span></pre></li>
+	<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">Cache-Control public</span></pre></li>
+</ul>
+	<aside class="notes">
+		<p>By adding the 'public' Cache-Contrl header, we're allowing any system to cache entries. Setting them to private would limit them to being cached by private caches, such as our browser.</p>
+
+	</aside>
+</section>	
+
+		<section data-state="lab">
+		  <h3>Lab 5.1: Set Cache Params</h3>
+		  <ol>
+		  	<li>Create a separate conf file called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">cache.params.conf</span></pre></li>
+		  	<li>Transfer all cache details at <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> and <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">http</span></pre> contexts</li>
+		  	</ol>
+		 <pre><code class="apache" data-trim contenteditable>
+		  		proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=wordpress_cache:20m inactive=5m loader_files=100 loader_threshold=200;
+
+map $remote_addr $cache_status {
+    127.0.0.1   $upstream_cache_status;
+    default         "";
+}
+
+map $request_method $purge_method {
+    default  0;
+    PURGE    1;
+}
+
+proxy_cache_key $scheme$host$request_uri;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    add_header X-Cache-Status $cache_status;
+		  	</code></pre>
+		  <aside class="notes">
+
+	</code></pre>
+		  </aside>
+		  </section>
+
+		  <section data-state="lab">
+		  <h3>Lab 5.2: Set Reference Cache Params</h3>
+		  <ol>
+		  	<li>Add one <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">map</span></pre> that bypasses the cache based on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$status</span></pre> and a custom variable called <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$do_not_cache</span></pre>, and another based on <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$content_type</span></pre> with <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">$expires</span></pre></li>
+		  	<li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy.conf</span></pre> and add the following:</li>
+<pre><code class="apache" data-trim contenteditable>
+	proxy_cache_bypass $do_not_cache;
+proxy_cache_methods GET HEAD POST;
+expires $expires;
+</code></pre>
+</ol>
+<aside class="notes">
+	<h4> Full Config</h4>
+	<pre><code class="apache" data-trim contenteditable>
+
+		proxy_cache_path /data/nginx/cache levels=1:2 keys_zone=wordpress_cache:20m inactive=5m loader_files=100 loader_threshold=200;
+
+map $remote_addr $cache_status {
+    127.0.0.1   $upstream_cache_status;
+    default         "";
+}
+
+map $request_method $purge_method {
+    default  0;
+    PURGE    1;
+}
+
+map $content_type $expires {
+    default            off;
+    application/pdf    10m;
+    ~image/            max;
+    css/javascript     10m;
+    text/html          epoch;
+}
+
+map $status $do_not_cache {
+    400     1;
+    403     1;
+    500     1;
+    502     1;
+    504     1;
+    default 0;
+}
+
+    proxy_cache_key $scheme$host$request_uri;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    add_header X-Cache-Status $cache_status;
+	</code></pre>
+		  </aside>
+		  </section>
+<!--Next Section-->
+
+		<section data-background="rgb(20, 149, 62)">
+                  <h2>Cache Scaling</h2>
+                 </section>
+
+<section>
+                  <h3>Module Objectives</h3>
+                  <p>This module enables you to:</p>
+                  <ul>
+                    <li>Enable microcaching</li>
+                    <li>Create and Deploy Cache Placement Strategies</li>
+                    <li>Optimize read and write operations</li>
+                    <li>Create high-capacity/highly-available caches</li>
+		  </ul>
+                  <aside class="notes"></aside>
+                </section>
+
+<section>
+	<h3>Microcaching</h3>
+	<p>Benefits:</p>
+	<ul>
+		<li>Improves web performance</li>
+		<li>Reduces load on origin servers</li>
+	</ul>
+		<p>Drawbacks:</p>
+		<ul>
+		<li>Depends on cacheability of content</li>
+		<li>Spike on origin server after entry expires</li>
+	</ul>
+	
+	<aside class="notes">
+		<p>Microcaching is a techqunie where the content is cached for a very short period of time, as little as 1 second. This means that updates to the site are delayed by no more than a second, which in many cases is perfectly acceptable.</p>
+</aside>
+</section>
+<section>
+	<h3>Microcaching Scenarios</h3>
+	<ul>
+		<li>Front page of busy blog or news site</li>
+		<li>RSS feed of recent information</li>
+		<li>Status page of a CI build platform</li>
+		<li>Calendar data</li>
+		<li>Personalized dynamic content on client side</li>
+	</ul>
+	<aside class="notes">
+<p>Deciding what should be microcached and when is key with microcaching. Typically caching static content like .html files and images is a given, but it's also a relatively straightforward process. It might be more beneficial to cache this content for a longer duration because it's least likely to change. </p><p>However when it gets to caching personalized content (that is, content customized for each user by the server application), or dynamic content, things get trickier</p>
+<p>Generally, caching personalized content is impossible because the server's response to each request for the same resource is different per user. Techniquies such as server side include and edge side includes can help with page assembly, but the performance imporvement isn't gauranteed or is negligble</p>
+<p>However dynamic content, that is content that can change unpredictably but isn't personalized for each user can be cached and SHOULD be cached. Sometimes this content is extremely expensive to generate and serving an outdated version can cause a range of problems</p>
+<p>Examples of dynamic content suitable for caching include: (read the list)</p>
+	</aside>
+</section>
+
+<section>
+	<h3>Microcaching Example</h3>
+	<pre><code class="apache" data-trim contenteditable>
+proxy_cache_path /tmp/cache keys_zone=cache:10m levels=1:2 inactive=600s max_size=100m;
+server {
+    listen external-ip:80;  # External IP address
+    proxy_cache cache;
+    proxy_cace_valid 200 1s;
+    status_zone wordpress; # NGINX Plus status monitoring
+
+    location / {
+        proxy_http_version 1.1; # Always upgrade to HTTP/1.1
+        proxy_set_header Connection ""; # Enable keepalives
+        proxy_set_header Accept-Encoding ""; # Optimize encoding
+        proxy_pass http://wordpress-upstreams;
+    }
+}
+
+upstream wordpress-upstreams {
+    zone wordpress 128k;
+    keepalive 20; # Keepalive pool to upstream
+    server localhost:80;
+}
+
+	</code></pre>
+<aside class="notes">
+
+</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Lab 6.1 Microcaching</h3>
+		  <ol>
+		 
+<li>Open <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy.conf</span></pre> and change the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_valid</span></pre> directive value to <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">1s</span></pre></li>
+<li>Save and reload NGINX, and re-run your <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ab</span></pre> test
+	<pre><code class="apache" data-trim contenteditable>
+		ab -c 10 -t 30 -k http://frontend-nginx-url/;
+	</code></pre>
+	<li>Take a look at the status dashboard</li>
+	<li>There should be increase in connections received, but also notice the spike in 3xx codes every so often?</li>
+</ol>
+</section>
+<section data-state="lab">
+		  <h3>Lab 6.2 Microcaching</h3>
+		  <ol>
+	<li>Add the following to the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">server</span></pre> context:
+		 <pre><code class="apache" data-trim contenteditable>
+		  		server {
+    listen 80;
+    ...
+    proxy_cache_bypass 404 403 500 503 502;
+    expires $expires;
+	...
+    proxy_cache_revalidate on;
+    proxy_cache_lock on;
+
+}
+		  	</code></pre></li>
+		  	<li>Save and Reload NGINX, then re-run the <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">ab</span></pre> test. Notice a difference?</li>
+		  </ol>
+		  <aside class="notes">
+<h4>Full config</h4>
+<pre><code class="apache" data-trim contenteditable>
+	map $request_method $purge_method {
+        default 0;
+        PURGE   1;
+}
+
+map $request_method $cache_method {
+    GET     1;
+    HEAD    1;
+    POST    1;
+    default 0;
+}
+
+map $content_type $expires {
+    default                  off;
+    application/pdf          42d;
+    ~image/                  max;
+    css/javascript           modified +24h;
+    text/html                epoch;  
+}
+
+server {
+        listen 80;
+        root /var/wwwl/html;
+        index index.php index.html;
+        status_zone wordpress_proxy:
+
+        proxy_cache_key $scheme$host$request_uri;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_cache_bypass 404 403 500 503 502;
+        proxy_cache_methods $cache_method;
+        expires $expires;
+        proxy_cache_use_stale updating error http_500 http_503 http_502;
+        proxy_cache_revalidate on;
+        proxy_cache_lock on;
+	</code></pre>
+		  </aside>
+		  </section>
+
+<section>
+	<h3>Cache Placement Strategies</h3>
+	<ul>
+		<li>Single Disk</li>
+		<li>Mirror</li>
+		<li>Stripe</li>
+		<li>Hash</li>
+	</ul>
+	<aside class="notes"></aside>
+</section>
+
+<section>
+	<h3>Single Disk</h3>
+	<pre><code class="apache" data-trim contenteditable>
+		proxy_cache_path /tmp/cache keys_zone=cache:10m levels=1:2 inactive=600s max_size=100m;
+
+		server {
+		...
+		proxy_cache cache
+		proxy_cache valid 200 15s;
+	}
+	</code></pre>
+	<aside class="notes"></aside>
+</section>
+
+<section>
+	<h3>Mirror</h3>
+	<pre><code class="apache" data-trim contenteditable>
+		$ lvcreate -L 50G -m1 -n mirrorlv vg0
+	</code></pre>
+	<p></p>
+	<div style="text-align:center;"><small>Documentation: <a href="https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Logical_Volume_Manager_Administration/mirror_create.html" target="_blank">Create Mirrored Volume </a></small></div>
+	<aside class="notes">
+<p> To create the mirrored cache strategy we can use Linux LVM to mirror a disk volume. This command is for a single mirrored volume. For more information on using the LVM commands, use the documentation link provided in this slide</p>
+	</aside>
+</section>
+
+<section>
+	<h3>Stripe</h3>
+	<pre><code class="apache" data-trim contenteditable>
+		$ lvcreate -i3 -I4 -L1G -nmy_logical_volume my_volume_group
+lvcreate -- rounding 1048576 KB to stripe boundary size 1056768 KB / 258 PE
+	</code></pre>
+	<p></p>
+	<div style="text-align:center;"><small>Documentation: <a href="http://tldp.org/HOWTO/LVM-HOWTO/recipethreescsistripe.html" target="_blank">Create Striped Logical Volume </a></small></div>
+	
+	<aside class="notes">
+<p>Again, we use the LVM to stripe our volumes. Use the documentation to learn how to do this</p>.
+	</aside>
+</section>
+
+<section>
+	<h3>Hash</h3>
+	<pre><code class="apache" data-trim contenteditable>
+		proxy_cache_path /mnt/disk1/cache keys_zone=disk1:100m levels=1:2 inactive=600s
+                 max_size=5G use_temp_path=off;
+proxy_cache_path /mnt/disk2/cache keys_zone=disk2:100m levels=1:2 inactive=600s
+                 max_size=5G use_temp_path=off;
+
+split_clients $request_uri $cache {
+    50%     disk1;
+    *       disk2;
+}
+
+server {
+    listen localhost:80;
+    proxy_cache $cache;
+    status_zone loadbalancer;
+...
+}
+	</code></pre>
+	<aside class="notes">
+<p>To implement the Hash strategy, we included the split_clients directive in the NGINX configuration. This configuration splits cached content evenly between the two caches created by the proxy_cache_path directives, one on each physical disk:</p>
+	</aside>
+</section>
+
+<section>
+	<h3>Testing Placement Strategies</h3>
+	<ul>
+		<li>Use <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">iostat</span></pre> to monitor I/O on individual disks </li>
+		<li>Test both cloud and bare-metal servers</li>
+		<li>Make sure caches are flushed and empty before each test run</li>
+	</ul>
+	<p></p>
+	<div style="text-align:center;"><small>Documentation: <a href="https://www.nginx.com/blog/cache-placement-strategies-nginx-plus/" target="_blank">Cache Placement Strategy</a></small></div>
+
+	<aside class="notes">
+		<p>Disc I/O can be a limiting factor, so iostat will help visualize the load on physical and virtual disks</p>
+		<p>To show the variablity between cloud and on prem deployments, you should conduct the same test on both cloud and bare-metabl servers</p>
+		<p>Finally, make sure you reduce any sampling bias or standard deviation by making sure your caches are flushed and empty before each test run</p>
+		<p>Check the admin guide for cache placement strategy as well as configuration details on how to conduct this test in your own projects</p>
+	</aside>
+</section>
+
+
+<section>
+<h3>Optimizing Read Operations</h3>
+<ul>
+	<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">aio</span></pre></li>
+	<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">directio</span></pre></li>
+	<li><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">thread_pools</span></pre></li>
+</ul>
+<aside class="notes">
+<p>If content is available in main memory (because it was recently used or written to cache), cache read operations are immediate; if content is not in main memory, NGINX generally blocks while the content is retrieved from storage. The thread pools feature mitigates this problem by handing the blocking read operation over to an aio thread so that the main NGINX worker thread is not blocked. In the use case described in Valentin’s article, we saw a 9x performance improvement for hot content.</p>
+</aside>
+</section>
+
+<aside class="notes"></aside>
+</section>
+
+<section>
+	<h3>Async I/O</h3>
+	<pre><code class="apache" data-trim contenteditable>
+		thread_pool io_pool threads=16;
+http{
+….....
+   location /data{
+     sendfile   on;
+     aio       threads=io_pool;
+   }
+}
+	</code></pre>
+<aside class="notes">
+<p>Asynchronous I/O allows a process to initiate I/O operations witout having to block or wait for it to complete.</p>
+<p>The aio directive is available under the http, server, or location contexts</p>
+<p>Depending on where the directive is placed, the directive will perform asynchrnous I/O for matching requests.</p>
+<p>The directve is best used with the sendfile directive to speed up TCP data transfers</p>
+<p>This directive only works on a Linux kernel 2.6.22 or higher, or FreeBSD 4.3 or higher. By default the directive is set to off, and it has a special parameter where it can reference a thread pool for multithreading tasks</p>
+
+<p>To understand how thread pools work we need to talk about the number one enemy of the asynchrnous I/O cycle---blocking calls</p>
+</aside>
+</section>
+
+<section>
+	<h3>Blocking Operations</h3>
+	 <div style="float:right;width:95%;" class="centered">
+	<img src="assets/images/blocking-operation-diagram.png" style="border:0;background:none;">
+</div>
+	<aside class="notes">
+<p>Generally, NGINX works well with sockets in a non-blocking mode and uses efficient methods such as epoll or kqueue to prevent the worker processes from being blocked</p><p>However sometimes a long write operation, or a poorly configured third-party module, will create blocking operations--even using the aio interface</p><p>One of the biggest drawbacks are the alignment requirements for file access/buffers. The second problem is the 0_DIRECT flag to be set on the file descriptor, this means any access to the file will bypass the cache in memory and increase load on hard disks.</p>
+	<p>thread_pools to the rescue!</p>
+	</aside>
+</section>
+
+<section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">thread_pools</span></pre></h3>
+	<div style="float:right;width:100%;" class="centered">
+	<img src="assets/images/thread-pools-worker-process-event-cycle.png" style="border:0;background:none;">
+</div>
+	<aside class="notes">
+<p>In terms of NGINX, the thread pool is performing the functions of a delivery service. It consists of a task queue and a number of threads that handle the queue. When a worker process needs to do a potentially long operation, instead of processing the operation by itself it puts a task in the pool’s queue, from which it can be taken and processed by any free thread.</p>
+	<p>At the moment, offloading to thread pools is implemented for only three essential operations: the read() syscall on most operating systems, sendfile() on LInux, and aio_write() on Linux, which is used when writing some temporary files such as those for the cache.</p>
+	</aside>
+</section>
+
+<!--<section data-state="lab">
+		  <h3>Lab 6: Async IO for Cache Writes </h3>
+		  
+		  <aside class ="notes">
+
+
+</aside>
+
+		</section>-->
+
+<section>
+	<h3>Byte Range Requests</h3>
+	<p><strong>Problem:</strong> Subsequent requests spawn new cache-fill operations during long cache-fill.</p>
+	<p><strong>Solution:</strong> Cache lock or slicing</p>
+	
+<aside class="notes">
+</aside>
+</section>
+
+<section>
+	<h3>Lock a Single Fill </h3>
+	<pre><code class="apache" data-trim contenteditable>
+		proxy_cache_path /tmp/mycache keys_zone=mycache:10m;
+
+server {
+    listen 80;
+
+    proxy_cache mycache;
+    proxy_cache_valid 200 600s;
+    proxy_cache_lock on;
+
+    # Immediately forward requests to the origin if we are filling the cache
+    proxy_cache_lock_timeout 0s;
+
+    # Set the 'age' to a value larger than the expected fill time
+    proxy_cache_lock_age 200s;
+
+    proxy_cache_use_stale updating;
+
+    location / {
+        proxy_pass http://origin:80;
+    }
+}
+	</code></pre>
+<aside class="notes">
+	<p>This configuraiton triggers an immediate cache-fill when the first byte range request is recevied, and forwards all other requets to the origin server while the cache-fill operation is in progress</p>
+	<p>The proxy_cache_lock sets the lock so that when NGINX recieves the first byte-range request, it requests the entire file from origin server while starting the cache-fill, and nginx won't convert subsequent byte-range requests into requests for the entire file or a start a new cache-fill operation</p>
+	<p>the proxy_cache_lock_timeout will control who long the cache is locked, when the timeout expires NGINX will forward each queued request to the origin server with the Range header perserves rather than requests for the entire file</p>
+	<p>If a cache-fill operation is taking a long time (like for a 10mb file) we can set a deadline for the cache-fill operation using proxy_cache_lock_age</p>
+<p>It's also a good practice to use proxy_cache_use_stale updating while nginx is updating a resource so it can served any available cached resources directly to the client</p>
+</aside>
+</section>
+
+<section>
+	<h3>Slice-by-Slice</h3>
+	<p>Use the Cache Slice module to optimize bandwidth during long cache-fill operations</p>
+	<div style="float:left;width:90%;" class="centered">
+	<img src="assets/images/nginx-cache-slicing-detail.png" style="border:0;background:none;">
+</div>
+
+	
+<aside class="notes">
+</aside>
+</section>
+
+<section>
+	<h3>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">slice</span></pre> Example</h3>
+<pre><code class="apache" data-trim contenteditable>
+	proxy_cache_path /tmp/mycache keys_zone=mycache:10m;
+
+server {
+    listen 80;
+
+    proxy_cache mycache;
+
+    slice              1m;
+    proxy_cache_key    $host$uri$is_args$args$slice_range;
+    proxy_set_header   Range $slice_range;
+    proxy_http_version 1.1;
+    proxy_cache_valid  200 206 1h;
+
+    location / {
+        proxy_pass http://origin:80;
+    }
+}
+</code></pre>
+<aside class="notes">
+<p>Tips</p>
+<ul>
+	<li>Choose a slice size that's set to a value small enough that each segment can be transferred quickly (for example a second or two). This will reduce the chances of multiple requests trigging a continous-updating behavior</li>
+	<li>Cache Slice splits a resource into indepednent segments, it's not possible to cahnge the resouce once it has been cached. The module verifies the resouce's ETag header each time it receives a segment from the origin, and if the ETag changes, NGINX aborts the transaction because the underlying cache entry is now corrupt.</li>
+	<li>Only use cache slicing on large static files that won't changed once published like archived big images or video files</li>
+</ul>
+</aside>
+</section>
+
+<section>
+	<h3>Splitting Across Disks</h3>
+<pre><code class="apache" data-trim contenteditable>
+	proxy_cache_path /path/to/hdd1 levels=1:2 keys_zone=my_cache_hdd1:10m
+                 max_size=10g inactive=60m use_temp_path=off;
+proxy_cache_path /path/to/hdd2 levels=1:2 keys_zone=my_cache_hdd2:10m
+                 max_size=10g inactive=60m use_temp_path=off;
+
+split_clients $request_uri $my_cache {
+              50%          “my_cache_hdd1”;
+              50%          “my_cache_hdd2”;
+}
+
+server {
+    ...
+    location / {
+        proxy_cache $my_cache;
+        proxy_pass http://my_upstream;
+    }
+}
+	</code></pre>
+<aside class="notes">
+<p>Rather than build a RAID, and if you have mutliple hard disks, you can split the cache across the disks</p>
+</p> In the above example we're splitting the clients evenly across two disks based on 50% of the requests</p>
+</aside>
+</section>
+
+
+<section data-state="lab">
+		  <h3>Lab 7.1: Split Across Directories</h3>
+		  <ol>
+		  <li>Create two cache directories to emulate hard disks</li>
+		  <pre><code class="apache" data-trim contenteditable>
+		  	$ sudo mkdir -p /data/nginx/cache1 /data/nginx/cache2
+		  </code></pre>
+		<li>Setup <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">proxy_cache_path</span></pre> directives for each directory</li>
+		  <li>Use <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">split_clients</span></pre> to spread cache writes</li>
+		  <pre><code class="apache" data-trim contenteditable>
+		  	split_clients $request_uri $cache_dir {
+    		50%         "cache1";
+    		*           "cache2";
+}
+...
+proxy_cache $cache_dir;
+		  </code></pre>
+		
+		  <li>Run the following dynamic <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">curl</span></pre> request</li>
+		  <pre><code class="apache" data-trim contenteditable>
+$ for i in `seq 1 100` ; do curl -s -o /dev/null -w "%{http_code}" http://&#60;ec2-hostname&#62;/\?$i ; done
+		  </code></pre>
+		  <li>Run <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">top</span></pre> or check the status page</li>
+		</ol>
+		  <aside class ="notes">
+Full Solution:
+
+proxy_cache_path /tmp/cache1 levels=1:2 keys_zone=cache1:20m inactive=5m;
+proxy_cache_path /tmp/cache2 levels=1:2 keys_zone=cache2:20m inactive=5m;
+
+plit_clients $request_uri $cache_dir {
+    		50%         "cache1";
+    		*           "cache2";
+ }
+
+ server {
+ 	...
+ 	location /{
+ 	proxy_cache $my_cache;
+ 	proxy_pass http://127.0.0.1:8080/;
+ }
+}
+</aside>
+
+		</section>
+
+<section>
+	<h3>Cache Clusters</h3>
+	<p>High Cacpacity</h3>
+		<ul>
+			<li>Sharded Cache</li>
+			<li>"Hot" level Cache</li>
+
+		</ul>
+		<p>High Availability:
+		<ul>
+			<li>Shared Cache</li>
+			<ul>
+				<li>keepalived (VRRP)</li>
+				<li>All-Active GCE</li>
+			</ul>
+		</ul>
+	</p>
+	
+	
+<aside class="notes">
+</aside>
+</section>
+
+<section>
+	<h3>No Shared Disk?</h3>
+	<p>NGINX Plus is sensitive to disk latency, potentially overwhelmed by thread volumes, and requires cluster-wide locks that could result in overlapping cache operations</p>
+	<aside class="notes">
+		<p>Before we get into the high availablity and caching cluster solutions, it's important to address the elephant in the room. We get a lot of questions about why NGINX Plus can't share a disk-based cache between multiple NGINX Plus nodes--and it's because it was a deliberate design choice</p>
+<p>Storing a cache on a high‑latency, potentially unreliable shared filesystem is not a good design choice.  NGINX Plus is sensitive to disk latency due to it operating as a single threaded event looping mechinism. Even though the thread pools capability can offload read() and write() operations from the main thread, when the filesystem is slow and cache I/O is high then NGINX Plus may become overwhelmed by large volumes of threads. 
+</p>
+<p>Maintaining a consistent, shared cache across NGINX Plus instances would also require cluster‑wide locks to synchronize overlapping cache operations such as fills, reads, and deletes. Finally, shared filesystems introduce a source of unreliability and unpredictable performance to caching, where reliability and consistent performance is paramount.</p>
+	</aside>
+</section>
+
+
+<section>
+	<h3>Sharded Cache</h3>
+	<p>Primary Use Cases:</p>
+	<ul>
+		<li>High Capacity—partitioned across multiple servers</li>
+		<li>High Performance—minimizes origin server load</li>
+	</ul>
+	 <div style="float:right;width:100%;" class="centered">
+	<img src="assets/images/sharded-cache-traffic-flow.png" style="border:0;background:none;">
+</div>
+
+	
+<aside class="notes">
+	<p>The way sharding works is the total cache capacity is the sum of the cache capacity of each server. This pattern reduces the backend trips to the origin server because only one server attempts to cache each resource (usually based on a proxy_cache_key set at the Load Balancing tier), this way you don't have multiple indepedent copies of the same resource on each caching servers.</p>
+</aside>
+</section>
+
+
+<section>
+	<h3>Fault Tolerance Scenarios</h3>
+	<p> One node fails, only 1/N cached data is 'lost'. New nodes automatically partition entries</p>
+	 <div style="float:right;width:100%;" class="centered">
+	<img src="assets/images/sharded-cache-add-remove-server.png" style="border:0;background:none;">
+</div>
+	<aside class="notes">
+<p>Cache sharding uses a consistent hashing algorithm to select the one cache server for each cache entry. The diagram shows what happens to a cache sharded across three servers (left figure) when either one server goes down (middle figure) or another server is added (right figure).</p>
+
+<p>So diving deeper into this example we have the diagram on the left which displays each cache URL assigned by color: red, blue, or green servers according to hash value (proxy_cache_key). Let's say for example that the blue cache server fails, it's 1/3 of the share is distributed between the remaining red and green servers. Or, in another scenario, if an additional cache node is added to the caching upstream (the yellow partition), the new server takes 1/4 of the share from each of the currently working servers</p>
+
+	</aside>
+</section>
+
+<section>
+	<h3>Consistent Hashing</h3>
+	<pre><code class="apache" data-trim contenteditable>
+		upstream cache-servers {
+	hash $scheme$proxy_host$request_uri consistent;
+
+	server cache-server1;
+	server cache-server2;
+	server cache-server3;
+}
+	</code></pre>
+	<aside class="notes">
+<p>This approach is fault tolerant in the sense that if you have N cache servers and one fails, you lose only 1/N of your cache. This ‘lost portion’ is evenly distributed by the consistent hash across the remaining N –1 servers. Simpler hashing methods i.e. not using the 'consistent' parameter, would instead redistribute the entire cache across the remaining servers and you lose almost all of your cache during the redistribution--forcing the client to revalidate and make uneccsary backend trips</p>
+	</aside>
+</section>
+
+
+<section>
+	<h3>Combining LB and Cache Tiers</h3>
+	<div style="float:right;width:100%;" class="centered">
+	<img src="assets/images/sharded-cache-combined-with-lb-tier.png" style="border:0;background:none;">
+</div>
+	<aside class="notes">
+
+<p>You can combine the LB and Cache tiers. In this configuration, two virtual servers run on each NGINX Plus instance. The load‑balancing virtual server (“LB VS” in the figure) accepts requests from external clients and uses a consistent hash to distribute them across all NGINX Plus instances in the cluster, which are connected by an internal network.</p> 
+<p>The caching virtual server (“Cache VS”) on each NGINX Plus instance listens on its internal IP address for its share of requests, forwarding them to the origin server and caching the responses. This allows all NGINX Plus instances to act as caching servers, maximizing your cache capacity.</p>
+	</aside>
+</section>
+
+<section>
+	<h3>"Hot" Cache</h3>
+	<div style="float:right;width:100%;" class="centered">
+	<img src="assets/images/sharded-cache-first-hot-level.png" style="border:0;background:none;">
+</div>
+	<aside class="notes">
+<p>You can also configure a first‑level cache on the frontend LB tier for very hot (frequently accessed) content, using the large shared cache as a second‑level cache.</p>
+
+<p>This can improve performance and reduce the impact on the origin server if a second‑level cache tier fails, because content only needs to be refreshed as the first‑tier cache content gradually expires. This approach compliments any simliar or object lifecycle policies you've inacted either in your cloud or local storage so that the client doesn't make uncessary requests for pieces of content.</p>
+	</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Demo 7.1: Setting up the Cache Tier</h3>
+		  <p>Prerequisites</p>
+		  <ul>
+		  	<li>Load Balancer with NGINX Plus</li>
+		  	<li>Application Server (origin)</li>
+		  	<li>At least two NGINX Plus Cache Servers</li>
+		  	<ul>
+		  		<li>Extended Status enabled to see the cache fill</li>
+		  </ul>
+		  
+		  <aside class ="notes">
+
+</aside>
+
+		</section>
+
+<section data-state="lab">
+				  <h3>Demo 7.2: Sharding the Cache </h3>
+				  <ol>
+		  		<li>Enable <pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">consistent hash</span></pre> on the cache upstream</li>
+		  		<li>Make dynamic requests to spread across nodes</li>
+		  		<li>Stop NGINX processes on one of the cache servers, note that server responses are still sent from the second cache</li>
+		  	</ol>
+		  
+		  <aside class ="notes">
+		  	Sharding the Cache:
+
+- Spinup a load balancer and an application instance in GCE
+- Spinup two more load balancer instances (name them cache-servers)
+- SSH into the cache server(s) and backup the lb.conf
+- Create a new config called cache.conf
+- Change the server IPs to map to the internal IP addresses
+- Create directories to save the cached data
+- Repeat same steps for second cache server
+
+- SSH into the load-balancer instance
+- Change the upstream name to cache-pool
+- Change the IPs to map to the cache servers
+- Change the zone directive to “cache-pool”
+- Add hash $scheme$proxy_host$request_uri consistent;
+- Change the status_zone cache-pool
+- Change proxy_pass http://cache-pool/;
+- Reload all instances (load balancer, cache servers)
+
+- Open up the status dashboards for all 3 instances (LB, cache servers)
+- Note that due to the health check, all requests that pass through the load balancer are being severed from the cache.
+- Run a curl request against the external load balancer IP using -I flag e.g. curl -I http://104.196.241.243, you should see the cache status returning a hit, as well as displaying the origin server name “Application-Server”
+
+-Run a wrk test: wrk -t12 -c400 -d30s http://104.196.241.243/
+
+- Dynamic request: for i in `seq 1 100` ; do curl -s -o /dev/null -w "%{http_code}" http://104.196.241.243/\?$i ; done
+
+	- change {http_code} to {X-Cache-Status}
+	- log files
+
+Make sure all 3 servers return X-Cache-Status
+Create a shell script that sends 100 requests and prints number of different values X-Cache-Status
+
+Kill one server (comment out virtual server block or rename .conf)
+run script again
+with consistent hash, 1/3 will be MISS and 2/3 will be HIT
+then re-instate server
+
+then rinse and repeat and get rid of the consistent parameter
+
+run script again: 1/3 will be HIT and 2/3 will be MISS because keys are re-mapped
+
+
+
+hash directive causing session persistence i.e. only one resource is cached on one server, so requests for that resource will go to that server.
+
+
+CODE:
+<pre><code class="apache" data-trim contenteditable>
+#lb.conf
+
+upstream cache-pool {
+        hash $scheme$proxy_host$request_uri consistent;
+        server 10.138.0.4;
+        server 10.138.0.3;
+        zone cache-pool 64k;
+        sticky cookie GCPPersist expires=300;
+}
+
+…
+
+status_zone cache-pool;
+
+location / {
+	
+	proxy_pass http://cache-pool/;
+…
+
+#cache.conf
+
+proxy_cache_path /data/nginx/cache-blue keys_zone=blue_cache:10m levels=1:2 inactive=600s max_size=700m;
+upstream upstream_app_pool {
+        server 10.138.0.2;
+        zone upstream-apps 64k;
+        sticky cookie GCPPersist expires=300;
+}
+server {
+        listen 80 default_server;
+        server_name _;
+        error_page      404     /404.html;
+        error_page      500 502 503 504 /50x.html;
+        error_log       /var/log/nginx/lb-error.log notice;
+        proxy_cache_key $scheme$host$request_uri;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-Ip $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        location /50x.html {
+                root    /usr/share/nginx/html;
+        }
+        status_zone blue_cache;
+        location / {
+                proxy_cache blue_cache;
+                proxy_cache_valid 5m;
+                proxy_pass http://upstream_app_pool/;
+                add_header X-Cache-Status $upstream_cache_status;
+                health_check;
+                proxy_http_version 1.1;
+                proxy_set_header Connection "";
+        }
+        location /images {
+                root /usr/share/nginx;
+                }
+        location ~ /favicon.ico {
+                root /usr/share/nginx/images;
+        }
+        location ~ /status-old.html {
+                root /usr/share/nginx/html;
+        }
+}
+</code></pre>
+</aside>
+		</section>
+
+
+<section>
+	<h3>High Availability Cache</h3>
+	<div style="float:right;width:100%;" class="centered">
+	<img src="assets/images/shared-cache-ha-failover.png" style="border:0;background:none;">
+</div>
+<aside class="notes">
+	<p>If minimizing the number of requests to your origin servers at all costs is your primary goal, then the cache sharding solution is not the best option. Instead, a solution with careful configuration of primary and secondary NGINX Plus instances can meet your requirements:</p>
+
+	<p>The primary NGINX Plus instance receives all traffic and forwards requests to the secondary instance. The secondary instance retrieves the content from the origin server and caches it; the primary instance also caches the response from the secondary and returns it to the client.</p>
+
+<p>Both devices have fully populated caches and the cache is refreshed according to your configured timeouts.</p>
+
+</aside>
+</section>
+
+<section>
+	<h3>Primary Cache</h3>
+	<pre><code class="apache" data-trim contenteditable>
+		proxy_cache_path /tmp/mycache keys_zone=mycache:10m;
+server {
+    status_zone mycache;          # for NGINX Plus status dashboard
+    listen 80;
+    proxy_cache mycache;
+    proxy_cache_valid 200 15s;
+
+    location / {
+        proxy_pass http://secondary;
+    }
+}
+
+upstream secondary {
+    zone secondary 128k;          # for NGINX Plus status dashboard
+    server 192.168.56.11;         # secondary
+    server 192.168.56.12 backup;  # origin
+}
+	</code></pre>
+	<aside class="notes">
+<p>Configure the primary cache server to forward all requests to the secondary server and cache responses. As indicated by the backup parameter to the server directive in the upstream group, the primary server forwards requests directly to the origin server in the event that the secondary server fails:</p>
+	</aside>
+</section>
+
+<section>
+	<h3>Secondary Cache</h3>
+	<pre><code class="apache" data-trim contenteditable>
+		proxy_cache_path /tmp/mycache keys_zone=mycache:10m;
+server {
+    status_zone mycache;          # for NGINX Plus status dashboard
+    listen 80;
+    proxy_cache mycache;
+    proxy_cache_valid 200 15s;
+
+    location / {
+        proxy_pass http://origin;
+    }
+}
+
+upstream origin {
+    zone origin 128k;            # for NGINX Plus status dashboard
+    server 192.168.56.12;        # origin
+}
+	</code></pre>
+	<aside class="notes">
+<p>Configure the secondary cache server to forward requests to the origin server and cache responses</p>
+	</aside>
+</section>
+
+<section>
+	<h3>GCE HA Solution</h3>
+	<div style="float:left;width:60%;" class="centered">
+	<img src="assets/images/gce-all-active-load-balancing-topology.png" style="border:0;background:none; width:90%">
+</div>
+<div style="float:right;width:40%;">
+	<p>Advantages:</p>
+	<ol>
+		<li>Detects changes</li>
+		<li>Active checking</li>
+		<li>Automatic recovery</li>
+	</ol>
+	<p></p>
+	<div style="text-align:center;"><small>Deployment Guide: <a href="https://www.nginx.com/resources/deployment-guides/all-active-nginx-plus-load-balancing-gce/" target="_blank">All-Active GCE Load Balancer </a></small></div>
+</div>
+	<aside class="notes">
+<p>In order for the HA cache to work, you must configure HA so that the secondary server takes the incoming traffic if the primary fails; and the primary takes the traffic back when it subsequently recovers.</p>
+<p>If you're NGINX nodes are on prem you can use the keepalived VRRP solution, if you're using a hosting service like Google Cloud Engine, there is an admin guide on how to set this up yourself. Here is the diagram showing an all active load balancer that uses a GCE frontend load balancer to detect network changes at the NGINX Plus LB tier level. For example if one of these LB instances fails the GCE load balancer will detect the changes and load balance new requests to the other instance.</p>
+
+FULL STEPS:
+<ol>
+
+	</aside>
+</section>
+
+<section data-state="lab">
+		  <h3>Demo 8.1: HA Shared Cache </h3>
+		  <div style="float:right;width:100%;" class="centered">
+	<img src="assets/images/gce-lb-instances.png" style="border:0;background:none;">
+</div>
+		  <aside class ="notes">
+
+		  	Tell the class we will take a break so you can set this up (especially the GCE frontend load balancer)
+		  	GCE Shared Cache Lab steps
+
+1. Spin up an app instance group
+2. Spin up a primary cache instance group (1 image)
+3. Spin up a secondary cache instance group (1 image)
+4. SSH into the primary cache instance;
+	- make the secondary server the primary
+	- make the app server the backup
+	- check primary.conf and secondary.conf for examples
+5. Save and reload
+6. Edit the Fronted GCE LB as needed.
+6. Run the following command for testing
+	$ while sleep 1 ; do curl http://104.196.239.36/test/ ; done
+
+6. Mark the secondary server as “down” in the primary conf, notice how the requests still populate in the running command.
+7. stop the primary instance in GCE, the network load balancer will take a minute to detect the change, but after one or two failed connections will begin serving responses from the backup server’s cache fill.
+
+
+</aside>
+
+		</section>
+
+<section>
+	<h3>Failover Scenenarios</h3>
+	<div style="float:right;width:100%;" class="centered">
+	<img src="assets/images/shared-cache-primary-fails.png" style="border:0;background:none;">
+</div>
+<div style="float:right;width:100%;" class="centered">
+	<img src="assets/images/shared-cache-secondary-fails.png" style="border:0;background:none;">
+</div>
+	<aside class="notes">
+<p>There are two possible failover scenarios with the HA cache solution</p>
+<ol>
+	<li><p><strong>Primary Cache Server Fails:</strong> the NGINX Plus HA solution transfers the external IP address to the secondary.</p> <p>The secondary has a full cache and continues to operate as normal. There is no additional load on the origin server.</p><p>When the primary cache server recovers and starts receiving client traffic, its cache will be out of date and many entries will have expired. The primary will refresh its local cache from the secondary cache server; because the cache on the secondary server is already up‑to‑date, there is no increase in traffic to the origin server.</p></li>
+	<li><p><strong>Secondary Cache Server Fails:</strong> The primary detects this (using a health check configured as part of the HA solution) and forwards traffic directly to the backup server (which is the origin server).</p><p>The primary server has a full cache and continues to operate as normal. Once again, there is no additional load on the origin server.</p> <p>When the secondary recovers, its cache will be out of date. However, it will only receive requests from the primary when the primary’s cache expires, at which point the secondary’s copy will also have expired. Even though the secondary needs to make a request for content from the origin server, this does not increase the frequency of requests to the origin. There’s no adverse effect on the origin server.</p></li>
+</ol>
+	</aside>
+</section>
+
+		<section data-state="lab">
+		  <h3>Demo 8.2: Testing Failover </h3>
+		  <ol>
+		  	<li>Configure origin server</li>
+		  <pre><code class="apache" data-trim contenteditable>
+		  	access_log /var/log/nginx/access.log;
+location / {
+    return 200 "It's now $time_local\n";
+}
+		  </code></pre>
+		  <li>Configure cache validation</li>
+		  <pre><code class="apache" data-trim contenteditable>
+		  proxy_cache_valid 200 15s;
+		  </code></pre>
+		  <li>Verify cache behavor</li>
+		  <pre><code class="apache" data-trim contenteditable>
+		  $ while sleep 1 ; do curl http://&#60;external frontend lb ip&#62;/ ; done
+		</code></pre>
+		<li>Verfiy failover behavior (2nd scenario)</li>
+		<pre><code class="apache" data-trim contenteditable>
+		  $ nginx -s stop
+# Inspect log on origin server
+tail -f /var/log/nginx/access.log
+		 </code></pre>
+		  <aside class ="notes">
+		  	<ol>
+<li>To test our HA solution, we configure the origin server to log requests and to return the current time for each request. This means that the origin server’s response changes every second:</li>
+<li>The primary and secondary cache servers are already configured to cache responses with status code 200 for 15 seconds. This typically results in cache updates every 15 or 16 seconds.</li>
+<li>Once per second, we send an HTTP request to the highly available virtual IP address for the cache cluster. The response does not change until the caches on the primary and secondary servers expire and the response is refreshed from the origin server. This happens every 15 or 16 seconds.We can also inspect the logs on the origin server to confirm that it is receiving a request only every 15 or 16 seconds.</li>
+<li>We can verify that the failover is working correctly by stopping either the primary or the secondary server, for example, by stopping the nginx processes. The constant‑load test continues to run, and the response is consistently cached.
+
+Inspecting the access log on the origin server confirms that it only ever receives a request every 15 to 16 seconds, no matter which of the cache servers fails or recovers.</li>
+</ol>
+</aside>
+
+		</section>
+
+
+<section>
+	<h3>Timing Cache Updates</h3>
+	<p><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 30px;">expires</span></pre> headers that are shared by mutliple instances, could result in time stamp mismatch. It's recommended to shorten the cache timeout on the secondary server</p>
+	<aside class="notes">
+<p>In a stable situation, the cached content is normally updated every 15 to 16 seconds. The content expires after 15 seconds, and there is a delay of up to 1 second before the next request is received, causing a cache update.</p>
+
+<p>Sometimes, the cache will appear to update slowly (up to 30 seconds between changes in content). This can happen if the primary cache server’s content expires and the primary retrieves cached content that is 'almost' expired from the secondary server. To fix this potential problem, you can always try and configure a shorter cache timeout on the secondary server.</p>
+	</aside>
+</section>
+
+<section>
+	<h3><pre style="display:inline; color:rgb(240,168,40);"><span style="font-size: 60px;">nginx-sync</span></pre></h3>
+	<p>Share configurations in an HA cluster</p>
+<div style="float:right;width:100%;" class="centered">
+	<img src="assets/images/nginx-sync-sh.png" style="border:0;background:none;">
+</div>	
+	<div style="text-align:center;"><small>Documentation: <a href="https://www.nginx.com/blog/nginx-plus-r12-released/#r12-config-sharing" target="_blank">nginx-sync</a></small></div>
+	<aside class="notes"></aside>
+</section>
+
+
+
+
+                 <!--Next Section-->
+		<section data-background="rgb(20, 149, 62)">
+                  <h2>Additional Resources</h2>
+                 </section>
+
+		<section>
+                  <h3>Further Information</h3>
+                  <li><a href="https://nginx.org/en/docs/" target="_blank">NGINX Documentation</a></li>
+                  <li><a href="https://www.nginx.com/resources/admin-guide/" target="_blank">NGINX Admin Guides</a></li>
+                  <li><a href="https://www.nginx.com/blog/" target="_blank">NGINX Blog</a></li>
+                  <aside class="notes"></aside>
+                 </section>
+
+                 <section>
+                   <h3>Q&A</h3>
+                   <li><a href="http://www.surveygizmo.com/s3/3449621/NGINX-Plus-Adv-Caching-Survey" target="_blank">Survey!</a></li>
+                   <li>Sales: <a href="mailto:nginx-inquiries@nginx.com" target="_top">nginx-inquiries@nginx.com</a></li>
+                   <aside class="notes"></aside>
+                 </section>
+		</div>
+	  </div>
+	  
+      <script src="lib/js/jquery-2.2.4.min.js"></script>
+      <script src="lib/js/head.min.js"></script>
+	  <script src="js/reveal.js"></script>
+
+	  <script>
+
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+            //width: 1200,
+
+
+            controls: true,
+				progress: true,
+				history: true,
+				center: true,
+                slideNumber: true,
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+          			{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'lib/js/jquery-2.2.4.min.js'},
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/external/external.js', condition: function() { return !!document.querySelector( '[data-external]' ); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+            Reveal.addEventListener( 'slidechanged', function( event ) {
+//            console.log(event.currentSlide.getAttribute("data-state"))
+// if we're on a lab slide, unhide the lab image, otherwise hide it.
+
+
+            if(event.currentSlide.getAttribute("data-state") === "lab"){
+                //document.getElementById("lab_pic").style.visibility="visible";
+
+
+            if(document.getElementById("lab_pic").style.visibility=="visible"){
+                document.getElementById("lab_pic").style.visibility="visible";
+            }else{
+      $("#lab_pic").css({opacity: 0.0, visibility: "visible"}).animate({opacity: 1}, 200);
+            }
+
+            }else{
+               //(document.getElementById("lab_pic").style.visibility=="hidden";
+               $("#lab_pic").css({opacity: 1.0, visibility: "hidden"}).animate({opacity: 0}, 200);
+            }
+
+            } );
+
+		</script>
+
+	</body>
+</html>
